@@ -59,7 +59,7 @@ Various static checks:
 
       - name: Run tests
         run: dart test
-``
+```
 
 ## Matrix testing
 
