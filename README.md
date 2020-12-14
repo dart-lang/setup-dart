@@ -1,5 +1,7 @@
 # setup-dart
 
+[![Dart](https://github.com/dart-lang/setup-dart/workflows/Dart/badge.svg)](https://github.com/dart-lang/setup-dart/actions?query=workflow%3A%22Dart%22+branch%3Amain)
+
 This [GitHub Action]() installs and sets up of a Dart SDK for use in actions by:
 
 * Downloading the Dart SDK
@@ -46,7 +48,6 @@ Various static checks:
 ```
 ...
     steps:
-      - uses: actions/checkout@v2
 
       - name: Install dependencies
         run: dart pub get
