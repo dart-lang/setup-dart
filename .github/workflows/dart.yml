@@ -1,0 +1,25 @@
+name: Dart
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        channel: [stable, beta, dev]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          channel: ${{ matrix.channel }}
+
+      - name: Run hello world
+        run: |
+          echo "main() { print('hello world'); }" > hello.dart
+          dart hello.dart
