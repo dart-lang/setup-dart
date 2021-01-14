@@ -3,7 +3,7 @@
 ###############################################################################
 # Bash script that downloads and does setup for a Dart SDK.                   #
 # Takes three params; first listed is the default:                            #
-# $1: Dart channel: stable|beta|dev                                           #
+# $1: Dart channel: stable<@version>|beta<@version>|dev<@version>             #
 # $2: OS: Linux|Windows|macOS                                                 #
 # $3: ARCH: x64|ia32                                                          #
 ###############################################################################
@@ -11,15 +11,23 @@
 
 # Parse args.
 CHANNEL="${1:-stable}"
-OS="${2:-Linux}"
-ARCH="${3:-x64}"
+VERSION=$(echo $CHANNEL | cut -s -d'@' -f 2)
+if [[ ! "$VERSION" ]]
+then
+  VERSION=latest
+else
+  # A version was specified, but the channel should just be the first part before the version delimiter
+  CHANNEL=$(echo $CHANNEL | cut -s -d'@' -f 1)
+fi
+OS="${3:-Linux}"
+ARCH="${4:-x64}"
 OS=$(echo "$OS" | awk '{print tolower($0)}')
-echo "Installing Dart SDK from the ${CHANNEL} channel on ${OS}-${ARCH}"
+echo "Installing Dart SDK version \"${VERSION}\" from the ${CHANNEL} channel on ${OS}-${ARCH}"
 
 # Calculate download Url. Based on:
 # https://dart.dev/tools/sdk/archive#download-urls
 PREFIX="https://storage.googleapis.com/dart-archive/channels"
-URL="${PREFIX}/${CHANNEL}/release/latest/sdk/dartsdk-${OS}-${ARCH}-release.zip"
+URL="${PREFIX}/${CHANNEL}/release/${VERSION}/sdk/dartsdk-${OS}-${ARCH}-release.zip"
 echo "Downloading ${URL}..."
 
 # Download installation zip.

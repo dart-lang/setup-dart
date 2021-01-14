@@ -98,6 +98,42 @@ jobs:
         run: dart test
 ```
 
+## Specifying a stable version
+
+By default, the `latest` release is used that has been published within the specified `channel`.
+
+If you want to test on a previous release from the `stable` channel, you can specify it following an `@` 
+delimiter as shown below:
+
+```
+name: Dart
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        channel: [stable, stable@2.7.2]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v1
+        with:
+          channel: ${{ matrix.channel }}
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Run tests
+        run: dart test
+```
+
 # License
 
 See the [`LICENSE`](LICENSE) file.
