@@ -19,8 +19,8 @@ else
   # A version was specified, but the channel should just be the first part before the version delimiter
   CHANNEL=$(echo $CHANNEL | cut -s -d'@' -f 1)
 fi
-OS="${3:-Linux}"
-ARCH="${4:-x64}"
+OS="${2:-Linux}"
+ARCH="${3:-x64}"
 OS=$(echo "$OS" | awk '{print tolower($0)}')
 echo "Installing Dart SDK version \"${VERSION}\" from the ${CHANNEL} channel on ${OS}-${ARCH}"
 
