@@ -31,7 +31,7 @@ jobs:
       - uses: dart-lang/setup-dart@v1
 
       - name: Install dependencies
-        run: dart pub get~~~~
+        run: dart pub get
 
       - name: Hello world
         run: dart bin/hello_world.dart
@@ -42,7 +42,7 @@ jobs:
 Various static checks:
 
   1) Check static analysis with the Dart analyzer
-  2) Check code follows Dart ideomatic formatting
+  2) Check code follows Dart idiomatic formatting
   3) Check that unit tests pass
 
 ```
