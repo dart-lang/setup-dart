@@ -31,7 +31,7 @@ jobs:
       - uses: dart-lang/setup-dart@v1
 
       - name: Install dependencies
-        run: dart pub get
+        run: dart pub get~~~~
 
       - name: Hello world
         run: dart bin/hello_world.dart
@@ -67,7 +67,7 @@ Various static checks:
 Double matrix across two dimensions:
 
   - All three major operating systems: Linux, macOS, and Windows.
-  - Dart release channels: stable, beta, dev.
+  - Dart SDK: stable, beta, dev, or a specific version string.
 
 ```
 name: Dart
@@ -84,54 +84,18 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        channel: [stable, beta, dev]
+        sdk: [stable, 2.7.2, 2.12.0-1.4.beta, beta, dev]
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v1
         with:
-          channel: ${{ matrix.channel }}
+          sdk: ${{ matrix.sdk }}
 
       - name: Install dependencies
-        run: dart pub get
+        run: pub get
 
       - name: Run tests
-        run: dart test
-```
-
-## Specifying a stable version
-
-By default, the `latest` release is used that has been published within the specified `channel`.
-
-If you want to test on a previous release from the `stable` channel, you can specify it following an `@` 
-delimiter as shown below:
-
-```
-name: Dart
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
-jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        channel: [stable, stable@2.7.2]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@v1
-        with:
-          channel: ${{ matrix.channel }}
-
-      - name: Install dependencies
-        run: dart pub get
-
-      - name: Run tests
-        run: dart test
+        run: pub run test
 ```
 
 # License

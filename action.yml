@@ -1,12 +1,18 @@
 name: "Setup Dart SDK"
 description: "Setup the Dart SDK, and add it to the PATH"
 inputs:
+  # @deprecated - Use sdk instead.
   channel:
-    description: "The release channel to install from ('stable', 'stable@version', 'beta', or 'dev')"
+    description: "The release channel to install from ('stable', 'beta', or 'dev'). DEPRECATED. Use sdk instead."
+    required: false
+    # none is used only to assert whether the consumer has stopped using this deprecated input.
+    default: "none"
+  sdk:
+    description: "The channel, or a specific version from a channel to install ('stable', 'beta', 'dev', '2.7.2', '2.12.0-1.4.beta'). Using one of the three channels instead of a version will give you the latest version published to that channel."
     required: false
     default: "stable"
 runs:
   using: "composite"
   steps:
-    - run: $GITHUB_ACTION_PATH/setup.sh ${{ inputs.channel }} ${{ runner.os }}
+    - run: $GITHUB_ACTION_PATH/setup.sh ${{ inputs.sdk }} ${{ inputs.channel }} ${{ runner.os }}
       shell: bash

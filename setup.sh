@@ -3,24 +3,45 @@
 ###############################################################################
 # Bash script that downloads and does setup for a Dart SDK.                   #
 # Takes three params; first listed is the default:                            #
-# $1: Dart channel: stable<@version>|beta<@version>|dev<@version>             #
-# $2: OS: Linux|Windows|macOS                                                 #
-# $3: ARCH: x64|ia32                                                          #
+# $1: Dart SDK version/channel: stable|beta|dev|<version_string>              #
+# $2: Dart channel (DEPRECATED): stable|beta|dev                              #
+# $3: OS: Linux|Windows|macOS                                                 #
+# $4: ARCH: x64|ia32                                                          #
 ###############################################################################
 
-
 # Parse args.
-CHANNEL="${1:-stable}"
-VERSION=$(echo $CHANNEL | cut -s -d'@' -f 2)
-if [[ ! "$VERSION" ]]
+SDK="${1:-stable}"
+# Check for use of deprecated channel input
+DEPRECATED_CHANNEL=${2}
+if [[ $DEPRECATED_CHANNEL != "none" ]]
 then
+  echo "WARNING: The channel input of the setup-dart Github action is deprecated. Use the sdk input instead."
+  SDK=$DEPRECATED_CHANNEL
+fi
+
+CHANNEL=
+VERSION=
+
+# Check for a specific version
+if [[ $SDK == stable || $SDK == beta || $SDK == dev ]]
+then
+  CHANNEL=$SDK
   VERSION=latest
 else
-  # A version was specified, but the channel should just be the first part before the version delimiter
-  CHANNEL=$(echo $CHANNEL | cut -s -d'@' -f 1)
+  CHANNEL=stable
+  VERSION=$SDK
+  # Derive the channel from the version string
+  if [[ "$SDK" == *"dev"* ]]
+  then
+    CHANNEL=dev
+  elif [[ "$SDK" == *"beta"* ]]
+  then
+    CHANNEL=beta
+  fi
 fi
-OS="${2:-Linux}"
-ARCH="${3:-x64}"
+
+OS="${3:-Linux}"
+ARCH="${4:-x64}"
 OS=$(echo "$OS" | awk '{print tolower($0)}')
 echo "Installing Dart SDK version \"${VERSION}\" from the ${CHANNEL} channel on ${OS}-${ARCH}"
 
