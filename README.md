@@ -98,6 +98,12 @@ jobs:
         run: pub run test
 ```
 
+> __NOTE:__ The above example is using the deprecated global `pub` executable instead of `dart pub` - which was released in `2.12.0`.
+> 
+> When specifying a version that precedes the `2.12.0` release _(like `2.7.2` from the above example)_ - the commands need to work across all versions in the matrix.
+> 
+> If you are not testing version(s) that precede the `2.12.0` release, use `dart pub get` / `dart test` instead of `pub get` / `pub run test`.
+
 # License
 
 See the [`LICENSE`](LICENSE) file.
