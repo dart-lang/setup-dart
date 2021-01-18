@@ -10,9 +10,27 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        channel: [stable, beta, dev]
+        sdk: [stable, 2.7.2, 2.12.0-133.7.beta, beta, dev ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          sdk: ${{ matrix.sdk }}
+
+      - name: Run hello world
+        run: |
+          echo "main() { print('hello world'); }" > hello.dart
+          dart hello.dart
+
+  test_deprecated_channel:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        channel: [ stable ]
     steps:
       - uses: actions/checkout@v2
       - uses: ./

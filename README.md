@@ -42,7 +42,7 @@ jobs:
 Various static checks:
 
   1) Check static analysis with the Dart analyzer
-  2) Check code follows Dart ideomatic formatting
+  2) Check code follows Dart idiomatic formatting
   3) Check that unit tests pass
 
 ```
@@ -67,7 +67,7 @@ Various static checks:
 Double matrix across two dimensions:
 
   - All three major operating systems: Linux, macOS, and Windows.
-  - Dart release channels: stable, beta, dev.
+  - Dart SDK: stable, beta, dev, or a specific version string.
 
 ```
 name: Dart
@@ -84,19 +84,25 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        channel: [stable, beta, dev]
+        sdk: [stable, 2.7.2, 2.12.0-1.4.beta, beta, dev]
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v1
         with:
-          channel: ${{ matrix.channel }}
+          sdk: ${{ matrix.sdk }}
 
       - name: Install dependencies
-        run: dart pub get
+        run: pub get
 
       - name: Run tests
-        run: dart test
+        run: pub run test
 ```
+
+> __NOTE:__ The above example is using the deprecated global `pub` executable instead of `dart pub` - which was released in `2.12.0`.
+> 
+> When specifying a version that precedes the `2.12.0` release _(like `2.7.2` from the above example)_ - the commands need to work across all versions in the matrix.
+> 
+> If you are not testing version(s) that precede the `2.12.0` release, use `dart pub get` / `dart test` instead of `pub get` / `pub run test`.
 
 # License
 
