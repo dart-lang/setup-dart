@@ -13,7 +13,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: [stable, 2.7.2, 2.12.0-133.7.beta, beta, dev ]
+        # Test latest stable, beta, and dev channels + last stable release
+        # prior to the introduction of the unified `dart` developer tool.
+        sdk: [stable, beta, dev, 2.9.3]
     steps:
       - uses: actions/checkout@v2
       - uses: ./
@@ -25,6 +27,7 @@ jobs:
           echo "main() { print('hello world'); }" > hello.dart
           dart hello.dart
 
+  # TODO: Remove this step after v0.2 (https://github.com/dart-lang/setup-dart/issues/12).
   test_deprecated_channel:
     runs-on: ubuntu-latest
     strategy:
