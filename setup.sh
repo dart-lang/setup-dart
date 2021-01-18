@@ -15,7 +15,7 @@ SDK="${1:-stable}"
 DEPRECATED_CHANNEL=${2}
 if [[ $DEPRECATED_CHANNEL != "none" ]]
 then
-  echo "WARNING: The channel input of the setup-dart Github action is deprecated. Use the sdk input instead."
+  echo -e "::warning::The channel input is deprecated. Use the sdk input instead."
   SDK=$DEPRECATED_CHANNEL
 fi
 
