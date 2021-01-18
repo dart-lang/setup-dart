@@ -153,7 +153,7 @@ jobs:
 
 ## v0.2
 
-  * Added support for testing requesting a specific SDK version (e.g. 2.10.0).
+  * Added support for installing a specific SDK version (e.g. `2.10.0`).
 
 ## v0.1
 
