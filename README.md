@@ -13,7 +13,7 @@ This [GitHub Action]() installs and sets up of a Dart SDK for use in actions by:
 
 Install the latest stable SDK, and run Hello World.
 
-```
+```yml
 name: Dart
 
 on:
@@ -45,7 +45,7 @@ Various static checks:
   2) Check code follows Dart idiomatic formatting
   3) Check that unit tests pass
 
-```
+```yml
 ...
     steps:
 
@@ -67,9 +67,9 @@ Various static checks:
 Double matrix across two dimensions:
 
   - All three major operating systems: Linux, macOS, and Windows.
-  - Dart SDK: stable, beta, dev, or a specific version string.
+  - Dart SDK: Latest stable, beta & dev plus two specific versions.
 
-```
+```yml
 name: Dart
 
 on:
@@ -84,7 +84,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: [stable, 2.7.2, 2.12.0-1.4.beta, beta, dev]
+        sdk: [stable, beta, dev, 2.10.3, 2.12.0-29.10.beta]
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v1
@@ -92,17 +92,72 @@ jobs:
           sdk: ${{ matrix.sdk }}
 
       - name: Install dependencies
-        run: pub get
+        run: dart pub get
 
+      - name: Run tests
+        run: dart test
+```
+
+## Testing older Dart SDKs
+
+The Dart SDK continously evolves, and new features and tools are added. The Dart
+2.10 SDK introduced a new unified `dart` developer tool, which is what we use in
+the usage examples above for installing dependencies, verifying formatting,
+analyzing, etc. If you need to test a combination of SDKs before and after Dart
+2.10, we recommend splitting your test job as illustrated here:
+
+```yml
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        sdk: [stable, beta, dev]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@main
+        with:
+          sdk: ${{ matrix.sdk }}
+      - name: Install dependencies
+        run: dart pub get
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed .
+      - name: Analyze code
+        run: dart analyze
+      - name: Run tests
+        run: dart test
+
+  test_old_sdks:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        sdk: [2.9.0, 2.8.1]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@main
+        with:
+          sdk: ${{ matrix.sdk }}
+      - name: Install dependencies
+        run: pub get
+      - name: Check formatting
+        run: dartfmt --dry-run --set-exit-if-changed .
+      - name: Analyze code
+        run: dartanalyzer --fatal-warnings .
       - name: Run tests
         run: pub run test
 ```
 
-> __NOTE:__ The above example is using the deprecated global `pub` executable instead of `dart pub` - which was released in `2.12.0`.
-> 
-> When specifying a version that precedes the `2.12.0` release _(like `2.7.2` from the above example)_ - the commands need to work across all versions in the matrix.
-> 
-> If you are not testing version(s) that precede the `2.12.0` release, use `dart pub get` / `dart test` instead of `pub get` / `pub run test`.
+# Version history
+
+## v0.2
+
+  * Added support for testing requesting a specific SDK version (e.g. 2.10.0).
+
+## v0.1
+
+  * Initial version.
 
 # License
 
