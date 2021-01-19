@@ -37,7 +37,6 @@ else
   elif [[ "$SDK" == *"beta"* ]]
   then
     CHANNEL=beta
-  fi
   elif [[ "$SDK" == *"main"* ]]
   then
     echo -e "::error::Versions cannot be specified for builds from the main channel."
