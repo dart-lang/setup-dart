@@ -64,10 +64,13 @@ Various static checks:
 
 ## Matrix testing
 
-Double matrix across two dimensions:
+You can create matrix jobs that run tests on multiple operating systems, and
+multiple versions of the Dart SDK.
+
+The following example create a double matrix across two dimensions:
 
   - All three major operating systems: Linux, macOS, and Windows.
-  - Dart SDK: Latest stable, beta & dev plus two specific versions.
+  - Five Dart SDKs: Latest stable, beta & dev plus two specific versions.
 
 ```yml
 name: Dart
