@@ -13,9 +13,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        # Test latest stable, beta, and dev channels + last stable release
+        # Test latest stable, beta, dev, and main channels + last stable release
         # prior to the introduction of the unified `dart` developer tool.
-        sdk: [stable, beta, dev, 2.9.3, 2.12.0-29.10.beta]
+        sdk: [stable, beta, dev, main, 2.9.3, 2.12.0-29.10.beta]
     steps:
       - uses: actions/checkout@v2
       - uses: ./
