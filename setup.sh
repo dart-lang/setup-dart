@@ -57,7 +57,6 @@ if [[ $SDK == main]]
 then
   URL="${PREFIX}/be/raw/latest/sdk/${BUILD}"
 else
-then
   URL="${PREFIX}/${CHANNEL}/release/${VERSION}/${BUILD}"
 fi
 echo "Downloading ${URL}..."
