@@ -164,6 +164,10 @@ jobs:
 
 # Version history
 
+## v0.3
+
+  * Added support for installing SDKs from the `main` channel.
+
 ## v0.2
 
   * Added support for installing a specific SDK version (e.g. `2.10.0`).
