@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  test_general:
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
