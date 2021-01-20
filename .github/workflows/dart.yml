@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  test_general:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -21,6 +21,25 @@ jobs:
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
+
+      - name: Run hello world
+        run: |
+          echo "main() { print('hello world'); }" > hello.dart
+          dart hello.dart
+
+  test_arch:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk: [stable, beta, dev, 2.9.3, 2.12.0-29.10.beta]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          sdk: ${{ matrix.sdk }}
+          os: windows-latest
+          architecture: ia32
 
       - name: Run hello world
         run: |
