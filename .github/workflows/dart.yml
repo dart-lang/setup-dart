@@ -28,7 +28,7 @@ jobs:
           dart hello.dart
 
   test_arch:
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
@@ -38,7 +38,6 @@ jobs:
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
-          os: windows-latest
           architecture: ia32
 
       - name: Run hello world
