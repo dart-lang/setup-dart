@@ -5,8 +5,12 @@ inputs:
     description: "The channel, or a specific version from a channel to install ('stable', 'beta', 'dev', '2.7.2', '2.12.0-1.4.beta'). Using one of the three channels instead of a version will give you the latest version published to that channel."
     required: false
     default: "stable"
+  architecture:
+    description: "The CPU architecture ('x64', 'ia32', 'arm', or 'arm64')."
+    required: false
+    default: "x64"
 runs:
   using: "composite"
   steps:
-    - run: $GITHUB_ACTION_PATH/setup.sh ${{ inputs.sdk }} ${{ runner.os }}
+    - run: $GITHUB_ACTION_PATH/setup.sh ${{ inputs.sdk }} ${{ runner.os }} ${{ inputs.architecture }}
       shell: bash

@@ -19,6 +19,11 @@ The action takes the following inputs:
       Available channels are `stable`, `beta`, `dev`, and `main`. See
       https://dart.dev/tools/sdk/archive for details.
 
+  * `architecture`: The CPU architecture to setup support for. Valid options are
+    `x64`, `ia32`, `arm`, and `arm64`. Note that not all CPU architectures are
+    supported on all operating systems; see https://dart.dev/tools/sdk/archive
+    for valid combinations.
+
 ## Basic example
 
 Install the latest stable SDK, and run Hello World.
@@ -166,7 +171,8 @@ jobs:
 
 ## v0.4
 
-   * Removed previously deprecated input `channel`. Use the `sdk` input instead.
+  * Removed previously deprecated input `channel`. Use the `sdk` input instead.
+  * Added support for specifying the CPU architecture.
 
 ## v0.3
 
