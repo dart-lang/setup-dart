@@ -44,21 +44,3 @@ jobs:
         run: |
           echo "main() { print('hello world'); }" > hello.dart
           dart hello.dart
-
-  # TODO: Remove this step after v0.2 (https://github.com/dart-lang/setup-dart/issues/12).
-  test_deprecated_channel:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        channel: [ stable ]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./
-        with:
-          channel: ${{ matrix.channel }}
-
-      - name: Run hello world
-        run: |
-          echo "main() { print('hello world'); }" > hello.dart
-          dart hello.dart
