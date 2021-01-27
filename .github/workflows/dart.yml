@@ -27,6 +27,24 @@ jobs:
           echo "main() { print('hello world'); }" > hello.dart
           dart hello.dart
 
+  test_arch:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk: [stable, beta, dev, 2.9.3, 2.12.0-29.10.beta]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          sdk: ${{ matrix.sdk }}
+          architecture: ia32
+
+      - name: Run hello world
+        run: |
+          echo "main() { print('hello world'); }" > hello.dart
+          dart hello.dart
+
   # TODO: Remove this step after v0.2 (https://github.com/dart-lang/setup-dart/issues/12).
   test_deprecated_channel:
     runs-on: ubuntu-latest
