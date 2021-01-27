@@ -164,6 +164,10 @@ jobs:
 
 # Version history
 
+## v0.4
+
+   * Removed previously deprecated input `channel`. Use the `sdk` input instead.
+
 ## v0.3
 
   * Added support for installing SDKs from the `main` channel.
