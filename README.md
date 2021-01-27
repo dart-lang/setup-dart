@@ -171,6 +171,7 @@ jobs:
 
 ## v0.4
 
+  * Removed previously deprecated input `channel`. Use the `sdk` input instead.
   * Added support for specifying the CPU architecture.
 
 ## v0.3

@@ -9,20 +9,9 @@
 # $4: ARCH: x64|ia32                                                          #
 ###############################################################################
 
-# Parse args.
+# Parse SDK and version args.
 SDK="${1:-stable}"
-# Check for use of deprecated channel input
-DEPRECATED_CHANNEL=${2}
-if [[ $DEPRECATED_CHANNEL != "none" ]]
-then
-  echo -e "::warning::The channel input is deprecated. Use the sdk input instead."
-  SDK=$DEPRECATED_CHANNEL
-fi
-
-CHANNEL=
 VERSION=
-
-# Check for a specific version
 if [[ $SDK == stable || $SDK == beta || $SDK == dev || $SDK == main ]]
 then
   CHANNEL=$SDK
@@ -44,8 +33,8 @@ else
   fi
 fi
 
-OS="${3:-Linux}"
-ARCH="${4:-x64}"
+OS="${2:-Linux}"
+ARCH="${3:-x64}"
 OS=$(echo "$OS" | awk '{print tolower($0)}')
 echo "Installing Dart SDK version \"${VERSION}\" from the ${CHANNEL} channel on ${OS}-${ARCH}"
 
