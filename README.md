@@ -9,7 +9,17 @@ This [GitHub Action]() installs and sets up of a Dart SDK for use in actions by:
 
 # Usage
 
-## Basic
+## Inputs
+
+The action takes the following inputs:
+
+  * `sdk`: Which SDK version to setup. Can be specified using one of two forms:
+    * A specific SDK version, e.g. `2.7.2` or `2.12.0-1.4.beta`
+    * A release channel, which will install the latest build from that channel.
+      Available channels are `stable`, `beta`, `dev`, and `main`. See
+      https://dart.dev/tools/sdk/archive for details.
+
+## Basic example
 
 Install the latest stable SDK, and run Hello World.
 
@@ -37,7 +47,7 @@ jobs:
         run: dart bin/hello_world.dart
 ```
 
-## Check static analysis, formatting, and tests
+## Check static analysis, formatting, and test example
 
 Various static checks:
 
@@ -62,7 +72,7 @@ Various static checks:
         run: dart test
 ```
 
-## Matrix testing
+## Matrix testing example
 
 You can create matrix jobs that run tests on multiple operating systems, and
 multiple versions of the Dart SDK.
@@ -101,7 +111,7 @@ jobs:
         run: dart test
 ```
 
-## Testing older Dart SDKs
+## Testing older Dart SDKs example
 
 The Dart SDK continously evolves, and new features and tools are added. The Dart
 2.10 SDK introduced a new unified `dart` developer tool, which is what we use in
@@ -154,9 +164,13 @@ jobs:
 
 # Version history
 
-## v0.3
+## v0.4
 
   * Added support for specifying the machine architecture (x64 or ia32).
+
+## v0.3
+
+  * Added support for installing SDKs from the `main` channel.
 
 ## v0.2
 
