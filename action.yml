@@ -12,7 +12,7 @@ inputs:
     required: false
     default: "stable"
   architecture:
-    description: "The CPU architecture ('x64 or ia32')."
+    description: "The CPU architecture ('x64', 'ia32', 'arm', or 'arm64')."
     required: false
     default: "x64"
 runs:
