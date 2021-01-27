@@ -12,7 +12,7 @@ inputs:
     required: false
     default: "stable"
   architecture:
-    description: "The CPU architecture ('x64 or ia32'). Supported on macOS and Linux only."
+    description: "The CPU architecture ('x64 or ia32')."
     required: false
     default: "x64"
 runs:
