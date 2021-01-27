@@ -171,7 +171,7 @@ jobs:
 
 ## v0.4
 
-  * Added support for specifying the machine architecture (x64 or ia32).
+  * Added support for specifying the CPU architecture.
 
 ## v0.3
 
