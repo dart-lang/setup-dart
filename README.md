@@ -154,6 +154,10 @@ jobs:
 
 # Version history
 
+## v0.3
+
+  * Added support for specifying the machine architecture (x64 or ia32).
+
 ## v0.2
 
   * Added support for installing a specific SDK version (e.g. `2.10.0`).
