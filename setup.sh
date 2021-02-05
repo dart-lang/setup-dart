@@ -59,8 +59,8 @@ if [ $? -ne 0 ]; then
 fi
 rm "${HOME}/dartsdk.zip"
 
-# Configure pub to use a fixed location (standard behavoir uses a different location on Windows).
-export PUB_CACHE="${HOME}/.pub-cache"
+# Configure pub to use a fixed location.
+echo "PUB_CACHE=${HOME}/.pub-cache" >> $GITHUB_ENV
 
 # Update paths.
 echo "${HOME}/.pub-cache/bin" >> $GITHUB_PATH
