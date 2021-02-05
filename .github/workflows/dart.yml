@@ -61,6 +61,7 @@ jobs:
       - name: Global activate + run
         run: |
           dart pub global activate stagehand
+          echo "${HOME}/.pub-cache/bin"
           mkdir testapp
           cd testapp
           stagehand console-simple
