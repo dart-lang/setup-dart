@@ -63,6 +63,6 @@ jobs:
           dart pub global activate stagehand
           mkdir testapp
           cd testapp
-          dart pub global run stagehand console-simple
+          stagehand console-simple
           dart pub get
           dart run
