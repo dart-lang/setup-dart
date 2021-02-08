@@ -169,6 +169,9 @@ jobs:
 
 # Version history
 
+## v0.5
+  * Fixed a Windows `pub global activate` path issue.
+
 ## v0.4
 
   * Removed previously deprecated input `channel`. Use the `sdk` input instead.

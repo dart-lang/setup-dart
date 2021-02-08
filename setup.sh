@@ -59,6 +59,9 @@ if [ $? -ne 0 ]; then
 fi
 rm "${HOME}/dartsdk.zip"
 
+# Configure pub to use a fixed location.
+echo "PUB_CACHE=${HOME}/.pub-cache" >> $GITHUB_ENV
+
 # Update paths.
 echo "${HOME}/.pub-cache/bin" >> $GITHUB_PATH
 echo "${RUNNER_TOOL_CACHE}/dart-sdk/bin" >> $GITHUB_PATH
