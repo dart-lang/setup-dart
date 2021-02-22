@@ -134,7 +134,7 @@ jobs:
         sdk: [stable, beta, dev]
     steps:
       - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@main
+      - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.sdk }}
       - name: Install dependencies
@@ -154,7 +154,7 @@ jobs:
         sdk: [2.9.0, 2.8.1]
     steps:
       - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@main
+      - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.sdk }}
       - name: Install dependencies
@@ -168,6 +168,9 @@ jobs:
 ```
 
 # Version history
+
+## v1.0
+  * Promoted to 1.0 stable.
 
 ## v0.5
   * Fixed a Windows `pub global activate` path issue.
