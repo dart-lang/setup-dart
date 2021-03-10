@@ -1,6 +1,11 @@
 #!/bin/bash
 
 ###############################################################################
+# Copyright (c) 2021, the Dart project authors.                               #
+#                                                                             #
+# Use of this source code is governed by a BSD-style license that can be.     #
+# found in the LICENSE file.                                                  #
+#                                                                             #
 # Bash script that downloads and does setup for a Dart SDK.                   #
 # Takes three params; first listed is the default:                            #
 # $1: Dart SDK version/channel: stable|beta|dev|main|<version_string>         #
