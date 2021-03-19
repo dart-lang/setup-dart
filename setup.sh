@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2021, the Dart project authors.
+# Copyright (c) 2020, the Dart project authors.
 #
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
