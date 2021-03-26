@@ -2,7 +2,7 @@
 
 [![Dart](https://github.com/dart-lang/setup-dart/workflows/Dart/badge.svg)](https://github.com/dart-lang/setup-dart/actions?query=workflow%3A%22Dart%22+branch%3Amain)
 
-This [GitHub Action]() installs and sets up of a Dart SDK for use in actions by:
+This [GitHub Action](https://github.com/dart-lang/setup-dart) installs and sets up of a Dart SDK for use in actions by:
 
 * Downloading the Dart SDK
 * Adding the `dart` command and `pub` cache to path
