@@ -5,7 +5,7 @@
 This [GitHub Action](https://github.com/dart-lang/setup-dart) installs and sets up of a Dart SDK for use in actions by:
 
 * Downloading the Dart SDK
-* Adding the `dart` command and `pub` cache to path
+* Adding the [`dart`](https://dart.dev/tools/dart-tool) command and `pub` cache to path
 
 # Usage
 
