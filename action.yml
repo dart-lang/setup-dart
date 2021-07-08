@@ -12,8 +12,11 @@ inputs:
     description: "The CPU architecture ('x64', 'ia32', 'arm', or 'arm64')."
     required: false
     default: "x64"
+  flavor:
+    description: "The build flavor ('raw' or 'release')."
+    required: false
 runs:
   using: "composite"
   steps:
-    - run: $GITHUB_ACTION_PATH/setup.sh ${{ inputs.sdk }} ${{ runner.os }} ${{ inputs.architecture }}
+    - run: $GITHUB_ACTION_PATH/setup.sh ${{ inputs.sdk }} ${{ runner.os }} ${{ inputs.architecture }} ${{ inputs.flavor }}
       shell: bash

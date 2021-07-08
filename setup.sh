@@ -41,7 +41,27 @@ fi
 OS="${2:-Linux}"
 ARCH="${3:-x64}"
 OS=$(echo "$OS" | awk '{print tolower($0)}')
-echo "Installing Dart SDK version \"${VERSION}\" from the ${CHANNEL} channel on ${OS}-${ARCH}"
+
+DEFAULT_FLAVOR=release
+if [[ $SDK == main ]]
+then
+  DEFAULT_FLAVOR=raw
+fi
+
+FLAVOR="${4:-$DEFAULT_FLAVOR}"
+if ! [[ $FLAVOR == raw || $FLAVOR == release ]]
+then
+  echo -e "::error::Unrecognized build flavor \"${FLAVOR}\"."
+  exit 1
+fi
+
+if [[ $SDK == main && $FLAVOR != raw ]]
+then
+  echo -e "::error::Main channel only supports raw build flavor."
+  exit 1
+fi
+
+echo "Installing Dart SDK version \"${VERSION}\" from the ${CHANNEL} channel (${FLAVOR}) on ${OS}-${ARCH}"
 
 # Calculate download Url. Based on:
 # https://dart.dev/tools/sdk/archive#download-urls
@@ -51,7 +71,7 @@ if [[ $SDK == main ]]
 then
   URL="${PREFIX}/be/raw/latest/${BUILD}"
 else
-  URL="${PREFIX}/${CHANNEL}/release/${VERSION}/${BUILD}"
+  URL="${PREFIX}/${CHANNEL}/${FLAVOR}/${VERSION}/${BUILD}"
 fi
 echo "Downloading ${URL}..."
 
