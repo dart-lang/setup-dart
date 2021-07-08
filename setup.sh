@@ -9,14 +9,15 @@
 # Bash script that downloads and does setup for a Dart SDK.                   #
 # Takes three params; first listed is the default:                            #
 # $1: Dart SDK version/channel: stable|beta|dev|main|<version_string>         #
-# $2: Dart channel (DEPRECATED): stable|beta|dev                              #
-# $3: OS: Linux|Windows|macOS                                                 #
-# $4: ARCH: x64|ia32                                                          #
+# $2: OS: Linux|Windows|macOS                                                 #
+# $3: ARCH: x64|ia32                                                          #
+# $4: SIGNED: true|false  (optional, defaults to true)                        #
 ###############################################################################
 
 # Parse SDK and version args.
 SDK="${1:-stable}"
 VERSION=
+SIGNED="${4:-true}"
 if [[ $SDK == stable || $SDK == beta || $SDK == dev || $SDK == main ]]
 then
   CHANNEL=$SDK
@@ -47,12 +48,14 @@ echo "Installing Dart SDK version \"${VERSION}\" from the ${CHANNEL} channel on 
 # https://dart.dev/tools/sdk/archive#download-urls
 PREFIX="https://storage.googleapis.com/dart-archive/channels"
 BUILD="sdk/dartsdk-${OS}-${ARCH}-release.zip"
-if [[ $SDK == main ]]
+CHANNEL_FOLDER="${CHANNEL/main/be}"
+if [[ $SIGNED == false || $SDK == main ]]
 then
-  URL="${PREFIX}/be/raw/latest/${BUILD}"
+  BINARIES_FOLDER=raw
 else
-  URL="${PREFIX}/${CHANNEL}/release/${VERSION}/${BUILD}"
+  BINARIES_FOLDER=release
 fi
+URL="${PREFIX}/${CHANNEL_FOLDER}/${BINARIES_FOLDER}/${VERSION}/${BUILD}"
 echo "Downloading ${URL}..."
 
 # Download installation zip.

@@ -24,6 +24,11 @@ The action takes the following inputs:
     supported on all operating systems; see https://dart.dev/tools/sdk/archive
     for valid combinations.
 
+  * `signed`: Whether to install signed SDK binaries (defaults to true).
+    Unsigned binaries may not work on all operating systems. This option is
+    exposed for core packages that need to test against unreleased dev SDKs that
+    are automatically rolled in to the flutter CI systems.
+
 ## Basic example
 
 Install the latest stable SDK, and run Hello World.
@@ -168,6 +173,9 @@ jobs:
 ```
 
 # Version history
+
+## v1.1
+  * Added support for installing unsigned dev SDKs.
 
 ## v1.0
   * Promoted to 1.0 stable.

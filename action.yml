@@ -12,8 +12,12 @@ inputs:
     description: "The CPU architecture ('x64', 'ia32', 'arm', or 'arm64')."
     required: false
     default: "x64"
+  signed:
+    description: "Whether to install a signed or unsigned Dart SDK build. Used to install unpublished dev releases."
+    required: false
+    default: true
 runs:
   using: "composite"
   steps:
-    - run: $GITHUB_ACTION_PATH/setup.sh ${{ inputs.sdk }} ${{ runner.os }} ${{ inputs.architecture }}
+    - run: $GITHUB_ACTION_PATH/setup.sh ${{ inputs.sdk }} ${{ runner.os }} ${{ inputs.architecture }} ${{inputs.signed }}
       shell: bash
