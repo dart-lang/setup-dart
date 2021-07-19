@@ -19,6 +19,13 @@ The action takes the following inputs:
       Available channels are `stable`, `beta`, `dev`, and `main`. See
       https://dart.dev/tools/sdk/archive for details.
 
+  * `flavor`: Which build flavor to setup.
+    * Avaliable build flavors are `raw` and `release`.
+    * `release` flavor contains published builds.
+    * `raw` flavor contains unpublished builds, which can be used by developers
+      to test against SDK versions before a release.
+    * `main` release channel only supports `raw` build flavor.
+
   * `architecture`: The CPU architecture to setup support for. Valid options are
     `x64`, `ia32`, `arm`, and `arm64`. Note that not all CPU architectures are
     supported on all operating systems; see https://dart.dev/tools/sdk/archive
@@ -168,6 +175,9 @@ jobs:
 ```
 
 # Version history
+
+## v1.1
+  * Added a `flavor` option setup.sh to allow downloading unpublished builds.
 
 ## v1.0
   * Promoted to 1.0 stable.
