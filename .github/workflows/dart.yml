@@ -27,6 +27,16 @@ jobs:
         run: |
           echo "main() { print('hello world'); }" > hello.dart
           dart hello.dart
+      
+      - id: dart_pub_upgrade
+        name: Dart pub upgrade
+        working-directory: example
+        run: dart pub upgrade
+        
+      - name: Dart test
+        if: "always() && steps.dart_pub_upgrade.conclusion == 'success'"
+        working-directory: example
+        run: dart test
 
   test_raw:
     runs-on: ${{ matrix.os }}
@@ -49,6 +59,16 @@ jobs:
         run: |
           echo "main() { print('hello world'); }" > hello.dart
           dart hello.dart
+      
+      - id: dart_pub_upgrade
+        name: Dart pub upgrade
+        working-directory: example
+        run: dart pub upgrade
+        
+      - name: Dart test
+        if: "always() && steps.dart_pub_upgrade.conclusion == 'success'"
+        working-directory: example
+        run: dart test
 
   test_arch:
     runs-on: windows-latest
@@ -67,6 +87,16 @@ jobs:
         run: |
           echo "main() { print('hello world'); }" > hello.dart
           dart hello.dart
+      
+      - id: dart_pub_upgrade
+        name: Dart pub upgrade
+        working-directory: example
+        run: dart pub upgrade
+        
+      - name: Dart test
+        if: "always() && steps.dart_pub_upgrade.conclusion == 'success'"
+        working-directory: example
+        run: dart test
           
   test_pub:
     runs-on: ${{ matrix.os }}
