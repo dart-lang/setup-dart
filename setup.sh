@@ -86,6 +86,7 @@ rm "${HOME}/dartsdk.zip"
 
 # Configure pub to use a fixed location.
 echo "PUB_CACHE=${HOME}/.pub-cache" >> $GITHUB_ENV
+echo "Pub cache set to: ${HOME}/.pub-cache"
 
 # Update paths.
 echo "${HOME}/.pub-cache/bin" >> $GITHUB_PATH
