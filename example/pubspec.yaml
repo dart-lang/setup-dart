@@ -1,6 +1,11 @@
 name: example
 publish_to: none
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  characters:
+    git: https://github.com/dart-lang/characters
+
 dev_dependencies:
   test: any

@@ -85,10 +85,17 @@ fi
 rm "${HOME}/dartsdk.zip"
 
 # Configure pub to use a fixed location.
-echo "PUB_CACHE=${HOME}/.pub-cache" >> $GITHUB_ENV
+if [[ $OS == windows ]]
+then
+  PUBCACHE="${USERPROFILE}\\.pub-cache"
+else
+  PUBCACHE="${HOME}/.pub-cache"
+fi
+echo "PUB_CACHE=${PUBCACHE}" >> $GITHUB_ENV
+echo "Pub cache set to: ${PUBCACHE}"
 
 # Update paths.
-echo "${HOME}/.pub-cache/bin" >> $GITHUB_PATH
+echo "${PUBCACHE}/bin" >> $GITHUB_PATH
 echo "${RUNNER_TOOL_CACHE}/dart-sdk/bin" >> $GITHUB_PATH
 
 # Report success, and print version.
