@@ -99,5 +99,5 @@ echo "${PUBCACHE}/bin" >> $GITHUB_PATH
 echo "${RUNNER_TOOL_CACHE}/dart-sdk/bin" >> $GITHUB_PATH
 
 # Report success, and print version.
-echo -e "Succesfully installed Dart SDK:"
+echo -e "Successfully installed Dart SDK:"
 ${RUNNER_TOOL_CACHE}/dart-sdk/bin/dart --version
