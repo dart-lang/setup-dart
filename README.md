@@ -176,6 +176,9 @@ jobs:
 
 # Version history
 
+## v1.2
+  * Fixed a path issue impacting git dependencies on Windows.
+
 ## v1.1
   * Added a `flavor` option setup.sh to allow downloading unpublished builds.
 
