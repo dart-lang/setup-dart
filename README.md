@@ -176,6 +176,15 @@ jobs:
 
 # Version history
 
+## v1.3
+  * The install location of the Dart SDK is now available
+    in an environment variable, `DART_HOME`
+    ([#43](https://github.com/dart-lang/setup-dart/issues/43))
+
+  * Fixed a issue where cached downloads could lead to unzip issues
+    on self hosted runners
+    ([#35](https://github.com/dart-lang/setup-dart/issues/35))
+
 ## v1.2
   * Fixed a path issue impacting git dependencies on Windows.
 
