@@ -23,6 +23,9 @@ jobs:
         with:
           sdk: ${{ matrix.sdk }}
 
+      - name: Print DART_HOME
+        run: echo "Dart SDK installed in $DART_HOME"
+
       - name: Run hello world
         run: |
           echo "main() { print('hello world'); }" > hello.dart
