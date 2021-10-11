@@ -88,16 +88,16 @@ rm "${HOME}/dartsdk.zip"
 if [[ $OS == windows ]]
 then
   PUBCACHE="${USERPROFILE}\\.pub-cache"
-  DARTHOME="${RUNNER_TOOL_CACHE}\\dart-sdk"
+  DART_HOME="${RUNNER_TOOL_CACHE}\\dart-sdk"
 else
   PUBCACHE="${HOME}/.pub-cache"
-  DARTHOME="${RUNNER_TOOL_CACHE}/dart-sdk"
+  DART_HOME="${RUNNER_TOOL_CACHE}/dart-sdk"
 fi
 echo "PUB_CACHE=${PUBCACHE}" >> $GITHUB_ENV
 echo "Pub cache set to: ${PUBCACHE}"
 
 # Update paths.
-echo "DART_HOME=${DARTHOME}" >> $GITHUB_ENV
+echo "DART_HOME=${DART_HOME}" >> $GITHUB_ENV
 echo "${PUBCACHE}/bin" >> $GITHUB_PATH
 echo "${RUNNER_TOOL_CACHE}/dart-sdk/bin" >> $GITHUB_PATH
 
