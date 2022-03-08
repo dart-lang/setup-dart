@@ -9,9 +9,9 @@
 # Bash script that downloads and does setup for a Dart SDK.                   #
 # Takes three params; first listed is the default:                            #
 # $1: Dart SDK version/channel: stable|beta|dev|main|<version_string>         #
-# $2: Dart channel (DEPRECATED): stable|beta|dev                              #
-# $3: OS: Linux|Windows|macOS                                                 #
-# $4: ARCH: x64|ia32                                                          #
+# $2: OS: Linux|Windows|macOS                                                 #
+# $3: ARCH: x64|ia32                                                          #
+# $4: FLAVOR: raw|release                                                     #
 ###############################################################################
 
 # Parse SDK and version args.
@@ -76,10 +76,17 @@ fi
 echo "Downloading ${URL}..."
 
 # Download installation zip.
-curl --connect-timeout 15 --retry 5 "$URL" > "${HOME}/dartsdk.zip"
-unzip -o "${HOME}/dartsdk.zip" -d "${RUNNER_TOOL_CACHE}" > /dev/null
+curl --connect-timeout 15 --retry 5 --retry-all-errors "$URL" \
+  --output "${HOME}/dartsdk.zip"
 if [ $? -ne 0 ]; then
   echo -e "::error::Download failed! Please check passed arguments."
+  exit 1
+fi
+
+# Unzip SDK
+unzip -o "${HOME}/dartsdk.zip" -d "${RUNNER_TOOL_CACHE}" > /dev/null
+if [ $? -ne 0 ]; then
+  echo -e "::error::Unzip failed! Please check passed arguments."
   exit 1
 fi
 rm "${HOME}/dartsdk.zip"
