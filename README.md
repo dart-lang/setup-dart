@@ -50,7 +50,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@v1.3
 
       - name: Install dependencies
         run: dart pub get
@@ -112,7 +112,7 @@ jobs:
         sdk: [stable, beta, dev, 2.10.3, 2.12.0-29.10.beta]
     steps:
       - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: ${{ matrix.sdk }}
 
@@ -141,7 +141,7 @@ jobs:
         sdk: [stable, beta, dev]
     steps:
       - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: ${{ matrix.sdk }}
       - name: Install dependencies
@@ -161,7 +161,7 @@ jobs:
         sdk: [2.9.0, 2.8.1]
     steps:
       - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: ${{ matrix.sdk }}
       - name: Install dependencies
