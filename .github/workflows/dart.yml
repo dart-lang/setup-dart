@@ -18,7 +18,7 @@ jobs:
         sdk: [stable, beta, dev, 2.9.3, 2.12.0-29.10.beta]
         flavor: [release]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
@@ -44,7 +44,7 @@ jobs:
         sdk: [stable, beta, dev, main, 2.9.3, 2.12.0-29.10.beta]
         flavor: [raw]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
@@ -61,7 +61,7 @@ jobs:
       matrix:
         sdk: [stable, beta, dev, 2.9.3, 2.12.0-29.10.beta]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
@@ -80,7 +80,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         sdk: [stable, beta]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
@@ -104,7 +104,7 @@ jobs:
         sdk: [stable, beta, dev]
         flavor: [release]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
