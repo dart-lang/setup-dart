@@ -174,6 +174,15 @@ jobs:
         run: pub run test
 ```
 
+## Cached example
+
+```yml
+      - uses: dart-lang/setup-dart@v1.3
+        with:
+          sdk: '2.9.0'
+          cache: true # Should only be used when a fixed SDK version is specified
+```
+
 # Version history
 
 ## v1.3
