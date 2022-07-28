@@ -1,0 +1,32 @@
+{
+  "problemMatcher": [
+    {
+      "owner": "dart",
+      "pattern": [
+        {
+          "regexp": "^\\s*(error|warning|info)\\s-\\s(.+):(\\d+):(\\d+)\\s-\\s(.+)\\s-\\s(.+)$",
+          "file": 2,
+          "line": 3,
+          "column": 4,
+          "severity": 1,
+          "message": 5,
+          "code": 6
+        }
+      ]
+    },
+    {
+      "owner": "flutter",
+      "pattern": [
+        {
+          "regexp": "^\\s*(error|warning|info)\\s•\\s(.+)\\s•\\s(.+):(\\d+):(\\d+)\\s•\\s(.+)$",
+          "file": 3,
+          "line": 4,
+          "column": 5,
+          "severity": 1,
+          "message": 2,
+          "code": 6
+        }
+      ]
+    }
+  ]
+}

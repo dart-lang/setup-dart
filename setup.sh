@@ -101,6 +101,9 @@ echo "DART_HOME=${DART_HOME}" >> $GITHUB_ENV
 echo "${PUBCACHE}/bin" >> $GITHUB_PATH
 echo "${RUNNER_TOOL_CACHE}/dart-sdk/bin" >> $GITHUB_PATH
 
+ACTION_PATH="$(dirname "$0")"
+echo -e "::add-matcher::$ACTION_PATH/.github/matcher-dart.json"
+
 # Report success, and print version.
 echo -e "Successfully installed Dart SDK:"
 ${RUNNER_TOOL_CACHE}/dart-sdk/bin/dart --version
