@@ -108,7 +108,12 @@ ${RUNNER_TOOL_CACHE}/dart-sdk/bin/dart --version
 # When enabled through env variables, create OIDC token for publishing on pub.dev.
 if [[ "${ACTIONS_ID_TOKEN_REQUEST_URL}" != "" && "${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" != "" ]]
 then
-  PUB_TOKEN=$(curl --retry 5 --retry-connrefused -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https://pub.dev" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
-  echo "PUB_TOKEN=${PUB_TOKEN}" >> $GITHUB_ENV
-  ${RUNNER_TOOL_CACHE}/dart-sdk/bin/dart pub token add https://pub.dev --env-var PUB_TOKEN
+  if [[ -x "$(command -v jq)" ]]
+  then
+    PUB_TOKEN=$(curl --retry 5 --retry-connrefused -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https://pub.dev" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
+    echo "PUB_TOKEN=${PUB_TOKEN}" >> $GITHUB_ENV
+    ${RUNNER_TOOL_CACHE}/dart-sdk/bin/dart pub token add https://pub.dev --env-var PUB_TOKEN
+  else
+    echo "Could not setup OIDC token, 'jq' is not available.";
+  fi
 fi
