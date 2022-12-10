@@ -144,7 +144,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         sdk: [stable, beta, dev]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: ${{ matrix.sdk }}
@@ -164,7 +164,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         sdk: [2.9.0, 2.8.1]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: ${{ matrix.sdk }}
