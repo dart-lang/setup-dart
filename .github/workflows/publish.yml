@@ -3,7 +3,7 @@ name: Publish to pub.dev
 ## Caller of this workflow should use it as follows:
 ## jobs:
 ##   publish:
-##     uses: dart-lang/setup-dart/.github/workflows/publish.yml@1.4
+##     uses: dart-lang/setup-dart/.github/workflows/publish.yml@main [or a recent commit hash / version tag]
 ##     # with:
 ##     #   working-directory: path/to/sub/directory
 
@@ -30,7 +30,7 @@ jobs:
       # Checkout repository
       - uses: actions/checkout@v3
       # Setup Dart SDK with JWT token
-      - uses: dart-lang/setup-dart@1.4
+      - uses: dart-lang/setup-dart@7b1734b5b08d53fbf347cf96b664fa1a49cc6497
       # Minimal package setup and dry run checks.
       - name: Install dependencies
         run: dart pub get
