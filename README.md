@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: dart-lang/setup-dart@v1.3
+      - uses: dart-lang/setup-dart@v1.4
 
       - name: Install dependencies
         run: dart pub get
@@ -116,7 +116,7 @@ jobs:
         sdk: [stable, beta, dev, 2.10.3, 2.12.0-29.10.beta]
     steps:
       - uses: actions/checkout@v3
-      - uses: dart-lang/setup-dart@v1.3
+      - uses: dart-lang/setup-dart@v1.4
         with:
           sdk: ${{ matrix.sdk }}
 
@@ -145,7 +145,7 @@ jobs:
         sdk: [stable, beta, dev]
     steps:
       - uses: actions/checkout@v3
-      - uses: dart-lang/setup-dart@v1.3
+      - uses: dart-lang/setup-dart@v1.4
         with:
           sdk: ${{ matrix.sdk }}
       - name: Install dependencies
@@ -165,7 +165,7 @@ jobs:
         sdk: [2.9.0, 2.8.1]
     steps:
       - uses: actions/checkout@v3
-      - uses: dart-lang/setup-dart@v1.3
+      - uses: dart-lang/setup-dart@v1.4
         with:
           sdk: ${{ matrix.sdk }}
       - name: Install dependencies
@@ -180,43 +180,52 @@ jobs:
 
 # Version history
 
-## v1.3
-  * The install location of the Dart SDK is now available
-    in an environment variable, `DART_HOME`
-    ([#43](https://github.com/dart-lang/setup-dart/issues/43))
+## v1.4
 
-  * Fixed an issue where cached downloads could lead to unzip issues
-    on self-hosted runners
-    ([#35](https://github.com/dart-lang/setup-dart/issues/35))
+* Automatically create OIDC token for pub.dev.
+* Add a reusable workflow for publishing.
+
+## v1.3
+
+* The install location of the Dart SDK is now available
+  in an environment variable, `DART_HOME`
+  ([#43](https://github.com/dart-lang/setup-dart/issues/43)).
+* Fixed an issue where cached downloads could lead to unzip issues
+  on self-hosted runners
+  ([#35](https://github.com/dart-lang/setup-dart/issues/35)).
 
 ## v1.2
-  * Fixed a path issue impacting git dependencies on Windows.
+
+* Fixed a path issue impacting git dependencies on Windows.
 
 ## v1.1
-  * Added a `flavor` option setup.sh to allow downloading unpublished builds.
+
+* Added a `flavor` option setup.sh to allow downloading unpublished builds.
 
 ## v1.0
-  * Promoted to 1.0 stable.
+
+* Promoted to 1.0 stable.
 
 ## v0.5
-  * Fixed a Windows `pub global activate` path issue.
+
+* Fixed a Windows `pub global activate` path issue.
 
 ## v0.4
 
-  * Removed previously deprecated input `channel`. Use the `sdk` input instead.
-  * Added support for specifying the CPU architecture.
+* Removed previously deprecated input `channel`. Use the `sdk` input instead.
+* Added support for specifying the CPU architecture.
 
 ## v0.3
 
-  * Added support for installing SDKs from the `main` channel.
+* Added support for installing SDKs from the `main` channel.
 
 ## v0.2
 
-  * Added support for installing a specific SDK version (e.g. `2.10.0`).
+* Added support for installing a specific SDK version (e.g. `2.10.0`).
 
 ## v0.1
 
-  * Initial version.
+* Initial version.
 
 # License
 
