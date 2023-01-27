@@ -15,8 +15,16 @@ inputs:
   flavor:
     description: "The build flavor ('raw' or 'release')."
     required: false
+  cache:
+    description: 'Cache the Dart SDK'
+    required: false
 runs:
   using: "composite"
   steps:
+    - if: ${{ inputs.cache == 'true' }}
+      uses: actions/cache@v3
+      with:
+        path: ${{ runner.tool_cache }}/dart-sdk
+        key: dart-sdk-${{ runner.os }}-${{ inputs.sdk }}-${{ inputs.architecture }}-${{ inputs.flavor }}
     - run: $GITHUB_ACTION_PATH/setup.sh ${{ inputs.sdk }} ${{ runner.os }} ${{ inputs.architecture }} ${{ inputs.flavor }}
       shell: bash

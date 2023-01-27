@@ -61,28 +61,30 @@ then
   exit 1
 fi
 
-echo "Installing Dart SDK version \"${VERSION}\" from the ${CHANNEL} channel (${FLAVOR}) on ${OS}-${ARCH}"
+if [[ ! -x "${RUNNER_TOOL_CACHE}/dart-sdk/bin/dart" ]]; then
+  echo "Installing Dart SDK version \"${VERSION}\" from the ${CHANNEL} channel (${FLAVOR}) on ${OS}-${ARCH}"
 
-# Calculate download Url. Based on:
-# https://dart.dev/tools/sdk/archive#download-urls
-PREFIX="https://storage.googleapis.com/dart-archive/channels"
-BUILD="sdk/dartsdk-${OS}-${ARCH}-release.zip"
-if [[ $SDK == main ]]
-then
-  URL="${PREFIX}/be/raw/latest/${BUILD}"
-else
-  URL="${PREFIX}/${CHANNEL}/${FLAVOR}/${VERSION}/${BUILD}"
-fi
-echo "Downloading ${URL}..."
+  # Calculate download Url. Based on:
+  # https://dart.dev/tools/sdk/archive#download-urls
+  PREFIX="https://storage.googleapis.com/dart-archive/channels"
+  BUILD="sdk/dartsdk-${OS}-${ARCH}-release.zip"
+  if [[ $SDK == main ]]
+  then
+    URL="${PREFIX}/be/raw/latest/${BUILD}"
+  else
+    URL="${PREFIX}/${CHANNEL}/${FLAVOR}/${VERSION}/${BUILD}"
+  fi
+  echo "Downloading ${URL}..."
 
-# Download installation zip.
-curl --connect-timeout 15 --retry 5 "$URL" > "${HOME}/dartsdk.zip"
-unzip -o "${HOME}/dartsdk.zip" -d "${RUNNER_TOOL_CACHE}" > /dev/null
-if [ $? -ne 0 ]; then
-  echo -e "::error::Download failed! Please check passed arguments."
-  exit 1
+  # Download installation zip.
+  curl --connect-timeout 15 --retry 5 "$URL" > "${HOME}/dartsdk.zip"
+  unzip -o "${HOME}/dartsdk.zip" -d "${RUNNER_TOOL_CACHE}" > /dev/null
+  if [ $? -ne 0 ]; then
+    echo -e "::error::Download failed! Please check passed arguments."
+    exit 1
+  fi
+  rm "${HOME}/dartsdk.zip"
 fi
-rm "${HOME}/dartsdk.zip"
 
 # Configure pub to use a fixed location.
 if [[ $OS == windows ]]
