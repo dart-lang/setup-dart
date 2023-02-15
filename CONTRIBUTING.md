@@ -1,4 +1,4 @@
-# How to Contribute
+## How to Contribute
 
 Prior to sending patches and contributions to this project, please file
 an issue in the issue tracker to ensure there is alignment with the overall
