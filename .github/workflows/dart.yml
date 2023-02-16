@@ -59,7 +59,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: [2.12.0, stable, dev]
+        sdk: [dev, main]
         flavor: [raw]
       fail-fast: false
     steps:
