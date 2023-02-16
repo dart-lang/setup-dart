@@ -9,16 +9,18 @@ on:
   - cron: "0 0 * * 0" # Run every Sunday at 00:00.
 
 jobs:
+
+  # Default test configurations.
   test:
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: example
     strategy:
-      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        # Test latest stable, beta, dev channels + last stable release
-        # prior to the introduction of the unified `dart` developer tool.
-        sdk: [stable, beta, dev, 2.9.3, 2.12.0-29.10.beta]
-        flavor: [release]
+        sdk: [2.12.0, stable, beta, dev]
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - uses: ./
@@ -26,25 +28,20 @@ jobs:
           sdk: ${{ matrix.sdk }}
 
       - name: Print DART_HOME
-        shell: bash
         run: echo "Dart SDK installed in $DART_HOME"
+      - run: dart pub get
+      - run: dart run bin/main.dart
+      - run: dart analyze
+      - run: dart test
 
-      - name: Run hello world
-        run: |
-          echo "main() { print('hello world'); }" > hello.dart
-          dart hello.dart
-
-  test_raw:
+  # Test older SDKs.
+  test_older:
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        # Test latest stable, beta, dev, and main channels + last stable release
-        # prior to the introduction of the unified `dart` developer tool, using
-        # raw (unsigned) bits.
-        sdk: [stable, beta, dev, main, 2.9.3, 2.12.0-29.10.beta]
-        flavor: [raw]
+        sdk: [2.9.3]
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - uses: ./
@@ -56,12 +53,33 @@ jobs:
           echo "main() { print('hello world'); }" > hello.dart
           dart hello.dart
 
+  # Test the raw flavor SDKs.
+  test_raw:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        sdk: [dev, main]
+        flavor: [raw]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./
+        with:
+          sdk: ${{ matrix.sdk }}
+
+      - name: Run hello world
+        run: |
+          echo "main() { print('hello world'); }" > hello.dart
+          dart hello.dart
+
+  # Test the architecture input parameter.
   test_arch:
     runs-on: windows-latest
     strategy:
-      fail-fast: false
       matrix:
-        sdk: [stable, beta, dev, 2.9.3, 2.12.0-29.10.beta]
+        sdk: [2.12.0, stable, dev]
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - uses: ./
@@ -73,50 +91,23 @@ jobs:
         run: |
           echo "main() { print('hello world'); }" > hello.dart
           dart hello.dart
-          
-  test_pub:
-    runs-on: ${{ matrix.os }}
+
+  # Test inferring the channel from the sdk parameter.
+  test_inferred_channels:
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: [stable, beta]
+        sdk: [2.12.0-29.10.beta]
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
+          architecture: ia32
 
-      - name: Global activate + run
+      - name: Run hello world
         run: |
-          dart pub global activate stagehand
-          mkdir testapp
-          cd testapp
-          stagehand console-simple
-          dart pub get
-          dart run
-
-  test_test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        # Test latest stable, beta, dev channels
-        sdk: [stable, beta, dev]
-        flavor: [release]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./
-        with:
-          sdk: ${{ matrix.sdk }}
-      
-      - id: dart_pub_upgrade
-        name: Dart pub upgrade
-        working-directory: example
-        run: dart pub upgrade
-        
-      - name: Dart test
-        if: "always() && steps.dart_pub_upgrade.conclusion == 'success'"
-        working-directory: example
-        run: dart test
+          echo "main() { print('hello world'); }" > hello.dart
+          dart hello.dart
+      - run: dart --version

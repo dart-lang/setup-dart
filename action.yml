@@ -5,7 +5,11 @@ branding:
   color: blue
 inputs:
   sdk:
-    description: "The channel, or a specific version from a channel to install ('stable', 'beta', 'dev', '2.7.2', '2.12.0-1.4.beta'). Using one of the three channels instead of a version will give you the latest version published to that channel."
+    description: >-
+      The channel, or a specific version from a channel to install ('stable',
+      'beta', 'dev', '2.7.2', '2.12.0-1.4.beta'). Using one of the three
+      channels instead of a version will give you the latest version published
+      to that channel.
     required: false
     default: "stable"
   architecture:
