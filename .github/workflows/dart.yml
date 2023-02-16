@@ -91,3 +91,23 @@ jobs:
         run: |
           echo "main() { print('hello world'); }" > hello.dart
           dart hello.dart
+
+  # Test inferring the channel from the sdk parameter.
+  test_arch:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        sdk: [2.12.0-29.10.beta]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./
+        with:
+          sdk: ${{ matrix.sdk }}
+          architecture: ia32
+
+      - name: Run hello world
+        run: |
+          echo "main() { print('hello world'); }" > hello.dart
+          dart hello.dart
+      - run: dart --version
