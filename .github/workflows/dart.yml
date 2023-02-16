@@ -93,7 +93,7 @@ jobs:
           dart hello.dart
 
   # Test inferring the channel from the sdk parameter.
-  test_arch:
+  test_inferred_channels:
     runs-on: ubuntu-latest
     strategy:
       matrix:
