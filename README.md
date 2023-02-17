@@ -178,4 +178,4 @@ Contributions are welcome! Please see [CONTRIBUTING.md.md](CONTRIBUTING.md.md).
 
 ## Version history
 
-Please see out [CHANGELOG.md](CHANGELOG.md) file.
+Please see our [CHANGELOG.md](CHANGELOG.md) file.
