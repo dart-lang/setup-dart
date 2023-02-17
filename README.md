@@ -36,8 +36,9 @@ The action takes the following inputs:
     * The available build flavors are `release` and `raw`.
     * The `release` flavor contains published builds.
     * The `raw` flavor contains unpublished builds; these can be used by
-      developers to test against SDK versions before a release. Note that the 
-      `main` release channel only supports `raw` build flavor.
+      developers to test against SDK versions before a signed release is
+      available. Note that the  `main` release channel only supports the `raw`
+      build flavor.
 
   * `architecture`: The CPU architecture to setup support for.
     * Valid options are `x64`, `ia32`, `arm`, and `arm64`.
@@ -46,7 +47,13 @@ The action takes the following inputs:
       [Dart system requirements](https://dart.dev/get-dart#system-requirements)
       for valid combinations.
 
-## Check static analysis, formatting, and run tests
+## Outputs
+
+The action produces the following output:
+
+  * `dart-version`: The version of the Dart SDK that was installed.
+
+## Checking static analysis, formatting, and running tests
 
 Various static checks:
 

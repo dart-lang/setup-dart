@@ -1,3 +1,6 @@
-example/.packages
-example/pubspec.lock
-example/.dart_tool/
+# node modules
+node_modules/
+
+# typescript built files
+__tests__/runner/*
+lib/**/*
