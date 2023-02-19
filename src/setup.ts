@@ -7,7 +7,7 @@ import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as sdk_utils from './sdk'
 import * as system from './system'
-import * as odic from './odic'
+import * as oidc from './oidc'
 import * as versions from './versions'
 import * as tc from '@actions/tool-cache'
 
@@ -15,7 +15,7 @@ import * as tc from '@actions/tool-cache'
 
 // TODO: Cache pub packages; have an input flag to control this.
 
-// TODO: have an input parameter to control creation of the ODIC token?
+// TODO: have an input parameter to control creation of the OIDC token?
 
 export async function install(): Promise<void> {
   try {
@@ -116,8 +116,8 @@ export async function install(): Promise<void> {
     core.exportVariable('PUB_CACHE', pubCache)
     core.addPath(path.join(pubCache, 'bin'))
 
-    // Potentially create the ODIC token used for pub.dev publishing.
-    odic.createPubOIDCToken()
+    // Potentially create the OIDC token used for pub.dev publishing.
+    oidc.createPubOIDCToken()
 
     // Configure the outputs.
     if (raw) {

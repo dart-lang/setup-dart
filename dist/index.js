@@ -39,7 +39,7 @@ setup.install();
 
 /***/ }),
 
-/***/ 5980:
+/***/ 8292:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -188,12 +188,12 @@ const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const sdk_utils = __importStar(__nccwpck_require__(6557));
 const system = __importStar(__nccwpck_require__(5785));
-const odic = __importStar(__nccwpck_require__(5980));
+const oidc = __importStar(__nccwpck_require__(8292));
 const versions = __importStar(__nccwpck_require__(7332));
 const tc = __importStar(__nccwpck_require__(7784));
 // TODO: Support version patterns of '2.19.x' to mean the latest 2.19 version.
 // TODO: Cache pub packages; have an input flag to control this.
-// TODO: have an input parameter to control creation of the ODIC token?
+// TODO: have an input parameter to control creation of the OIDC token?
 function install() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -276,8 +276,8 @@ function install() {
             core.addPath(path_1.default.join(sdkPath, 'bin'));
             core.exportVariable('PUB_CACHE', pubCache);
             core.addPath(path_1.default.join(pubCache, 'bin'));
-            // Potentially create the ODIC token used for pub.dev publishing.
-            odic.createPubOIDCToken();
+            // Potentially create the OIDC token used for pub.dev publishing.
+            oidc.createPubOIDCToken();
             // Configure the outputs.
             if (raw) {
                 core.setOutput('dart-version', sdk_utils.getVersionFromSdk(sdkPath));
