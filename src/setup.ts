@@ -92,7 +92,7 @@ export async function install(): Promise<void> {
     if (sdkPath) {
       core.info(`Using cached sdk from ${sdkPath}.`)
     } else {
-      core.info(url)
+      core.info(`${url} ...`)
 
       const archivePath = await tc.downloadTool(url)
       let extractedFolder = await tc.extractZip(archivePath)
@@ -129,6 +129,6 @@ export async function install(): Promise<void> {
     // Report success; print version.
     await exec.exec('dart', ['--version'])
   } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+    core.setFailed(error instanceof Error ? error.message : `${error}`)
   }
 }

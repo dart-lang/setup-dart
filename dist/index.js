@@ -265,7 +265,7 @@ function install() {
                 core.info(`Using cached sdk from ${sdkPath}.`);
             }
             else {
-                core.info(url);
+                core.info(`${url} ...`);
                 const archivePath = yield tc.downloadTool(url);
                 let extractedFolder = yield tc.extractZip(archivePath);
                 extractedFolder = path_1.default.join(extractedFolder, 'dart-sdk');
@@ -289,8 +289,7 @@ function install() {
             yield exec.exec('dart', ['--version']);
         }
         catch (error) {
-            if (error instanceof Error)
-                core.setFailed(error.message);
+            core.setFailed(error instanceof Error ? error.message : `${error}`);
         }
     });
 }
