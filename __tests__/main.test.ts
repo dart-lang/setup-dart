@@ -13,7 +13,7 @@ test('getArch', () => {
   // Note that this test behaves slightly differently when run on GitHub.
   const runnerArch = process.env['RUNNER_ARCH'];
   if (runnerArch != null) {
-    expect(system.getArch()).toEqual(runnerArch);
+    expect(system.getArch()).toEqual(runnerArch.toLowerCase());
   } else {
     expect(['x64', 'arm64']).toContain(system.getArch())
   }
