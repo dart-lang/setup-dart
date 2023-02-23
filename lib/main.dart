@@ -16,98 +16,6 @@ import 'node/os.dart';
 import 'node/process.dart';
 
 void main(List<String> args) async {
-  // todo: remove
-  test();
-
-  // todo: uncomment
-  // other();
-}
-
-void test() async {
-  var result = getVersionFromSdk(
-      '/Users/devoncarew/projects/dart-lang/sdk/sdk/xcodebuild/ReleaseARM64/dart-sdk');
-  print('dart version: $result');
-
-  print('arch: ${getArch()}');
-  print('platform: ${getPlatform()}');
-
-  core.info('foo bar');
-  core.warning('foo bar');
-
-  await promiseToFuture(exec.exec('ls', ['-l']));
-
-  print('** ${getProcessEnv('PATH')} **');
-
-  var ver = await latestPublishedVersion('stable', 'release');
-  print('latest version: $ver');
-}
-
-String? getVersionFromSdk(String sdkPath) {
-  final versionFilePath = path.join(sdkPath, 'version');
-  print(versionFilePath);
-
-  if (fs.existsSync(versionFilePath)) {
-    return fs.readFileSync(versionFilePath, 'utf8').trim();
-  } else {
-    return null;
-  }
-}
-
-/// Returns 'x64', 'ia32', 'arm', or 'arm64'.
-String getArch() {
-  const supported = ['x64', 'ia32', 'arm', 'arm64'];
-  return supported.contains(os.arch()) ? os.arch() : 'x64';
-}
-
-/// Returns 'linux', 'windows', or 'macos'.
-String getPlatform() {
-  if (os.platform() == 'win32') return 'windows';
-  return os.platform() == 'darwin' ? 'macos' : 'linux';
-}
-
-// When enabled through env variables, create OIDC token for publishing on
-// pub.dev.
-Future<void> createPubOIDCToken() async {
-  final tokenRequestUrl = getProcessEnv('ACTIONS_ID_TOKEN_REQUEST_URL');
-  final tokenRequestToken = getProcessEnv('ACTIONS_ID_TOKEN_REQUEST_TOKEN');
-
-  if (tokenRequestUrl == null || tokenRequestToken == null) {
-    return;
-  }
-
-  final token = await promiseToFuture(core.getIDToken('https://pub.dev'));
-
-  core.exportVariable('PUB_TOKEN', token);
-
-  await promiseToFuture(exec.exec('dart',
-      ['pub', 'token', 'add', 'https://pub.dev', '--env-var', 'PUB_TOKEN']));
-}
-
-// https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION
-// {
-//   "date": "2023-02-07",
-//   "version": "2.19.2",
-//   "revision": "e46b4f59490230778e907bde2eedb06b062d31be"
-// }
-
-// Query google storage for the most recent published SDK version for the given
-// channel and flavor.
-Future<String?> latestPublishedVersion(String channel, String flavor) async {
-  final url = 'https://storage.googleapis.com/dart-archive/channels/'
-      '$channel/$flavor/latest/VERSION';
-
-  final http = HttpClient('setup-dart', [], {
-    'allowRedirects': true,
-    'maxRedirects': 3,
-    'allowRetries': true,
-    'maxRetries': 3,
-  });
-
-  JSObject? result = await promiseToFuture(http.getJson(url));
-  return result == null ? null : getProperty(result, 'version');
-}
-
-void other() async {
   try {
     // sdk
     var sdk = core.getInput('sdk');
@@ -212,4 +120,91 @@ void other() async {
   } catch (error) {
     core.setFailed('$error');
   }
+}
+
+// todo: remove this
+
+void test() async {
+  var result = getVersionFromSdk(
+      '/Users/devoncarew/projects/dart-lang/sdk/sdk/xcodebuild/ReleaseARM64/dart-sdk');
+  print('dart version: $result');
+
+  print('arch: ${getArch()}');
+  print('platform: ${getPlatform()}');
+
+  core.info('foo bar');
+  core.warning('foo bar');
+
+  await promiseToFuture(exec.exec('ls', ['-l']));
+
+  print('** ${getProcessEnv('PATH')} **');
+
+  var ver = await latestPublishedVersion('stable', 'release');
+  print('latest version: $ver');
+}
+
+String? getVersionFromSdk(String sdkPath) {
+  final versionFilePath = path.join(sdkPath, 'version');
+  print(versionFilePath);
+
+  if (fs.existsSync(versionFilePath)) {
+    return fs.readFileSync(versionFilePath, 'utf8').trim();
+  } else {
+    return null;
+  }
+}
+
+/// Returns 'x64', 'ia32', 'arm', or 'arm64'.
+String getArch() {
+  const supported = ['x64', 'ia32', 'arm', 'arm64'];
+  return supported.contains(os.arch()) ? os.arch() : 'x64';
+}
+
+/// Returns 'linux', 'windows', or 'macos'.
+String getPlatform() {
+  if (os.platform() == 'win32') return 'windows';
+  return os.platform() == 'darwin' ? 'macos' : 'linux';
+}
+
+// When enabled through env variables, create OIDC token for publishing on
+// pub.dev.
+Future<void> createPubOIDCToken() async {
+  final tokenRequestUrl = getProcessEnv('ACTIONS_ID_TOKEN_REQUEST_URL');
+  final tokenRequestToken = getProcessEnv('ACTIONS_ID_TOKEN_REQUEST_TOKEN');
+
+  if (tokenRequestUrl == null || tokenRequestToken == null) {
+    return;
+  }
+
+  final token = await promiseToFuture(core.getIDToken('https://pub.dev'));
+
+  core.exportVariable('PUB_TOKEN', token);
+
+  await promiseToFuture(exec.exec('dart',
+      ['pub', 'token', 'add', 'https://pub.dev', '--env-var', 'PUB_TOKEN']));
+}
+
+// https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION
+// {
+//   "date": "2023-02-07",
+//   "version": "2.19.2",
+//   "revision": "e46b4f59490230778e907bde2eedb06b062d31be"
+// }
+
+// Query google storage for the most recent published SDK version for the given
+// channel and flavor.
+Future<String?> latestPublishedVersion(String channel, String flavor) async {
+  final url = 'https://storage.googleapis.com/dart-archive/channels/'
+      '$channel/$flavor/latest/VERSION';
+
+  final http = HttpClient('setup-dart', [], {
+    'allowRedirects': true,
+    'maxRedirects': 3,
+    'allowRetries': true,
+    'maxRetries': 3,
+  });
+
+  JSObject response = await promiseToFuture(http.getJson(url));
+  JSObject? result = getProperty(response, 'result');
+  return result == null ? null : getProperty(result, 'version');
 }

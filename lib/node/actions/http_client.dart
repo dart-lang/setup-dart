@@ -7,9 +7,6 @@ import 'dart:js_interop';
 import 'package:js/js.dart' as js;
 
 @JS()
-external HttpClient get httpClient;
-
-@JS()
 @js.staticInterop
 class HttpClient {
   external factory HttpClient(
