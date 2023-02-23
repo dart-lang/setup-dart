@@ -1,5 +1,5 @@
 name: "Setup Dart SDK"
-description: "Setup the Dart SDK, and add it to the PATH"
+description: "Download and setup the Dart SDK."
 branding:
   icon: check-circle
   color: blue
@@ -7,7 +7,7 @@ inputs:
   sdk:
     description: >-
       The channel, or a specific version from a channel to install ('stable',
-      'beta', 'dev', '2.7.2', '2.12.0-1.4.beta'). Using one of the three
+      'beta', 'dev', '2.7.2', '2.12.0-1.4.beta'). Using one of the named
       channels instead of a version will give you the latest version published
       to that channel.
     required: false
@@ -15,12 +15,12 @@ inputs:
   architecture:
     description: "The CPU architecture ('x64', 'ia32', 'arm', or 'arm64')."
     required: false
-    default: "x64"
   flavor:
-    description: "The build flavor ('raw' or 'release')."
+    description: "The build flavor ('release' or 'raw')."
     required: false
+outputs:
+  dart-version:
+    description: 'The installed Dart version.'
 runs:
-  using: "composite"
-  steps:
-    - run: $GITHUB_ACTION_PATH/setup.sh ${{ inputs.sdk }} ${{ runner.os }} ${{ inputs.architecture }} ${{ inputs.flavor }}
-      shell: bash
+  using: "node16"
+  main: "dist/index.js"

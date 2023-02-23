@@ -1,0 +1,14 @@
+name: setup_dart
+description: dssdf
+
+publish_to: none
+
+environment:
+  sdk: ^2.19.0
+
+dependencies:
+  js: ^0.6.7
+  path: ^1.8.0
+
+dev_dependencies:
+  lints: ^2.0.0

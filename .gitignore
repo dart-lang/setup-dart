@@ -1,3 +1,8 @@
-example/.packages
-example/pubspec.lock
-example/.dart_tool/
+# Dart files
+.dart_tool/
+pubspec.lock
+
+# node modules
+node_modules/
+
+dist/main.js.deps
