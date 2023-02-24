@@ -5,4 +5,9 @@ pubspec.lock
 # node modules
 node_modules/
 
-dist/main.js.deps
+# intermediary compilation artifacts
+dist/index.mjs
+dist/package.json
+lib/main.js
+lib/main.js.deps
+lib/main.js.map

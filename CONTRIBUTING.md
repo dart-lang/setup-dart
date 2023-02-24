@@ -53,13 +53,13 @@ you edit an existing file, you shouldn't update the year.
 Install the dependencies:
 
 ```bash
-$ npm install
+npm install
 ```
 
 Build the Dart code and package it for distribution:
 
 ```bash
-dart compile js -O2 -odist/main.js lib/main.dart
+npm run build && npm run package
 ```
 
 ## Community Guidelines

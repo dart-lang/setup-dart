@@ -23,4 +23,4 @@ outputs:
     description: 'The installed Dart version.'
 runs:
   using: "node16"
-  main: "dist/main.mjs"
+  main: "dist/index.js"

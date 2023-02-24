@@ -1,4 +1,24 @@
 {
+  "name": "setup-dart",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Setup Dart SDK action",
+  "main": "lib/main.mjs",
+  "scripts": {
+    "build": "dart compile js -olib/main.js -O2 lib/main.dart",
+    "package": "ncc build lib/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dart-lang/setup-dart.git"
+  },
+  "type": "module",
+  "keywords": [
+    "actions",
+    "dart",
+    "setup"
+  ],
+  "license": "BSD",
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/exec": "^1.1.1",
