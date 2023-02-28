@@ -6,7 +6,7 @@
   "main": "lib/main.mjs",
   "scripts": {
     "build": "dart compile js -olib/main.js -O2 lib/main.dart",
-    "package": "ncc build lib/main.js"
+    "package": "ncc build lib/main.mjs && cp lib/main.js dist/main.cjs"
   },
   "repository": {
     "type": "git",

@@ -16,6 +16,11 @@ import 'node/os.dart';
 import 'node/process.dart';
 
 void main(List<String> args) async {
+  // TODO: this is only for testing the initial port
+  // test();
+
+  // return;
+
   try {
     // sdk
     var sdk = core.getInput('sdk');
@@ -122,8 +127,7 @@ void main(List<String> args) async {
   }
 }
 
-// todo: remove this
-
+// TODO: This is for testing the initial port; remove this before merging.
 void test() async {
   var result = getVersionFromSdk(
       '/Users/devoncarew/projects/dart-lang/sdk/sdk/xcodebuild/ReleaseARM64/dart-sdk');
