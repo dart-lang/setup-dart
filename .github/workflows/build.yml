@@ -1,0 +1,18 @@
+# Validate that the compiled artifacts are up-to-date.
+
+name: Build
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./
+
+      - run: dart pub get
+      - run: dart analyze
+      - run: dart tool/sig.dart --verify

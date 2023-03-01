@@ -6,8 +6,8 @@ pubspec.lock
 node_modules/
 
 # intermediary compilation artifacts
-dist/package.json
-
 lib/main.js
 lib/main.js.deps
 lib/main.js.map
+
+lib/sig.txt

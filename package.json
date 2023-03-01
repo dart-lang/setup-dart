@@ -2,11 +2,12 @@
   "name": "setup-dart",
   "version": "0.0.0",
   "private": true,
-  "description": "Setup Dart SDK action",
+  "description": "The setup-dart GitHub Action - download and setup the Dart SDK.",
   "main": "lib/main.mjs",
   "scripts": {
-    "build": "dart compile js -olib/main.js -O2 lib/main.dart",
-    "package": "ncc build lib/main.mjs && cp lib/main.js dist/main.cjs"
+    "build": "dart compile js -olib/main.js -O2 lib/main.dart && dart tool/sig.dart --generate",
+    "dist": "ncc build lib/main.mjs && cp lib/main.js dist/main.cjs && cp lib/sig.txt dist/sig.txt",
+    "all": "npm run build && npm run dist"
   },
   "repository": {
     "type": "git",

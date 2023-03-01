@@ -16,11 +16,6 @@ import 'node/os.dart';
 import 'node/process.dart';
 
 void main(List<String> args) async {
-  // TODO: this is only for testing the initial port
-  // test();
-
-  // return;
-
   try {
     // sdk
     var sdk = core.getInput('sdk');
@@ -125,26 +120,6 @@ void main(List<String> args) async {
   } catch (error) {
     core.setFailed('$error');
   }
-}
-
-// TODO: This is for testing the initial port; remove this before merging.
-void test() async {
-  var result = getVersionFromSdk(
-      '/Users/devoncarew/projects/dart-lang/sdk/sdk/xcodebuild/ReleaseARM64/dart-sdk');
-  print('dart version: $result');
-
-  print('arch: ${getArch()}');
-  print('platform: ${getPlatform()}');
-
-  core.info('foo bar');
-  core.warning('foo bar');
-
-  await promiseToFuture(exec.exec('ls', ['-l']));
-
-  print('** ${getProcessEnv('PATH')} **');
-
-  var ver = await latestPublishedVersion('stable', 'release');
-  print('latest version: $ver');
 }
 
 String? getVersionFromSdk(String sdkPath) {

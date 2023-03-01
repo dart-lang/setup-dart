@@ -50,20 +50,7 @@ you edit an existing file, you shouldn't update the year.
 
 ## Building and testing
 
-1. Install node
-1. Install additional node tooling (`npm i -g @vercel/ncc`)
-1. Install the node package dependencies (`npm install`)
-1. Build the Dart code and package it for distribution
-   (`npm run build && npm run package`)
-
-todo: update this description of the build artifacts
-
-Entrypoint and compilation pipeline info:
-- dart source entrypoint: `lib/main.dart`
-- lib/main.dart => (npm run build) => lib/main.js
-- dart module entrypoint: lib/main.mjs (loads lib/main.js)
-- lib/main.mjs => (npm run package) => dist/index.js
-- action execution entrypoint: `dist/index.js`
+See the [DEVELOPING.md](DEVELOPING.md) file.
 
 ## Community Guidelines
 

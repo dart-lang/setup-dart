@@ -1,8 +1,8 @@
 ## v1.5.0-dev
 
-* Re-wrote the implementation of the action to Dart.
+* Re-wrote the implementation of the action into Dart.
 * Auto-detect the platform architecture (`x64`, `ia32`, `arm`, `arm64`).
-* Improve caching and download resilience of the sdk.
+* Improved the caching and download resilience of the sdk.
 * Added a new action output: `dart-version` - the installed version of the sdk.
 
 ## v1.4.0
