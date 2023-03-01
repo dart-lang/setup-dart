@@ -106,7 +106,7 @@ void main(List<String> args) async {
     core.addPath(path.join(pubCache, 'bin'));
 
     // Create the OIDC token used for pub.dev publishing.
-    createPubOIDCToken();
+    await createPubOIDCToken();
 
     // Configure the outputs.
     if (raw) {
