@@ -14,7 +14,7 @@ external ToolCache get toolCache;
 class ToolCache {}
 
 extension ToolCacheExtension on ToolCache {
-  ///Finds the path to a tool version in the local installed tool cache.
+  /// Finds the path to a tool version in the local installed tool cache.
   ///
   /// @param toolName      name of the tool
   /// @param versionSpec   version of the tool
@@ -25,11 +25,11 @@ extension ToolCacheExtension on ToolCache {
     JSString arch,
   ]);
 
-  // JSPromise<String>
   /// Download a tool from an url and stream it into a file.
   ///
   /// @param url       url of tool to download
   /// @returns         path to downloaded tool
+  // JSPromise<String>
   external JSPromise downloadTool(JSString url);
 
   /// Extract a zip.
@@ -40,7 +40,7 @@ extension ToolCacheExtension on ToolCache {
 
   /// Caches a directory and installs it into the tool cacheDir
   ///
-  /// @param sourceDir    the directory to cache into tools
+  /// @param sourceDir     the directory to cache into tools
   /// @param tool          tool name
   /// @param version       version of the tool.  semver format
   /// @param arch          architecture of the tool.  Optional.

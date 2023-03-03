@@ -10,7 +10,7 @@ import 'package:js/js.dart' as js;
 @js.staticInterop
 class HttpClient {
   external factory HttpClient(
-      String userAgent, List handlers, Map requestOptions);
+      JSString userAgent, JSArray handlers, Map requestOptions);
 }
 
 extension HttpClientExtension on HttpClient {

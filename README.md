@@ -1,25 +1,35 @@
 # setup-dart
 
-[![Dart](https://github.com/dart-lang/setup-dart/workflows/Dart/badge.svg)](https://github.com/dart-lang/setup-dart/actions?query=workflow%3A%22Dart%22+branch%3Amain)
+[setup-dart](https://github.com/dart-lang/setup-dart) installs and sets up a
+Dart SDK for use in GitHub Actions; it:
 
-This [GitHub Action](https://github.com/dart-lang/setup-dart) installs 
-and sets up of a Dart SDK for use in actions by:
-
-* Downloading the Dart SDK
-* Adding the [`dart`](https://dart.dev/tools/dart-tool) command 
-  and [`pub` cache](https://dart.dev/tools/pub/cmd/pub-get#the-system-package-cache)
-  to the system path
+* downloads the Dart SDK
+* adds the [`dart`](https://dart.dev/tools/dart-tool) tool to the system path
 
 ## Usage
 
-Install the latest stable SDK and run 'Hello World':
+To install the latest stable Dart SDK and run typical checks:
 
 ```yml
-steps:
-- uses: actions/checkout@v3
-- uses: dart-lang/setup-dart@v1
-- run: dart pub get
-- run: dart run bin/hello_world.dart
+name: Dart
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dart-lang/setup-dart@v1
+
+      - run: dart pub get
+      - run: dart format --output=none --set-exit-if-changed .
+      - run: dart analyze
+      - run: dart test
 ```
 
 ## Inputs
@@ -52,31 +62,6 @@ The action takes the following inputs:
 The action produces the following output:
 
   * `dart-version`: The version of the Dart SDK that was installed.
-
-## Checking static analysis, formatting, and running tests
-
-Various static checks:
-
-  1) Check static analysis with the Dart analyzer
-  2) Check code follows Dart idiomatic formatting
-  3) Check that unit tests pass
-
-```yml
-...
-    steps:
-
-      - name: Install dependencies
-        run: dart pub get
-
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
-
-      - name: Analyze project source
-        run: dart analyze
-
-      - name: Run tests
-        run: dart test
-```
 
 ## Matrix testing example
 

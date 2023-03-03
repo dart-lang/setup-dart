@@ -1,3 +1,6 @@
+[![Build](https://github.com/dart-lang/setup-dart/actions/workflows/build.yml/badge.svg)](https://github.com/dart-lang/setup-dart/actions/workflows/build.yml)
+[![Dart](https://github.com/dart-lang/setup-dart/actions/workflows/dart.yml/badge.svg)](https://github.com/dart-lang/setup-dart/actions/workflows/dart.yml)
+
 ## Setting up
 
 1. Install node
