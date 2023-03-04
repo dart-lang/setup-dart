@@ -159,7 +159,7 @@ See the [LICENSE](LICENSE) file.
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md.md](CONTRIBUTING.md.md).
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Version history
 
