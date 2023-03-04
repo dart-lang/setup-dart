@@ -49,11 +49,11 @@ void main(List<String> args) async {
     if (sdk == 'stable' || sdk == 'beta' || sdk == 'dev') {
       channel = sdk;
       version =
-          raw ? 'latest' : (await latestPublishedVersion(channel, flavor))!;
+          raw ? 'latest' : (await latestPublishedVersion(channel, flavor));
     } else if (sdk == 'main') {
       channel = 'be';
       version =
-          raw ? 'latest' : (await latestPublishedVersion(channel, flavor))!;
+          raw ? 'latest' : (await latestPublishedVersion(channel, flavor));
     } else {
       version = sdk;
 
@@ -80,7 +80,7 @@ void main(List<String> args) async {
 
     // Use a cached sdk or download and cache the sdk; using a 'raw' sdk flavor
     // disables caching.
-    final toolName = flavor == 'raw' ? 'dart_raw' : 'dart';
+    final toolName = raw ? 'dart_raw' : 'dart';
     var sdkPath = !raw ? toolCache.find(toolName, version, architecture) : '';
     if (sdkPath.isNotEmpty) {
       core.info('Using cached sdk from $sdkPath.');
@@ -110,7 +110,7 @@ void main(List<String> args) async {
 
     // Configure the outputs.
     if (raw) {
-      core.setOutput('dart-version', getVersionFromSdk(sdkPath)!);
+      core.setOutput('dart-version', getVersionFromSdk(sdkPath));
     } else {
       core.setOutput('dart-version', version);
     }
@@ -122,15 +122,9 @@ void main(List<String> args) async {
   }
 }
 
-String? getVersionFromSdk(String sdkPath) {
+String getVersionFromSdk(String sdkPath) {
   final versionFilePath = path.join(sdkPath, 'version');
-  print(versionFilePath);
-
-  if (fs.existsSync(versionFilePath)) {
-    return fs.readFileSync(versionFilePath, 'utf8').trim();
-  } else {
-    return null;
-  }
+  return fs.readFileSync(versionFilePath, 'utf8').trim();
 }
 
 /// Returns 'x64', 'ia32', 'arm', or 'arm64'.
@@ -172,7 +166,7 @@ Future<void> createPubOIDCToken() async {
 
 // Query google storage for the most recent published SDK version for the given
 // channel and flavor.
-Future<String?> latestPublishedVersion(String channel, String flavor) async {
+Future<String> latestPublishedVersion(String channel, String flavor) async {
   final url = 'https://storage.googleapis.com/dart-archive/channels/'
       '$channel/$flavor/latest/VERSION';
 
@@ -184,6 +178,6 @@ Future<String?> latestPublishedVersion(String channel, String flavor) async {
   });
 
   JSObject response = await promiseToFuture(http.getJson(url));
-  JSObject? result = getProperty(response, 'result');
-  return result == null ? null : getProperty(result, 'version');
+  JSObject result = getProperty(response, 'result');
+  return getProperty(result, 'version');
 }
