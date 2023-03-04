@@ -1,25 +1,35 @@
 # setup-dart
 
-[![Dart](https://github.com/dart-lang/setup-dart/workflows/Dart/badge.svg)](https://github.com/dart-lang/setup-dart/actions?query=workflow%3A%22Dart%22+branch%3Amain)
+[setup-dart](https://github.com/dart-lang/setup-dart) installs and sets up a
+Dart SDK for use in GitHub Actions; it:
 
-This [GitHub Action](https://github.com/dart-lang/setup-dart) installs 
-and sets up of a Dart SDK for use in actions by:
-
-* Downloading the Dart SDK
-* Adding the [`dart`](https://dart.dev/tools/dart-tool) command 
-  and [`pub` cache](https://dart.dev/tools/pub/cmd/pub-get#the-system-package-cache)
-  to the system path
+* downloads the Dart SDK
+* adds the [`dart`](https://dart.dev/tools/dart-tool) tool to the system path
 
 ## Usage
 
-Install the latest stable SDK and run 'Hello World':
+To install the latest stable Dart SDK and run typical checks:
 
 ```yml
-steps:
-- uses: actions/checkout@v3
-- uses: dart-lang/setup-dart@v1
-- run: dart pub get
-- run: dart run bin/hello_world.dart
+name: Dart
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dart-lang/setup-dart@v1
+
+      - run: dart pub get
+      - run: dart format --output=none --set-exit-if-changed .
+      - run: dart analyze
+      - run: dart test
 ```
 
 ## Inputs
@@ -36,8 +46,9 @@ The action takes the following inputs:
     * The available build flavors are `release` and `raw`.
     * The `release` flavor contains published builds.
     * The `raw` flavor contains unpublished builds; these can be used by
-      developers to test against SDK versions before a release. Note that the 
-      `main` release channel only supports `raw` build flavor.
+      developers to test against SDK versions before a signed release is
+      available. Note that the  `main` release channel only supports the `raw`
+      build flavor.
 
   * `architecture`: The CPU architecture to setup support for.
     * Valid options are `x64`, `ia32`, `arm`, and `arm64`.
@@ -46,30 +57,11 @@ The action takes the following inputs:
       [Dart system requirements](https://dart.dev/get-dart#system-requirements)
       for valid combinations.
 
-## Check static analysis, formatting, and run tests
+## Outputs
 
-Various static checks:
+The action produces the following output:
 
-  1) Check static analysis with the Dart analyzer
-  2) Check code follows Dart idiomatic formatting
-  3) Check that unit tests pass
-
-```yml
-...
-    steps:
-
-      - name: Install dependencies
-        run: dart pub get
-
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
-
-      - name: Analyze project source
-        run: dart analyze
-
-      - name: Run tests
-        run: dart test
-```
+  * `dart-version`: The version of the Dart SDK that was installed.
 
 ## Matrix testing example
 
@@ -171,4 +163,4 @@ Contributions are welcome! Please see [CONTRIBUTING.md.md](CONTRIBUTING.md.md).
 
 ## Version history
 
-Please see out [CHANGELOG.md](CHANGELOG.md) file.
+Please see our [CHANGELOG.md](CHANGELOG.md) file.

@@ -1,0 +1,3 @@
+# Dart files
+.dart_tool/
+pubspec.lock
