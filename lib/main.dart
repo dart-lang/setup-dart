@@ -6,11 +6,11 @@ import 'dart:js_interop';
 import 'dart:js_util';
 
 import 'package:path/path.dart' as path;
-import 'package:setup_dart/node/actions/tool_cache.dart';
 
 import 'node/actions/core.dart';
 import 'node/actions/exec.dart';
 import 'node/actions/http_client.dart';
+import 'node/actions/tool_cache.dart';
 import 'node/fs.dart';
 import 'node/os.dart';
 import 'node/process.dart';
@@ -149,7 +149,8 @@ Future<void> createPubOIDCToken() async {
     return;
   }
 
-  final token = await promiseToFuture(core.getIDToken('https://pub.dev'));
+  final token =
+      await promiseToFuture<String>(core.getIDToken('https://pub.dev'));
 
   core.exportVariable('PUB_TOKEN', token);
 
@@ -177,7 +178,7 @@ Future<String> latestPublishedVersion(String channel, String flavor) async {
     'maxRetries': 3,
   });
 
-  JSObject response = await promiseToFuture(http.getJson(url));
-  JSObject result = getProperty(response, 'result');
+  var response = await promiseToFuture<JSObject>(http.getJson(url));
+  var result = getProperty<JSObject>(response, 'result');
   return getProperty(result, 'version');
 }
