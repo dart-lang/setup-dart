@@ -9,7 +9,7 @@
 
 ## Development
 
-tldr: edit Dart source files; run `npm run all` to re-compile the action
+tldr: edit Dart source files and run `npm run all` to re-compile the action
 
 ### Working on the action
 

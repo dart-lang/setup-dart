@@ -1,5 +1,5 @@
-include: package:lints/recommended.yaml
+include: package:dart_flutter_team_lints/analysis_options.yaml
 
 linter:
   rules:
-    - unawaited_futures
+    - prefer_relative_imports
