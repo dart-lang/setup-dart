@@ -18,7 +18,7 @@ re-compile the JavaScript code via `npm run all`. This will:
 
 - compile the Dart source (via dart2js) to `lib/main.js`; copy that file to
   `dist/main.cjs`
-- package and minify the `lib/main.mjs` entrypoint point and referencd node
+- package and minify the `lib/main.mjs` entrypoint point and referenced node
   modules to `dist/index.mjs`
 
 ### Files
