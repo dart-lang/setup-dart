@@ -139,7 +139,7 @@ String getPlatform() {
   return os.platform() == 'darwin' ? 'macos' : 'linux';
 }
 
-// When enabled through env variables, create OIDC token for publishing on
+// When enabled through env variables, create an OIDC token for publishing on
 // pub.dev.
 Future<void> createPubOIDCToken() async {
   final tokenRequestUrl = getProcessEnv('ACTIONS_ID_TOKEN_REQUEST_URL');

@@ -1,4 +1,4 @@
-## v1.5.0-dev
+## v1.5.0
 
 * Re-wrote the implementation of the action into Dart.
 * Auto-detect the platform architecture (`x64`, `ia32`, `arm`, `arm64`).
