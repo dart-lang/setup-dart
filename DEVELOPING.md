@@ -23,12 +23,10 @@ re-compile the JavaScript code via `npm run all`. This will:
 
 ### Files
 
-`lib/main.dart` - the Dart entry-point to the action.
-
-`lib/main.mjs` - the JavaScript wrapper; this sets up some important JS interop
-globals and bootstraps into `lib/main.dart`. 
-
-`dist/index.mjs` - the execution entry-point of the action.
+- `lib/main.dart` - the Dart entry-point to the action
+- `lib/main.mjs` - the JavaScript wrapper; this sets up some important JS
+   interop globals and bootstraps into `lib/main.dart`
+- `dist/index.mjs` - the execution entry-point of the action
 
 ## Releasing
 

@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: [2.12.0, stable, beta, dev]
+        sdk: [2.12.4, stable, beta, dev]
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
@@ -36,26 +36,7 @@ jobs:
       - run: dart analyze
       - run: dart test
 
-  # Test older SDKs.
-  test_older:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: [2.9.3]
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./
-        with:
-          sdk: ${{ matrix.sdk }}
-
-      - name: Run hello world
-        run: |
-          echo "main() { print('hello world'); }" > hello.dart
-          dart hello.dart
-
-  # Test the raw flavor SDKs.
+  # Test the raw SDK flavor.
   test_raw:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -78,15 +59,10 @@ jobs:
   # Test the architecture input parameter.
   test_arch:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        sdk: [2.12.0, stable, dev]
-      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - uses: ./
         with:
-          sdk: ${{ matrix.sdk }}
           architecture: ia32
 
       - name: Run hello world

@@ -37,7 +37,7 @@ jobs:
 The action takes the following inputs:
 
   * `sdk`: Which SDK version to setup. Can be specified using one of two forms:
-    * A specific SDK version, e.g. `2.7.2` or `2.12.0-1.4.beta`
+    * A specific SDK version, e.g. `2.19.0` or `2.12.0-1.4.beta`
     * A release channel, which will install the latest build from that channel.
       Available channels are `stable`, `beta`, `dev`, and `main`. 
       See the [Dart SDK archive](https://dart.dev/get-dart/archive) for details.
@@ -68,10 +68,11 @@ The action produces the following output:
 You can create matrix jobs that run tests on multiple operating systems, and
 multiple versions of the Dart SDK.
 
-The following example create a double matrix across two dimensions:
+The following example creates a matrix across two dimensions:
 
-  - All three major operating systems: Linux, macOS, and Windows.
-  - Five Dart SDKs: Latest stable, beta & dev plus two specific versions.
+- three major operating systems: Linux, MacOS, and Windows
+- several Dart SDK versions: a specific version, the latest stable, beta, and
+  dev
 
 ```yml
 name: Dart
@@ -100,57 +101,6 @@ jobs:
 
       - name: Run tests
         run: dart test
-```
-
-## Testing older Dart SDKs
-
-The Dart SDK continuously evolves, and new features and tools are added. The Dart
-2.10 SDK introduced a new unified `dart` developer tool, which is what we use in
-the usage examples above for installing dependencies, verifying formatting,
-analyzing, etc. If you need to test a combination of SDKs before and after Dart
-2.10, we recommend splitting your test job as illustrated here:
-
-```yml
-jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: [stable, beta, dev]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: dart-lang/setup-dart@v1
-        with:
-          sdk: ${{ matrix.sdk }}
-      - name: Install dependencies
-        run: dart pub get
-      - name: Check formatting
-        run: dart format --output=none --set-exit-if-changed .
-      - name: Analyze code
-        run: dart analyze
-      - name: Run tests
-        run: dart test
-
-  test_old_sdks:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: [2.9.0, 2.8.1]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: dart-lang/setup-dart@v1
-        with:
-          sdk: ${{ matrix.sdk }}
-      - name: Install dependencies
-        run: pub get
-      - name: Check formatting
-        run: dartfmt --dry-run --set-exit-if-changed .
-      - name: Analyze code
-        run: dartanalyzer --fatal-warnings .
-      - name: Run tests
-        run: pub run test
 ```
 
 ## License
