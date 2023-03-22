@@ -1,3 +1,7 @@
+## v1.5.1-dev
+
+* No longer test the `setup-dart` action on pre-2.12 SDKs.
+
 ## v1.5.0
 
 * Re-wrote the implementation of the action into Dart.
