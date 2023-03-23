@@ -4,19 +4,15 @@
 
 import 'dart:js_interop';
 
-import 'package:js/js.dart' as js;
-
 @JS()
 external Exec get exec;
 
 @JS()
-@js.staticInterop
-class Exec {}
-
-extension ExecExtension on Exec {
+inline class Exec {
   /// Exec a command.
   ///
   /// Output will be streamed to the live console. Returns promise with return
   /// code.
+  @JS()
   external JSPromise exec(JSString commandLine, [List<JSString> args]);
 }

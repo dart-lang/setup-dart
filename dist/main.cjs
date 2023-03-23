@@ -5472,7 +5472,7 @@
     main$body(args) {
       var $async$goto = 0,
         $async$completer = A._makeAsyncAwaitCompleter(type$.dynamic),
-        $async$returnValue, $async$handler = 2, $async$currentError, sdk, flavor, raw, os, architecture, version, channel, url, toolName, sdkPath, archivePath, extractedFolder, pubCache, error, t1, t2, t3, t4, versionFilePath, exception, $async$exception;
+        $async$returnValue, $async$handler = 2, $async$currentError, sdk, flavor, raw, os, architecture, version, channel, url, toolName, sdkPath, archivePath, extractedFolder, pubCache, error, t1, t2, t3, versionFilePath, exception, $async$exception;
       var $async$main = A._wrapJsFunctionForAsync(function($async$errorCode, $async$result) {
         if ($async$errorCode === 1) {
           $async$currentError = $async$result;
@@ -5483,25 +5483,24 @@
             case 0:
               // Function start
               $async$handler = 4;
-              t1 = type$.JavaScriptObject;
-              sdk = A._asString(t1._as(globalThis.core).getInput("sdk"));
+              sdk = A._asString(globalThis.core.getInput("sdk"));
               if (J.get$length$asx(sdk) === 0)
                 sdk = "stable";
-              flavor = A._asString(t1._as(globalThis.core).getInput("flavor"));
+              flavor = A._asString(globalThis.core.getInput("flavor"));
               if (J.get$length$asx(flavor) === 0)
                 flavor = J.$eq$(sdk, "main") ? "raw" : "release";
               else if (!J.$eq$(flavor, "raw") && !J.$eq$(flavor, "release")) {
-                t1._as(globalThis.core).setFailed("Unrecognized build flavor '" + A.S(flavor) + "'.");
+                globalThis.core.setFailed("Unrecognized build flavor '" + A.S(flavor) + "'.");
                 // goto return
                 $async$goto = 1;
                 break;
               }
               raw = J.$eq$(flavor, "raw");
               os = A.getPlatform();
-              architecture = A._asString(t1._as(globalThis.core).getInput("architecture"));
+              architecture = A._asString(globalThis.core.getInput("architecture"));
               if (J.get$length$asx(architecture) === 0) {
-                t2 = type$.JSObject;
-                architecture = B.JSArray_methods.contains$1(B.List_x64_ia32_arm_arm64, A._asString(t2._as(globalThis.os).arch())) ? A._asString(t2._as(globalThis.os).arch()) : "x64";
+                t1 = type$.JSObject;
+                architecture = B.JSArray_methods.contains$1(B.List_x64_ia32_arm_arm64, A._asString(t1._as(globalThis.os).arch())) ? A._asString(t1._as(globalThis.os).arch()) : "x64";
               }
               version = null;
               channel = null;
@@ -5565,7 +5564,7 @@
               else if (J.contains$1$asx(sdk, "beta"))
                 channel = "beta";
               else if (J.contains$1$asx(sdk, "main")) {
-                t1._as(globalThis.core).setFailed("Versions cannot be specified for main channel builds.");
+                globalThis.core.setFailed("Versions cannot be specified for main channel builds.");
                 // goto return
                 $async$goto = 1;
                 break;
@@ -5575,21 +5574,22 @@
               // join
             case 8:
               // join
-              t1._as(globalThis.core).info("Installing the " + A.S(os) + "-" + A.S(architecture) + " Dart SDK version " + A.S(version) + " from the " + A.S(channel) + " (" + A.S(flavor) + ") channel.");
+              globalThis.core.info("Installing the " + A.S(os) + "-" + A.S(architecture) + " Dart SDK version " + A.S(version) + " from the " + A.S(channel) + " (" + A.S(flavor) + ") channel.");
               url = string$.https_ + A.S(channel) + "/" + A.S(flavor) + "/" + A.S(version) + "/sdk/dartsdk-" + A.S(os) + "-" + A.S(architecture) + "-release.zip";
               toolName = A.boolConversionCheck(raw) ? "dart_raw" : "dart";
-              sdkPath = !A.boolConversionCheck(raw) ? A._asString(t1._as(globalThis.toolCache).find(toolName, version, architecture)) : "";
+              sdkPath = !A.boolConversionCheck(raw) ? A._asString(type$.JavaScriptObject._as(globalThis.toolCache).find(toolName, version, architecture)) : "";
               $async$goto = J.get$length$asx(sdkPath) !== 0 ? 21 : 23;
               break;
             case 21:
               // then
-              t1._as(globalThis.core).info("Using cached sdk from " + A.S(sdkPath) + ".");
+              globalThis.core.info("Using cached sdk from " + A.S(sdkPath) + ".");
               // goto join
               $async$goto = 22;
               break;
             case 23:
               // else
-              t1._as(globalThis.core).info(A.S(url) + " ...");
+              globalThis.core.info(A.S(url) + " ...");
+              t1 = type$.JavaScriptObject;
               t2 = type$.String;
               $async$goto = 24;
               return A._asyncAwait(A.promiseToFuture(t1._as(t1._as(globalThis.toolCache).downloadTool(url)), t2), $async$main);
@@ -5609,28 +5609,28 @@
               sdkPath = $async$result;
             case 22:
               // join
-              t2 = type$.JSObject;
-              t3 = t2._as(globalThis.process);
-              t4 = J.$eq$(os, "windows") ? "USERPROFILE" : "HOME";
-              t4 = A._asStringQ(t2._as(t3.env)[t4]);
-              t4.toString;
-              pubCache = A.join(t4, ".pub-cache");
-              t1._as(globalThis.core).exportVariable("DART_HOME", sdkPath);
-              t1._as(globalThis.core).addPath(A.join(sdkPath, "bin"));
-              t1._as(globalThis.core).exportVariable("PUB_CACHE", pubCache);
-              t1._as(globalThis.core).addPath(A.join(pubCache, "bin"));
+              t1 = type$.JSObject;
+              t2 = t1._as(globalThis.process);
+              t3 = J.$eq$(os, "windows") ? "USERPROFILE" : "HOME";
+              t3 = A._asStringQ(t1._as(t2.env)[t3]);
+              t3.toString;
+              pubCache = A.join(t3, ".pub-cache");
+              globalThis.core.exportVariable("DART_HOME", sdkPath);
+              globalThis.core.addPath(A.join(sdkPath, "bin"));
+              globalThis.core.exportVariable("PUB_CACHE", pubCache);
+              globalThis.core.addPath(A.join(pubCache, "bin"));
               $async$goto = 27;
               return A._asyncAwait(A.createPubOIDCToken(), $async$main);
             case 27:
               // returning from await.
               if (A.boolConversionCheck(raw)) {
-                t3 = t1._as(globalThis.core);
+                t2 = globalThis.core;
                 versionFilePath = A.join(sdkPath, "version");
-                t3.setOutput("dart-version", B.JSString_methods.trim$0(A._asString(t2._as(globalThis.fs).readFileSync(versionFilePath, "utf8"))));
+                t2.setOutput("dart-version", B.JSString_methods.trim$0(A._asString(t1._as(globalThis.fs).readFileSync(versionFilePath, "utf8"))));
               } else
-                t1._as(globalThis.core).setOutput("dart-version", version);
+                globalThis.core.setOutput("dart-version", version);
               $async$goto = 28;
-              return A._asyncAwait(A.promiseToFuture(t1._as(t1._as(globalThis.exec).exec("dart", A._setArrayType(["--version"], type$.JSArray_String))), type$.dynamic), $async$main);
+              return A._asyncAwait(A.promiseToFuture(type$.JavaScriptObject._as(globalThis.exec.exec("dart", A._setArrayType(["--version"], type$.JSArray_String))), type$.dynamic), $async$main);
             case 28:
               // returning from await.
               $async$handler = 2;
@@ -5643,7 +5643,7 @@
               $async$exception = $async$currentError;
               error = A.unwrapException($async$exception);
               t1 = globalThis;
-              type$.JavaScriptObject._as(t1.core).setFailed(A.S(error));
+              t1.core.setFailed(A.S(error));
               // goto after finally
               $async$goto = 6;
               break;
@@ -5691,13 +5691,13 @@
               }
               t1 = type$.JavaScriptObject;
               $async$goto = 3;
-              return A._asyncAwait(A.promiseToFuture(t1._as(t1._as(globalThis.core).getIDToken("https://pub.dev")), type$.String), $async$createPubOIDCToken);
+              return A._asyncAwait(A.promiseToFuture(t1._as(globalThis.core.getIDToken("https://pub.dev")), type$.String), $async$createPubOIDCToken);
             case 3:
               // returning from await.
               token = $async$result;
-              t1._as(globalThis.core).exportVariable("PUB_TOKEN", token);
+              globalThis.core.exportVariable("PUB_TOKEN", token);
               $async$goto = 4;
-              return A._asyncAwait(A.promiseToFuture(t1._as(t1._as(globalThis.exec).exec("dart", A._setArrayType(["pub", "token", "add", "https://pub.dev", "--env-var", "PUB_TOKEN"], type$.JSArray_String))), type$.dynamic), $async$createPubOIDCToken);
+              return A._asyncAwait(A.promiseToFuture(t1._as(globalThis.exec.exec("dart", A._setArrayType(["pub", "token", "add", "https://pub.dev", "--env-var", "PUB_TOKEN"], type$.JSArray_String))), type$.dynamic), $async$createPubOIDCToken);
             case 4:
               // returning from await.
             case 1:
