@@ -5577,7 +5577,7 @@
               globalThis.core.info("Installing the " + A.S(os) + "-" + A.S(architecture) + " Dart SDK version " + A.S(version) + " from the " + A.S(channel) + " (" + A.S(flavor) + ") channel.");
               url = string$.https_ + A.S(channel) + "/" + A.S(flavor) + "/" + A.S(version) + "/sdk/dartsdk-" + A.S(os) + "-" + A.S(architecture) + "-release.zip";
               toolName = A.boolConversionCheck(raw) ? "dart_raw" : "dart";
-              sdkPath = !A.boolConversionCheck(raw) ? A._asString(type$.JavaScriptObject._as(globalThis.toolCache).find(toolName, version, architecture)) : "";
+              sdkPath = !A.boolConversionCheck(raw) ? A._asString(globalThis.toolCache.find(toolName, version, architecture)) : "";
               $async$goto = J.get$length$asx(sdkPath) !== 0 ? 21 : 23;
               break;
             case 21:
@@ -5592,18 +5592,18 @@
               t1 = type$.JavaScriptObject;
               t2 = type$.String;
               $async$goto = 24;
-              return A._asyncAwait(A.promiseToFuture(t1._as(t1._as(globalThis.toolCache).downloadTool(url)), t2), $async$main);
+              return A._asyncAwait(A.promiseToFuture(t1._as(globalThis.toolCache.downloadTool(url)), t2), $async$main);
             case 24:
               // returning from await.
               archivePath = $async$result;
               $async$goto = 25;
-              return A._asyncAwait(A.promiseToFuture(t1._as(t1._as(globalThis.toolCache).extractZip(archivePath)), t2), $async$main);
+              return A._asyncAwait(A.promiseToFuture(t1._as(globalThis.toolCache.extractZip(archivePath)), t2), $async$main);
             case 25:
               // returning from await.
               extractedFolder = $async$result;
               extractedFolder = A.join(extractedFolder, "dart-sdk");
               $async$goto = 26;
-              return A._asyncAwait(A.promiseToFuture(t1._as(t1._as(globalThis.toolCache).cacheDir(extractedFolder, toolName, version, architecture)), t2), $async$main);
+              return A._asyncAwait(A.promiseToFuture(t1._as(globalThis.toolCache.cacheDir(extractedFolder, toolName, version, architecture)), t2), $async$main);
             case 26:
               // returning from await.
               sdkPath = $async$result;
