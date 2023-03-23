@@ -98,7 +98,7 @@ void main(List<String> args) async {
     }
 
     final pubCache = path.join(
-        getProcessEnv(os == 'windows' ? 'USERPROFILE' : 'HOME')!, '.pub-cache');
+        process.env(os == 'windows' ? 'USERPROFILE' : 'HOME')!, '.pub-cache');
 
     core.exportVariable('DART_HOME', sdkPath);
     core.addPath(path.join(sdkPath, 'bin'));
@@ -130,20 +130,20 @@ String getVersionFromSdk(String sdkPath) {
 /// Returns 'x64', 'ia32', 'arm', or 'arm64'.
 String getArch() {
   const supported = ['x64', 'ia32', 'arm', 'arm64'];
-  return supported.contains(os.arch()) ? os.arch() : 'x64';
+  return supported.contains(os.arch) ? os.arch : 'x64';
 }
 
 /// Returns 'linux', 'windows', or 'macos'.
 String getPlatform() {
-  if (os.platform() == 'win32') return 'windows';
-  return os.platform() == 'darwin' ? 'macos' : 'linux';
+  if (os.platform == 'win32') return 'windows';
+  return os.platform == 'darwin' ? 'macos' : 'linux';
 }
 
 // When enabled through env variables, create an OIDC token for publishing on
 // pub.dev.
 Future<void> createPubOIDCToken() async {
-  final tokenRequestUrl = getProcessEnv('ACTIONS_ID_TOKEN_REQUEST_URL');
-  final tokenRequestToken = getProcessEnv('ACTIONS_ID_TOKEN_REQUEST_TOKEN');
+  final tokenRequestUrl = process.env('ACTIONS_ID_TOKEN_REQUEST_URL');
+  final tokenRequestToken = process.env('ACTIONS_ID_TOKEN_REQUEST_TOKEN');
 
   if (tokenRequestUrl == null || tokenRequestToken == null) {
     return;
