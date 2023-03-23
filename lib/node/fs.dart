@@ -17,11 +17,11 @@ inline class FileSystem {
   final JSObject fileSystem;
   FileSystem(this.fileSystem);
 
+  /// Whether the [path] exists, false otherwise.
   @JS()
-  /// Returns true if the [path] exists, false otherwise.
   external JSBoolean existsSync(JSString path);
 
+  /// Read the contents of the [path].
   @JS()
-  /// Returns the contents of the [path].
   external JSString readFileSync(JSString path, [JSString encoding]);
 }

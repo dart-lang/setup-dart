@@ -2533,7 +2533,7 @@ break}l=J.a6(m,"raw")
 k=A.kF()
 j=A.B(a0.a(globalThis.core).getInput("architecture"))
 if(J.a_(j)===0){a1=t.m
-j=B.b.J(B.G,A.B(a1.a(globalThis.os).arch))?A.B(a1.a(globalThis.os).arch):"x64"}i=null
+j=B.b.J(B.G,A.B(a1.a(globalThis.os).arch()))?A.B(a1.a(globalThis.os).arch()):"x64"}i=null
 h=null
 s=J.a6(n,"stable")||J.a6(n,"beta")||J.a6(n,"dev")?7:9
 break
@@ -2621,8 +2621,8 @@ case 6:case 1:return A.fS(q,r)
 case 2:return A.fR(o,r)}})
 return A.fT($async$an,r)},
 kF(){var s=t.m
-if(A.B(s.a(globalThis.os).platform)==="win32")return"windows"
-return A.B(s.a(globalThis.os).platform)==="darwin"?"macos":"linux"},
+if(A.B(s.a(globalThis.os).platform())==="win32")return"windows"
+return A.B(s.a(globalThis.os).platform())==="darwin"?"macos":"linux"},
 en(){var s=0,r=A.fY(t.H),q,p,o,n,m
 var $async$en=A.h_(function(a,b){if(a===1)return A.fR(b,r)
 while(true)switch(s){case 0:o=t.m

@@ -19,5 +19,6 @@ inline class Process {
   // Map<String, String?>
   external JSObject _env;
 
-  String? env(String key) => getProperty<String?>(_env, key);
+  /// Read the environment variable [variable].
+  String? env(String variable) => getProperty<String?>(_env, variable);
 }

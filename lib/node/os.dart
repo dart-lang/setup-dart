@@ -15,10 +15,14 @@ inline class OS {
   OS(this.os);
 
   /// The operating system CPU architecture.
-  @JS()
-  external JSString get arch;
+  JSString get arch => _arch();
+
+  @JS('arch')
+  external JSString _arch();
 
   /// The operating system platform.
-  @JS()
-  external JSString get platform;
+  JSString get platform => _platform();
+
+  @JS('platform')
+  external JSString _platform();
 }
