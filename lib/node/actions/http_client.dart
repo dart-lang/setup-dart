@@ -4,16 +4,16 @@
 
 import 'dart:js_interop';
 
-import 'package:js/js.dart' as js;
-
 @JS()
-@js.staticInterop
-class HttpClient {
-  external factory HttpClient(
-      JSString userAgent, JSArray handlers, Map requestOptions);
-}
+inline class HttpClient {
+  @JS()
+  external HttpClient(
+    JSString userAgent,
+    JSArray handlers,
+    Map requestOptions,
+  );
 
-extension HttpClientExtension on HttpClient {
   // JSPromise<JSObject>
+  @JS()
   external JSPromise getJson(JSString requestUrl);
 }

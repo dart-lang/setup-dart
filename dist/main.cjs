@@ -5710,7 +5710,7 @@
     latestPublishedVersion(channel, flavor) {
       var $async$goto = 0,
         $async$completer = A._makeAsyncAwaitCompleter(type$.String),
-        $async$returnValue, t2, t3, t1, $async$temp1, $async$temp2;
+        $async$returnValue, t2, t1, $async$temp1, $async$temp2;
       var $async$latestPublishedVersion = A._wrapJsFunctionForAsync(function($async$errorCode, $async$result) {
         if ($async$errorCode === 1)
           return A._asyncRethrow($async$result, $async$completer);
@@ -5720,12 +5720,11 @@
               // Function start
               t1 = type$.dynamic;
               t1 = A.LinkedHashMap_LinkedHashMap$_literal(["allowRedirects", true, "maxRedirects", 3, "allowRetries", true, "maxRetries", 3], t1, t1);
-              t2 = type$.JavaScriptObject;
-              t3 = type$.JSObject;
+              t2 = type$.JSObject;
               $async$temp1 = type$.FutureOr_String;
-              $async$temp2 = t3;
+              $async$temp2 = t2;
               $async$goto = 3;
-              return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(new globalThis.HttpClient("setup-dart", [], t1)).getJson(string$.https_ + channel + "/" + flavor + "/latest/VERSION")), t3), $async$latestPublishedVersion);
+              return A._asyncAwait(A.promiseToFuture(type$.JavaScriptObject._as(new globalThis.HttpClient("setup-dart", [], t1).getJson(string$.https_ + channel + "/" + flavor + "/latest/VERSION")), t2), $async$latestPublishedVersion);
             case 3:
               // returning from await.
               $async$returnValue = $async$temp1._as($async$temp2._as($async$result.result).version);
