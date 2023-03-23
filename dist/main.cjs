@@ -5612,7 +5612,7 @@
               t2 = type$.JSObject;
               t3 = t2._as(globalThis.process);
               t4 = J.$eq$(os, "windows") ? "USERPROFILE" : "HOME";
-              t4 = A._asStringQ(t2._as(t3._env)[t4]);
+              t4 = A._asStringQ(t2._as(t3.env)[t4]);
               t4.toString;
               pubCache = A.join(t4, ".pub-cache");
               t1._as(globalThis.core).exportVariable("DART_HOME", sdkPath);
@@ -5682,8 +5682,8 @@
             case 0:
               // Function start
               t1 = type$.JSObject;
-              tokenRequestUrl = A._asStringQ(t1._as(t1._as(globalThis.process)._env).ACTIONS_ID_TOKEN_REQUEST_URL);
-              tokenRequestToken = A._asStringQ(t1._as(t1._as(globalThis.process)._env).ACTIONS_ID_TOKEN_REQUEST_TOKEN);
+              tokenRequestUrl = A._asStringQ(t1._as(t1._as(globalThis.process).env).ACTIONS_ID_TOKEN_REQUEST_URL);
+              tokenRequestToken = A._asStringQ(t1._as(t1._as(globalThis.process).env).ACTIONS_ID_TOKEN_REQUEST_TOKEN);
               if (tokenRequestUrl == null || tokenRequestToken == null) {
                 // goto return
                 $async$goto = 1;

@@ -15,7 +15,7 @@ inline class Process {
   final JSObject process;
   Process(this.process);
 
-  @JS()
+  @JS('env')
   // Map<String, String?>
   external JSObject _env;
 
