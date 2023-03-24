@@ -4,21 +4,17 @@
 
 import 'dart:js_interop';
 
-import 'package:js/js.dart' as js;
-
 @JS()
 external ToolCache get toolCache;
 
 @JS()
-@js.staticInterop
-class ToolCache {}
-
-extension ToolCacheExtension on ToolCache {
+inline class ToolCache {
   /// Finds the path to a tool version in the local installed tool cache.
   ///
   /// @param toolName      name of the tool
   /// @param versionSpec   version of the tool
   /// @param arch          optional arch.  defaults to arch of computer
+  @JS()
   external JSString find(
     JSString toolName,
     JSString versionSpec, [
@@ -30,12 +26,14 @@ extension ToolCacheExtension on ToolCache {
   /// @param url       url of tool to download
   /// @returns         path to downloaded tool
   // JSPromise<String>
+  @JS()
   external JSPromise downloadTool(JSString url);
 
   /// Extract a zip.
   ///
   /// @param file     path to the zip
   /// @returns        path to the destination directory
+  @JS()
   external JSPromise extractZip(JSString file);
 
   /// Caches a directory and installs it into the tool cacheDir
@@ -45,6 +43,7 @@ extension ToolCacheExtension on ToolCache {
   /// @param version       version of the tool.  semver format
   /// @param arch          architecture of the tool.  Optional.
   ///                      Defaults to machine architecture
+  @JS()
   external JSPromise cacheDir(
     JSString sourceDir,
     JSString tool,

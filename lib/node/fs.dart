@@ -6,15 +6,22 @@ import 'dart:js_interop';
 
 import 'package:js/js.dart' as js;
 
+/// POSIX functions for interacting with the file system.
+/// Wraps https://nodejs.org/api/fs.html
 @JS()
 external FileSystem get fs;
 
 @JS()
 @js.staticInterop
-class FileSystem {}
+inline class FileSystem {
+  final JSObject fileSystem;
+  FileSystem(this.fileSystem);
 
-extension FileSystemExtension on FileSystem {
+  /// Whether the [path] exists, false otherwise.
+  @JS()
   external JSBoolean existsSync(JSString path);
 
+  /// Read the contents of the [path].
+  @JS()
   external JSString readFileSync(JSString path, [JSString encoding]);
 }

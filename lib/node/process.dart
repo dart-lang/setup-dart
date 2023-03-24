@@ -5,18 +5,20 @@
 import 'dart:js_interop';
 import 'dart:js_util';
 
-import 'package:js/js.dart' as js;
-
+/// Provides information about, and control over, the current Node.js process.
+/// Wraps https://nodejs.org/api/process.html
 @JS()
 external Process get process;
 
 @JS()
-@js.staticInterop
-class Process {}
+inline class Process {
+  final JSObject process;
+  Process(this.process);
 
-extension ProcessExtension on Process {
+  @JS('env')
   // Map<String, String?>
-  external JSObject env;
-}
+  external JSObject _env;
 
-String? getProcessEnv(String name) => getProperty<String?>(process.env, name);
+  /// Read the environment variable [variable].
+  String? env(String variable) => getProperty<String?>(_env, variable);
+}

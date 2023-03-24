@@ -4,17 +4,25 @@
 
 import 'dart:js_interop';
 
-import 'package:js/js.dart' as js;
-
+/// Operating system-related utility methods and properties.
+/// Wraps https://nodejs.org/api/os.html
 @JS()
 external OS get os;
 
 @JS()
-@js.staticInterop
-class OS {}
+inline class OS {
+  final JSObject os;
+  OS(this.os);
 
-extension OSExtension on OS {
-  external JSString arch();
+  /// The operating system CPU architecture.
+  JSString get arch => _arch();
 
-  external JSString platform();
+  @JS('arch')
+  external JSString _arch();
+
+  /// The operating system platform.
+  JSString get platform => _platform();
+
+  @JS('platform')
+  external JSString _platform();
 }

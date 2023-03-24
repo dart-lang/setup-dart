@@ -4,30 +4,34 @@
 
 import 'dart:js_interop';
 
-import 'package:js/js.dart' as js;
-
 @JS()
 external Core get core;
 
 @JS()
-@js.staticInterop
-class Core {}
-
-extension CoreExtension on Core {
+inline class Core {
+  @JS()
   external JSString getInput(JSString name);
 
+  @JS()
   external void setOutput(JSString name, JSString value);
 
+  @JS()
   external void info(JSString name);
+  @JS()
   external void warning(JSString name);
+  @JS()
   external void error(JSString name);
 
+  @JS()
   external void addPath(JSString element);
 
+  @JS()
   external void exportVariable(JSString name, JSString value);
 
+  @JS()
   external void setFailed(JSString name);
 
+  @JS()
   // JSPromise<String>
   external JSPromise getIDToken(JSString audience);
 }
