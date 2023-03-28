@@ -135,8 +135,11 @@ String getArch() {
 
 /// Returns 'linux', 'windows', or 'macos'.
 String getPlatform() {
-  if (os.platform == 'win32') return 'windows';
-  return os.platform == 'darwin' ? 'macos' : 'linux';
+  return switch (os.platform) {
+    'win32' => 'windows',
+    'darwin' => 'macos',
+    _ => 'linux'
+  };
 }
 
 // When enabled through env variables, create an OIDC token for publishing on

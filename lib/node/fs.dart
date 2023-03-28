@@ -4,15 +4,12 @@
 
 import 'dart:js_interop';
 
-import 'package:js/js.dart' as js;
-
 /// POSIX functions for interacting with the file system.
 /// Wraps https://nodejs.org/api/fs.html
 @JS()
 external FileSystem get fs;
 
 @JS()
-@js.staticInterop
 inline class FileSystem {
   final JSObject fileSystem;
   FileSystem(this.fileSystem);
