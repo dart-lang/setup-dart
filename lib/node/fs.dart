@@ -15,10 +15,8 @@ inline class FileSystem {
   FileSystem(this.fileSystem);
 
   /// Whether the [path] exists, false otherwise.
-  @JS()
   external JSBoolean existsSync(JSString path);
 
   /// Read the contents of the [path].
-  @JS()
   external JSString readFileSync(JSString path, [JSString encoding]);
 }
