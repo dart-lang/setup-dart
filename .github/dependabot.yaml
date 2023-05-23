@@ -6,6 +6,8 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    labels:
+      - autosubmit
 
   - package-ecosystem: npm
     directory: /
