@@ -5,6 +5,8 @@ name: Build
 on:
   pull_request:
     branches: [main]
+  schedule:
+    - cron: "0 0 * * 0" # Run every Sunday at 00:00.
 
 jobs:
   build:
@@ -15,4 +17,5 @@ jobs:
         with:
           sdk: dev
       - run: dart pub get
+      - run: dart analyze --fatal-infos
       - run: dart tool/sig.dart --verify
