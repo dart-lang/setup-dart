@@ -17,7 +17,7 @@ inline class ToolCache {
   external String find(
     String toolName,
     String versionSpec, [
-    String arch,
+    String? arch,
   ]);
 
   /// Download a tool from an url and stream it into a file.
@@ -44,6 +44,6 @@ inline class ToolCache {
     String sourceDir,
     String tool,
     String version, [
-    String arch,
+    String? arch,
   ]);
 }

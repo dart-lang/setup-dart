@@ -116,7 +116,10 @@ void main(List<String> args) async {
     }
 
     // Report success; print version.
-    await promiseToFuture(exec.exec('dart', ['--version']));
+    await promiseToFuture(exec.exec(
+      'dart',
+      ['--version'].map((str) => str.toJS).toList().toJS,
+    ));
   } catch (error) {
     core.setFailed('$error');
   }
@@ -157,8 +160,17 @@ Future<void> createPubOIDCToken() async {
 
   core.exportVariable('PUB_TOKEN', token);
 
-  await promiseToFuture(exec.exec('dart',
-      ['pub', 'token', 'add', 'https://pub.dev', '--env-var', 'PUB_TOKEN']));
+  await promiseToFuture(exec.exec(
+    'dart',
+    [
+      'pub',
+      'token',
+      'add',
+      'https://pub.dev',
+      '--env-var',
+      'PUB_TOKEN',
+    ].map((str) => str.toJS).toList().toJS,
+  ));
 }
 
 // https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION
