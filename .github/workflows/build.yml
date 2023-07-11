@@ -17,4 +17,5 @@ jobs:
         with:
           sdk: dev
       - run: dart pub get
+      - run: dart analyze --fatal-infos
       - run: dart tool/sig.dart --verify
