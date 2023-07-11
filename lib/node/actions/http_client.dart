@@ -7,11 +7,11 @@ import 'dart:js_interop';
 @JS()
 inline class HttpClient {
   external HttpClient(
-    JSString userAgent,
-    JSArray handlers,
-    Map requestOptions,
-  );
+    String userAgent, [
+    JSArray? handlers,
+    JSObject? requestOptions,
+  ]);
 
   // JSPromise<JSObject>
-  external JSPromise getJson(JSString requestUrl);
+  external JSPromise getJson(String requestUrl);
 }

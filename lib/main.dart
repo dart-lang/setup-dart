@@ -174,12 +174,16 @@ Future<String> latestPublishedVersion(String channel, String flavor) async {
   final url = 'https://storage.googleapis.com/dart-archive/channels/'
       '$channel/$flavor/latest/VERSION';
 
-  final http = HttpClient('setup-dart', [], {
-    'allowRedirects': true,
-    'maxRedirects': 3,
-    'allowRetries': true,
-    'maxRetries': 3,
-  });
+  final http = HttpClient(
+    'setup-dart',
+    <JSAny>[].toJS,
+    jsify({
+      'allowRedirects': true,
+      'maxRedirects': 3,
+      'allowRetries': true,
+      'maxRetries': 3,
+    }) as JSObject?,
+  );
 
   var response = await promiseToFuture<JSObject>(http.getJson(url));
   var result = getProperty<JSObject>(response, 'result');

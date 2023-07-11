@@ -13,5 +13,5 @@ inline class Exec {
   ///
   /// Output will be streamed to the live console. Returns promise with return
   /// code.
-  external JSPromise exec(JSString commandLine, [List<JSString> args]);
+  external JSPromise exec(String commandLine, [List<String> args]);
 }
