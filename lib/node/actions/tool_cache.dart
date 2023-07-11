@@ -9,6 +9,10 @@ external ToolCache get toolCache;
 
 @JS()
 inline class ToolCache {
+  final JSObject obj;
+
+  ToolCache(this.obj);
+
   /// Finds the path to a tool version in the local installed tool cache.
   ///
   /// @param toolName      name of the tool

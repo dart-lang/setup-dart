@@ -9,6 +9,10 @@ external Core get core;
 
 @JS()
 inline class Core {
+  final JSObject obj;
+
+  Core(this.obj);
+
   external String getInput(String name);
 
   external void setOutput(String name, String value);

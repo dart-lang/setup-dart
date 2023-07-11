@@ -6,6 +6,9 @@ import 'dart:js_interop';
 
 @JS()
 inline class HttpClient {
+  // TODO: This needs to be assigned somewhere.
+  final JSObject obj;
+
   external HttpClient(
     String userAgent, [
     JSArray? handlers,
