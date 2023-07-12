@@ -118,7 +118,7 @@ void main(List<String> args) async {
     // Report success; print version.
     await promiseToFuture(exec.exec(
       'dart',
-      ['--version'].map((str) => str.toJS).toList().toJS,
+      ['--version'.toJS].toJS,
     ));
   } catch (error) {
     core.setFailed('$error');
@@ -163,13 +163,13 @@ Future<void> createPubOIDCToken() async {
   await promiseToFuture(exec.exec(
     'dart',
     [
-      'pub',
-      'token',
-      'add',
-      'https://pub.dev',
-      '--env-var',
-      'PUB_TOKEN',
-    ].map((str) => str.toJS).toList().toJS,
+      'pub'.toJS,
+      'token'.toJS,
+      'add'.toJS,
+      'https://pub.dev'.toJS,
+      '--env-var'.toJS,
+      'PUB_TOKEN'.toJS,
+    ].toJS,
   ));
 }
 
