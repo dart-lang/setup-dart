@@ -9,15 +9,19 @@ external ToolCache get toolCache;
 
 @JS()
 inline class ToolCache {
+  final JSObject obj;
+
+  ToolCache(this.obj);
+
   /// Finds the path to a tool version in the local installed tool cache.
   ///
   /// @param toolName      name of the tool
   /// @param versionSpec   version of the tool
   /// @param arch          optional arch.  defaults to arch of computer
-  external JSString find(
-    JSString toolName,
-    JSString versionSpec, [
-    JSString arch,
+  external String find(
+    String toolName,
+    String versionSpec, [
+    String? arch,
   ]);
 
   /// Download a tool from an url and stream it into a file.
@@ -25,13 +29,13 @@ inline class ToolCache {
   /// @param url       url of tool to download
   /// @returns         path to downloaded tool
   // JSPromise<String>
-  external JSPromise downloadTool(JSString url);
+  external JSPromise downloadTool(String url);
 
   /// Extract a zip.
   ///
   /// @param file     path to the zip
   /// @returns        path to the destination directory
-  external JSPromise extractZip(JSString file);
+  external JSPromise extractZip(String file);
 
   /// Caches a directory and installs it into the tool cacheDir
   ///
@@ -41,9 +45,9 @@ inline class ToolCache {
   /// @param arch          architecture of the tool.  Optional.
   ///                      Defaults to machine architecture
   external JSPromise cacheDir(
-    JSString sourceDir,
-    JSString tool,
-    JSString version, [
-    JSString arch,
+    String sourceDir,
+    String tool,
+    String version, [
+    String? arch,
   ]);
 }

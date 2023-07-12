@@ -12,17 +12,18 @@ external OS get os;
 @JS()
 inline class OS {
   final JSObject os;
+
   OS(this.os);
 
   @JS('arch')
-  external JSString _arch();
+  external String _arch();
 
   /// The operating system CPU architecture.
-  JSString get arch => _arch();
+  String get arch => _arch();
 
   @JS('platform')
-  external JSString _platform();
+  external String _platform();
 
   /// The operating system platform.
-  JSString get platform => _platform();
+  String get platform => _platform();
 }

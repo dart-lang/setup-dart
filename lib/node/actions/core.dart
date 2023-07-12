@@ -9,20 +9,24 @@ external Core get core;
 
 @JS()
 inline class Core {
-  external JSString getInput(JSString name);
+  final JSObject obj;
 
-  external void setOutput(JSString name, JSString value);
+  Core(this.obj);
 
-  external void info(JSString name);
-  external void warning(JSString name);
-  external void error(JSString name);
+  external String getInput(String name);
 
-  external void addPath(JSString element);
+  external void setOutput(String name, String value);
 
-  external void exportVariable(JSString name, JSString value);
+  external void info(String name);
+  external void warning(String name);
+  external void error(String name);
 
-  external void setFailed(JSString name);
+  external void addPath(String element);
+
+  external void exportVariable(String name, String value);
+
+  external void setFailed(String name);
 
   // JSPromise<String>
-  external JSPromise getIDToken(JSString audience);
+  external JSPromise getIDToken(String audience);
 }

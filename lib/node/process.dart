@@ -13,6 +13,7 @@ external Process get process;
 @JS()
 inline class Process {
   final JSObject process;
+
   Process(this.process);
 
   @JS('env')

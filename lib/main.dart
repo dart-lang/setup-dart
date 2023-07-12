@@ -116,7 +116,10 @@ void main(List<String> args) async {
     }
 
     // Report success; print version.
-    await promiseToFuture(exec.exec('dart', ['--version']));
+    await promiseToFuture(exec.exec(
+      'dart',
+      ['--version'.toJS].toJS,
+    ));
   } catch (error) {
     core.setFailed('$error');
   }
@@ -157,8 +160,17 @@ Future<void> createPubOIDCToken() async {
 
   core.exportVariable('PUB_TOKEN', token);
 
-  await promiseToFuture(exec.exec('dart',
-      ['pub', 'token', 'add', 'https://pub.dev', '--env-var', 'PUB_TOKEN']));
+  await promiseToFuture(exec.exec(
+    'dart',
+    [
+      'pub'.toJS,
+      'token'.toJS,
+      'add'.toJS,
+      'https://pub.dev'.toJS,
+      '--env-var'.toJS,
+      'PUB_TOKEN'.toJS,
+    ].toJS,
+  ));
 }
 
 // https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION
@@ -174,12 +186,16 @@ Future<String> latestPublishedVersion(String channel, String flavor) async {
   final url = 'https://storage.googleapis.com/dart-archive/channels/'
       '$channel/$flavor/latest/VERSION';
 
-  final http = HttpClient('setup-dart', [], {
-    'allowRedirects': true,
-    'maxRedirects': 3,
-    'allowRetries': true,
-    'maxRetries': 3,
-  });
+  final http = HttpClient(
+    'setup-dart',
+    <JSAny>[].toJS,
+    jsify({
+      'allowRedirects': true,
+      'maxRedirects': 3,
+      'allowRetries': true,
+      'maxRetries': 3,
+    }) as JSObject?,
+  );
 
   var response = await promiseToFuture<JSObject>(http.getJson(url));
   var result = getProperty<JSObject>(response, 'result');

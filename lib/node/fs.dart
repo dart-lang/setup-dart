@@ -12,11 +12,12 @@ external FileSystem get fs;
 @JS()
 inline class FileSystem {
   final JSObject fileSystem;
+
   FileSystem(this.fileSystem);
 
   /// Whether the [path] exists, false otherwise.
-  external JSBoolean existsSync(JSString path);
+  external bool existsSync(String path);
 
   /// Read the contents of the [path].
-  external JSString readFileSync(JSString path, [JSString encoding]);
+  external String readFileSync(String path, [String encoding]);
 }

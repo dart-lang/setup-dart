@@ -9,9 +9,13 @@ external Exec get exec;
 
 @JS()
 inline class Exec {
+  final JSObject obj;
+
+  Exec(this.obj);
+
   /// Exec a command.
   ///
   /// Output will be streamed to the live console. Returns promise with return
   /// code.
-  external JSPromise exec(JSString commandLine, [List<JSString> args]);
+  external JSPromise exec(String commandLine, [JSArray? args]);
 }
