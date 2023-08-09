@@ -186,7 +186,7 @@ Future<String> latestPublishedVersion(String channel, String flavor) async {
   final url = 'https://storage.googleapis.com/dart-archive/channels/'
       '$channel/$flavor/latest/VERSION';
 
-  final http = HttpClient(
+  final http = HttpClient.fromAgent(
     'setup-dart',
     <JSAny>[].toJS,
     jsify({

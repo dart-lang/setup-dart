@@ -11,11 +11,7 @@ import 'dart:js_util';
 external Process get process;
 
 @JS()
-inline class Process {
-  final JSObject process;
-
-  Process(this.process);
-
+extension type Process (JSObject process) {
   @JS('env')
   // Map<String, String?>
   external JSObject _env;
