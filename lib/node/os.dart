@@ -10,7 +10,7 @@ import 'dart:js_interop';
 external OS get os;
 
 @JS()
-extension type OS (JSObject os) {
+extension type OS (JSObject obj) {
   @JS('arch')
   external String _arch();
 

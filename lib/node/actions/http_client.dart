@@ -5,8 +5,8 @@
 import 'dart:js_interop';
 
 @JS()
-extension type HttpClient (JSObject obj) {
-  external HttpClient.fromAgent(
+extension type HttpClient._(JSObject obj) {
+  external HttpClient(
     String userAgent, [
     JSArray? handlers,
     JSObject? requestOptions,
