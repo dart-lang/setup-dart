@@ -1,7 +1,8 @@
 ## v1.5.1-dev
 
 * No longer test the `setup-dart` action on pre-2.12 SDKs.
-* Upgrade JS interop code to use inline classes.
+* Upgrade JS interop code to use extension types
+  (the new name for inline classes).
 
 ## v1.5.0
 

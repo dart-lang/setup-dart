@@ -8,11 +8,7 @@ import 'dart:js_interop';
 external Exec get exec;
 
 @JS()
-inline class Exec {
-  final JSObject obj;
-
-  Exec(this.obj);
-
+extension type Exec (JSObject obj) {
   /// Exec a command.
   ///
   /// Output will be streamed to the live console. Returns promise with return

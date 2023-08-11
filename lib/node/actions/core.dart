@@ -8,11 +8,7 @@ import 'dart:js_interop';
 external Core get core;
 
 @JS()
-inline class Core {
-  final JSObject obj;
-
-  Core(this.obj);
-
+extension type Core (JSObject obj) {
   external String getInput(String name);
 
   external void setOutput(String name, String value);
