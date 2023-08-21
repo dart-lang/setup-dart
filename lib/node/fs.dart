@@ -10,7 +10,7 @@ import 'dart:js_interop';
 external FileSystem get fs;
 
 @JS()
-extension type FileSystem (JSObject fileSystem) {
+extension type FileSystem (JSObject obj) {
   /// Whether the [path] exists, false otherwise.
   external bool existsSync(String path);
 
