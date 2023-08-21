@@ -14,7 +14,7 @@ external Process get process;
 extension type Process (JSObject obj) {
   @JS('env')
   // Map<String, String?>
-  external JSObject _env;
+  external JSObject get _env;
 
   /// Read the environment variable [variable].
   String? env(String variable) => getProperty<String?>(_env, variable);
