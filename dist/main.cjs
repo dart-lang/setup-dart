@@ -5560,7 +5560,7 @@
               // join
               t3 = t2._as(t1.process);
               t4 = J.$eq$(os, "windows") ? "USERPROFILE" : "HOME";
-              t4 = A._asStringQ(t2._as(t3.env())[t4]);
+              t4 = A._asStringQ(t2._as(t3.env)[t4]);
               t4.toString;
               pubCache = A.join(t4, ".pub-cache");
               t2._as(t1.core).exportVariable("DART_HOME", sdkPath);
@@ -5642,8 +5642,8 @@
               // Function start
               t1 = self;
               t2 = type$.JSObject;
-              tokenRequestUrl = A._asStringQ(t2._as(t2._as(t1.process).env()).ACTIONS_ID_TOKEN_REQUEST_URL);
-              tokenRequestToken = A._asStringQ(t2._as(t2._as(t1.process).env()).ACTIONS_ID_TOKEN_REQUEST_TOKEN);
+              tokenRequestUrl = A._asStringQ(t2._as(t2._as(t1.process).env).ACTIONS_ID_TOKEN_REQUEST_URL);
+              tokenRequestToken = A._asStringQ(t2._as(t2._as(t1.process).env).ACTIONS_ID_TOKEN_REQUEST_TOKEN);
               if (tokenRequestUrl == null || tokenRequestToken == null) {
                 // goto return
                 $async$goto = 1;
