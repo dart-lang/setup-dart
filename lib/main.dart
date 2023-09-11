@@ -51,6 +51,8 @@ void main(List<String> args) async {
       version =
           raw ? 'latest' : (await latestPublishedVersion(channel, flavor));
     } else if (sdk == 'main') {
+      // TODO: test - touching this file
+
       channel = 'be';
       version =
           raw ? 'latest' : (await latestPublishedVersion(channel, flavor));
