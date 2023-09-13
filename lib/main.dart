@@ -51,8 +51,8 @@ void main(List<String> args) async {
       version =
           raw ? 'latest' : (await latestPublishedVersion(channel, flavor));
     } else if (sdk == 'main') {
-      // TODO(b/299435467): Temporary forward compatibility that
-      // automatically migrates users when the be channel is renamed to main.
+      // Check for `main` first and fall back to `be`. This handles the channel
+      // rename from `be` to `main` (also tracked as b/299435467).
       try {
         channel = 'main';
         await latestPublishedVersion(channel, flavor);
