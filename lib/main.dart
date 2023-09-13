@@ -51,9 +51,15 @@ void main(List<String> args) async {
       version =
           raw ? 'latest' : (await latestPublishedVersion(channel, flavor));
     } else if (sdk == 'main') {
-      channel = 'be';
-      version =
-          raw ? 'latest' : (await latestPublishedVersion(channel, flavor));
+      // Check for `main` first and fall back to `be`. This handles the channel
+      // rename from `be` to `main` (also tracked as b/299435467).
+      try {
+        channel = 'main';
+        await latestPublishedVersion(channel, flavor);
+      } catch (_) {
+        channel = 'be';
+      }
+      version = 'latest';
     } else {
       version = sdk;
 

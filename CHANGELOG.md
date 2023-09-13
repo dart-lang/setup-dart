@@ -1,8 +1,10 @@
-## v1.5.1-dev
+## v1.5.1
 
 * No longer test the `setup-dart` action on pre-2.12 SDKs.
 * Upgrade JS interop code to use extension types
   (the new name for inline classes).
+* The upcoming rename of the `be` channel to `main` is now supported with
+  forward compatibility that switches when the rename happens.
 
 ## v1.5.0
 
