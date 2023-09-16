@@ -4225,6 +4225,9 @@
       B.JSArray_methods.add$1(parts, penultimateString);
       B.JSArray_methods.add$1(parts, ultimateString);
     },
+    print(object) {
+      A.printString(A.S(object));
+    },
     Uri_parse(uri) {
       var delta, indices, schemeEnd, hostStart, portStart, pathStart, queryStart, fragmentStart, isSimple, scheme, t1, t2, schemeAuth, queryStart0, pathStart0, userInfoStart, userInfo, host, portNumber, port, path, query, _null = null,
         end = uri.length;
@@ -5846,6 +5849,7 @@
             case 10:
               // returning from await.
               version = $async$result;
+              A.print("[version=" + A.S(version) + "]");
               // goto join
               $async$goto = 8;
               break;
@@ -5897,10 +5901,6 @@
               $async$handler = 21;
               $async$exception = $async$currentError;
               channel = "be";
-              $async$goto = 26;
-              return A._asyncAwait(A.latestPublishedVersion(channel, flavor), $async$main);
-            case 26:
-              // returning from await.
               // goto after finally
               $async$goto = 24;
               break;
@@ -5939,35 +5939,35 @@
               url = string$.https_ + A.S(channel) + "/" + A.S(flavor) + "/" + A.S(version) + "/sdk/dartsdk-" + A.S(os) + "-" + A.S(architecture) + "-release.zip";
               toolName = A.boolConversionCheck(raw) ? "dart_raw" : "dart";
               sdkPath = !A.boolConversionCheck(raw) ? A._asString(t2._as(t1.toolCache).find(toolName, version, architecture)) : "";
-              $async$goto = J.get$length$asx(sdkPath) !== 0 ? 27 : 29;
+              $async$goto = J.get$length$asx(sdkPath) !== 0 ? 26 : 28;
               break;
-            case 27:
+            case 26:
               // then
               t2._as(t1.core).info("Using cached sdk from " + A.S(sdkPath) + ".");
               // goto join
-              $async$goto = 28;
+              $async$goto = 27;
               break;
-            case 29:
+            case 28:
               // else
               t2._as(t1.core).info(A.S(url) + " ...");
               t3 = type$.String;
-              $async$goto = 30;
+              $async$goto = 29;
               return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.toolCache).downloadTool(url)), t3), $async$main);
-            case 30:
+            case 29:
               // returning from await.
               archivePath = $async$result;
-              $async$goto = 31;
+              $async$goto = 30;
               return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.toolCache).extractZip(archivePath)), t3), $async$main);
-            case 31:
+            case 30:
               // returning from await.
               extractedFolder = $async$result;
               extractedFolder = A.join(extractedFolder, "dart-sdk");
-              $async$goto = 32;
+              $async$goto = 31;
               return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.toolCache).cacheDir(extractedFolder, toolName, version, architecture)), t3), $async$main);
-            case 32:
+            case 31:
               // returning from await.
               sdkPath = $async$result;
-            case 28:
+            case 27:
               // join
               t3 = t2._as(t1.process);
               t4 = J.$eq$(os, "windows") ? "USERPROFILE" : "HOME";
@@ -5978,16 +5978,16 @@
               t2._as(t1.core).addPath(A.join(sdkPath, "bin"));
               t2._as(t1.core).exportVariable("PUB_CACHE", pubCache);
               t2._as(t1.core).addPath(A.join(pubCache, "bin"));
-              $async$goto = 33;
+              $async$goto = 32;
               return A._asyncAwait(A.createPubOIDCToken(), $async$main);
-            case 33:
+            case 32:
               // returning from await.
               t4 = t2._as(t1.core);
               versionFilePath = A.join(sdkPath, "version");
               t4.setOutput("dart-version", B.JSString_methods.trim$0(A._asString(t2._as(t1.fs).readFileSync(versionFilePath, "utf8"))));
-              $async$goto = 34;
+              $async$goto = 33;
               return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.exec).exec("dart", A._setArrayType(["--version"], type$.JSArray_String))), type$.dynamic), $async$main);
-            case 34:
+            case 33:
               // returning from await.
               $async$handler = 2;
               // goto after finally
@@ -6108,7 +6108,7 @@
     findLatestSdkForRelease(sdkRelease) {
       var $async$goto = 0,
         $async$completer = A._makeAsyncAwaitCompleter(type$.String),
-        $async$returnValue, versions, semvers, t1, t2, paths, $async$temp1, $async$temp2, $async$temp3;
+        $async$returnValue, t1, t2, result, paths, versions, semvers, $async$temp1;
       var $async$findLatestSdkForRelease = A._wrapJsFunctionForAsync(function($async$errorCode, $async$result) {
         if ($async$errorCode === 1)
           return A._asyncRethrow($async$result, $async$completer);
@@ -6116,23 +6116,28 @@
           switch ($async$goto) {
             case 0:
               // Function start
+              A.print("[sdkRelease=" + sdkRelease + "]");
               t1 = type$.String;
               t2 = type$.JSObject;
-              $async$temp1 = J;
-              $async$temp2 = type$.List_dynamic;
-              $async$temp3 = t2;
+              $async$temp1 = t2;
               $async$goto = 3;
               return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(new self.HttpClient("setup-dart", A._setArrayType([], type$.JSArray_Object), type$.nullable_JSObject._as(A.jsify(A.LinkedHashMap_LinkedHashMap$_literal(["allowRedirects", true, "maxRedirects", 3, "allowRetries", true, "maxRetries", 3], t1, type$.Object))))).getJson("https://storage.googleapis.com/storage/v1/b/dart-archive/o?prefix=" + ("channels/stable/release/" + sdkRelease + ".") + "&delimiter=/")), t2), $async$findLatestSdkForRelease);
             case 3:
               // returning from await.
-              paths = $async$temp1.cast$1$0$ax($async$temp2._as($async$temp3._as($async$result.result).prefixes), t1);
+              result = $async$temp1._as($async$result.result);
+              A.print(result);
+              paths = J.cast$1$0$ax(type$.List_dynamic._as(result.prefixes), t1);
+              A.print(paths);
               t1 = paths.$ti;
               t2 = t1._eval$1("MappedListIterable<ListBase.E,String>");
               versions = A.List_List$of(new A.MappedListIterable(paths, t1._eval$1("String(ListBase.E)")._as(new A.findLatestSdkForRelease_closure()), t2), true, t2._eval$1("ListIterable.E"));
+              A.print(versions);
               t2 = A._arrayInstanceType(versions);
               t1 = t2._eval$1("MappedListIterable<1,Version>");
               semvers = A.List_List$of(new A.MappedListIterable(versions, t2._eval$1("Version(1)")._as(A.version_Version___parse_tearOff$closure()), t1), true, t1._eval$1("ListIterable.E"));
+              A.print(semvers);
               B.JSArray_methods.sort$0(semvers);
+              A.print(semvers);
               $async$returnValue = B.JSArray_methods.get$last(semvers)._version$_text;
               // goto return
               $async$goto = 1;
@@ -6145,6 +6150,21 @@
       return A._asyncStartSync($async$findLatestSdkForRelease, $async$completer);
     },
     findLatestSdkForRelease_closure: function findLatestSdkForRelease_closure() {
+    },
+    printString(string) {
+      if (typeof dartPrint == "function") {
+        dartPrint(string);
+        return;
+      }
+      if (typeof console == "object" && typeof console.log != "undefined") {
+        console.log(string);
+        return;
+      }
+      if (typeof print == "function") {
+        print(string);
+        return;
+      }
+      throw "Unable to print message: " + String(string);
     },
     throwLateFieldADI(fieldName) {
       A.throwExpressionWithWrapper(new A.LateError("Field '" + fieldName + "' has been assigned during initialization."), new Error());

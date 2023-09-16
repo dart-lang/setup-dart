@@ -53,6 +53,7 @@ void main(List<String> args) async {
       // Find the latest version for 'sdk'.
       final versionPrefix = sdk.substring(0, sdk.length - '.x'.length);
       version = await findLatestSdkForRelease(versionPrefix);
+      print('[version=$version]');
     } else if (sdk == 'stable' || sdk == 'beta' || sdk == 'dev') {
       channel = sdk;
       version =
@@ -65,7 +66,6 @@ void main(List<String> args) async {
         await latestPublishedVersion(channel, flavor);
       } catch (_) {
         channel = 'be';
-        await latestPublishedVersion(channel, flavor);
       }
       version = 'latest';
     } else {
@@ -217,6 +217,8 @@ Future<String> latestPublishedVersion(String channel, String flavor) async {
 ///
 /// [sdkRelease] must be in the form of `major.minor` (e.g., `2.19`).
 Future<String> findLatestSdkForRelease(String sdkRelease) async {
+  print('[sdkRelease=$sdkRelease]');
+
   final filePrefix = 'channels/stable/release/$sdkRelease.';
   final url = 'https://storage.googleapis.com/storage/v1/b/dart-archive/o'
       '?prefix=$filePrefix&delimiter=/';
@@ -244,11 +246,17 @@ Future<String> findLatestSdkForRelease(String sdkRelease) async {
   var response = await promiseToFuture<JSObject>(http.getJson(url));
   var result = getProperty<JSObject>(response, 'result');
 
+  print(result);
+
   final paths = (getProperty(result, 'prefixes') as List).cast<String>();
+  print(paths);
   final versions = paths.map((p) => p.split('/').last).toList();
+  print(versions);
 
   // Sort versions by semver and return the highest version.
   final semvers = versions.map(Version.parse).toList();
+  print(semvers);
   semvers.sort();
+  print(semvers);
   return semvers.last.toString();
 }
