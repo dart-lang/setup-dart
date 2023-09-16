@@ -9565,7 +9565,11 @@
   };
   A.findLatestSdkForRelease_closure.prototype = {
     call$1(p) {
-      return B.JSArray_methods.get$last(A._asString(p).split("/"));
+      var t1 = A._setArrayType(A._asString(p).split("/"), type$.JSArray_String);
+      if (0 >= t1.length)
+        return A.ioore(t1, -1);
+      t1.pop();
+      return B.JSArray_methods.get$last(t1);
     },
     $signature: 7
   };

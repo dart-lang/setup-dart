@@ -250,7 +250,7 @@ Future<String> findLatestSdkForRelease(String sdkRelease) async {
 
   final paths = (getProperty(result, 'prefixes') as List).cast<String>();
   print(paths);
-  final versions = paths.map((p) => p.split('/').last).toList();
+  final versions = paths.map((p) => (p.split('/')..removeLast()).last).toList();
   print(versions);
 
   // Sort versions by semver and return the highest version.
