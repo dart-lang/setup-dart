@@ -6,6 +6,7 @@ import 'dart:js_interop';
 import 'dart:js_util';
 
 import 'package:path/path.dart' as path;
+import 'package:pub_semver/pub_semver.dart';
 
 import 'node/actions/core.dart';
 import 'node/actions/exec.dart';
@@ -46,7 +47,13 @@ void main(List<String> args) async {
     String version;
     String channel;
 
-    if (sdk == 'stable' || sdk == 'beta' || sdk == 'dev') {
+    if (sdk.endsWith('.x')) {
+      channel = 'stable';
+
+      // Find the latest version for 'sdk'.
+      final versionPrefix = sdk.substring(0, sdk.length - '.x'.length);
+      version = await findLatestSdkForRelease(versionPrefix);
+    } else if (sdk == 'stable' || sdk == 'beta' || sdk == 'dev') {
       channel = sdk;
       version =
           raw ? 'latest' : (await latestPublishedVersion(channel, flavor));
@@ -55,11 +62,11 @@ void main(List<String> args) async {
       // rename from `be` to `main` (also tracked as b/299435467).
       try {
         channel = 'main';
-        await latestPublishedVersion(channel, flavor);
+        version = await latestPublishedVersion(channel, flavor);
       } catch (_) {
         channel = 'be';
+        version = await latestPublishedVersion(channel, flavor);
       }
-      version = 'latest';
     } else {
       version = sdk;
 
@@ -115,11 +122,7 @@ void main(List<String> args) async {
     await createPubOIDCToken();
 
     // Configure the outputs.
-    if (raw) {
-      core.setOutput('dart-version', getVersionFromSdk(sdkPath));
-    } else {
-      core.setOutput('dart-version', version);
-    }
+    core.setOutput('dart-version', getVersionFromSdk(sdkPath));
 
     // Report success; print version.
     await promiseToFuture(exec.exec(
@@ -206,4 +209,44 @@ Future<String> latestPublishedVersion(String channel, String flavor) async {
   var response = await promiseToFuture<JSObject>(http.getJson(url));
   var result = getProperty<JSObject>(response, 'result');
   return getProperty(result, 'version');
+}
+
+/// Find the latest SDK patch version for the given SDK release.
+///
+/// [sdkRelease] must be in the form of `major.minor` (e.g., `2.19`).
+Future<String> findLatestSdkForRelease(String sdkRelease) async {
+  final filePrefix = 'channels/stable/release/$sdkRelease.';
+  final url = 'https://storage.googleapis.com/storage/v1/b/dart-archive/o'
+      '?prefix=$filePrefix&delimiter=/';
+
+  final http = HttpClient(
+    'setup-dart',
+    <JSAny>[].toJS,
+    jsify({
+      'allowRedirects': true,
+      'maxRedirects': 3,
+      'allowRetries': true,
+      'maxRetries': 3,
+    }) as JSObject?,
+  );
+
+  // {
+  //   "kind": "storage#objects",
+  //   "prefixes": [
+  //     "channels/stable/release/2.19.0/",
+  //     "channels/stable/release/2.19.1/",
+  //     ...
+  //     "channels/stable/release/2.19.6/"
+  //   ]
+  // }
+  var response = await promiseToFuture<JSObject>(http.getJson(url));
+  var result = getProperty<JSObject>(response, 'result');
+
+  final paths = (getProperty(result, 'prefixes') as List).cast<String>();
+  final versions = paths.map((p) => p.split('/').last).toList();
+
+  // Sort versions by semver and return the highest version.
+  final semvers = versions.map(Version.parse).toList();
+  semvers.sort();
+  return semvers.last.toString();
 }

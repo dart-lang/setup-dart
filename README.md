@@ -36,11 +36,13 @@ jobs:
 
 The action takes the following inputs:
 
-  * `sdk`: Which SDK version to setup. Can be specified using one of two forms:
-    * A specific SDK version, e.g. `2.19.0` or `2.12.0-1.4.beta`
+  * `sdk`: Which SDK version to setup. Can be specified using one of three forms:
     * A release channel, which will install the latest build from that channel.
-      Available channels are `stable`, `beta`, `dev`, and `main`. 
-      See the [Dart SDK archive](https://dart.dev/get-dart/archive) for details.
+      Available channels are `stable`, `beta`, `dev`, and `main`. See the
+      [Dart SDK archive](https://dart.dev/get-dart/archive) for details.
+    * A wildcard form for the latest patch release for a specific SDK version.
+      E.g., `2.19.x` will get the latest patch release for the 2.19 SDK.
+    * A specific SDK version, e.g. `2.19.0` or `2.12.0-1.4.beta`.
 
   * `flavor`: Which build flavor to setup.
     * The available build flavors are `release` and `raw`.
@@ -89,7 +91,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: [2.18.0, stable, beta, dev]
+        sdk: [3.1.x, stable, beta, dev]
     steps:
       - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1

@@ -1,3 +1,8 @@
+## v1.5.2-wip
+
+* Add support for specifying a wildcard format for provisioning the latest patch
+  release of an SDK.
+
 ## v1.5.1
 
 * No longer test the `setup-dart` action on pre-2.12 SDKs.
