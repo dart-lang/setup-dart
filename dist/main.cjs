@@ -5803,7 +5803,7 @@
     main$body(args) {
       var $async$goto = 0,
         $async$completer = A._makeAsyncAwaitCompleter(type$.dynamic),
-        $async$returnValue, $async$handler = 2, $async$currentError, sdk, flavor, raw, os, architecture, version, channel, versionPrefix, url, toolName, sdkPath, archivePath, extractedFolder, pubCache, error, t1, t2, exception, version0, t3, t4, versionFilePath, $async$exception, $async$exception1;
+        $async$returnValue, $async$handler = 2, $async$currentError, sdk, flavor, raw, os, architecture, version, channel, versionPrefix, url, toolName, sdkPath, archivePath, extractedFolder, pubCache, e, t1, t2, exception, t3, t4, versionFilePath, $async$exception, $async$exception1;
       var $async$main = A._wrapJsFunctionForAsync(function($async$errorCode, $async$result) {
         if ($async$errorCode === 1) {
           $async$currentError = $async$result;
@@ -5888,7 +5888,6 @@
               return A._asyncAwait(A.latestPublishedVersion(channel, flavor), $async$main);
             case 25:
               // returning from await.
-              version = $async$result;
               $async$handler = 4;
               // goto after finally
               $async$goto = 24;
@@ -5902,8 +5901,6 @@
               return A._asyncAwait(A.latestPublishedVersion(channel, flavor), $async$main);
             case 26:
               // returning from await.
-              version0 = $async$result;
-              version = version0;
               // goto after finally
               $async$goto = 24;
               break;
@@ -5914,6 +5911,7 @@
               break;
             case 24:
               // after finally
+              version = "latest";
               // goto join
               $async$goto = 19;
               break;
@@ -5999,9 +5997,11 @@
               // catch
               $async$handler = 3;
               $async$exception1 = $async$currentError;
-              error = A.unwrapException($async$exception1);
+              e = A.unwrapException($async$exception1);
               t1 = self;
-              type$.JSObject._as(t1.core).setFailed(A.S(error));
+              t2 = type$.JSObject;
+              t2._as(t1.core).error(A.S(e));
+              t2._as(t1.core).setFailed(A.S(e));
               // goto after finally
               $async$goto = 6;
               break;

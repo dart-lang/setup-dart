@@ -62,11 +62,12 @@ void main(List<String> args) async {
       // rename from `be` to `main` (also tracked as b/299435467).
       try {
         channel = 'main';
-        version = await latestPublishedVersion(channel, flavor);
+        await latestPublishedVersion(channel, flavor);
       } catch (_) {
         channel = 'be';
-        version = await latestPublishedVersion(channel, flavor);
+        await latestPublishedVersion(channel, flavor);
       }
+      version = 'latest';
     } else {
       version = sdk;
 
@@ -129,8 +130,9 @@ void main(List<String> args) async {
       'dart',
       ['--version'.toJS].toJS,
     ));
-  } catch (error) {
-    core.setFailed('$error');
+  } catch (e) {
+    core.error('$e');
+    core.setFailed('$e');
   }
 }
 
