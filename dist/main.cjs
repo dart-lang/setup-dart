@@ -5982,7 +5982,7 @@
               versionFilePath = A.join(sdkPath, "version");
               t4.setOutput("dart-version", B.JSString_methods.trim$0(A._asString(t2._as(t1.fs).readFileSync(versionFilePath, "utf8"))));
               $async$goto = 33;
-              return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.exec).exec("dart", A._setArrayType(["--version"], type$.JSArray_String))), type$.dynamic), $async$main);
+              return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.exec).exec("dart", A._setArrayType(["--version"], type$.JSArray_String))), type$.void), $async$main);
             case 33:
               // returning from await.
               $async$handler = 2;
@@ -6059,7 +6059,7 @@
               token = $async$result;
               t2._as(t1.core).exportVariable("PUB_TOKEN", token);
               $async$goto = 4;
-              return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.exec).exec("dart", A._setArrayType(["pub", "token", "add", "https://pub.dev", "--env-var", "PUB_TOKEN"], type$.JSArray_String))), type$.dynamic), $async$createPubOIDCToken);
+              return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.exec).exec("dart", A._setArrayType(["pub", "token", "add", "https://pub.dev", "--env-var", "PUB_TOKEN"], type$.JSArray_String))), type$.void), $async$createPubOIDCToken);
             case 4:
               // returning from await.
             case 1:

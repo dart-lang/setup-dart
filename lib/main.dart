@@ -125,7 +125,7 @@ void main(List<String> args) async {
     core.setOutput('dart-version', getVersionFromSdk(sdkPath));
 
     // Report success; print version.
-    await promiseToFuture(exec.exec(
+    await promiseToFuture<void>(exec.exec(
       'dart',
       ['--version'.toJS].toJS,
     ));
@@ -169,7 +169,7 @@ Future<void> createPubOIDCToken() async {
 
   core.exportVariable('PUB_TOKEN', token);
 
-  await promiseToFuture(exec.exec(
+  await promiseToFuture<void>(exec.exec(
     'dart',
     [
       'pub'.toJS,
