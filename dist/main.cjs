@@ -4225,9 +4225,6 @@
       B.JSArray_methods.add$1(parts, penultimateString);
       B.JSArray_methods.add$1(parts, ultimateString);
     },
-    print(object) {
-      A.printString(A.S(object));
-    },
     Uri_parse(uri) {
       var delta, indices, schemeEnd, hostStart, portStart, pathStart, queryStart, fragmentStart, isSimple, scheme, t1, t2, schemeAuth, queryStart0, pathStart0, userInfoStart, userInfo, host, portNumber, port, path, query, _null = null,
         end = uri.length;
@@ -5826,7 +5823,7 @@
               if (J.get$length$asx(flavor) === 0)
                 flavor = J.$eq$(sdk, "main") ? "raw" : "release";
               else if (!J.$eq$(flavor, "raw") && !J.$eq$(flavor, "release")) {
-                t2._as(t1.core).setFailed("Unrecognized build flavor '" + A.S(flavor) + "'.");
+                A._fail("Unrecognized build flavor '" + A.S(flavor) + "'.");
                 // goto return
                 $async$goto = 1;
                 break;
@@ -5849,7 +5846,6 @@
             case 10:
               // returning from await.
               version = $async$result;
-              A.print("[version=" + A.S(version) + "]");
               // goto join
               $async$goto = 8;
               break;
@@ -5923,7 +5919,7 @@
               else if (J.contains$1$asx(sdk, "beta"))
                 channel = "beta";
               else if (J.contains$1$asx(sdk, "main")) {
-                t2._as(t1.core).setFailed("Versions cannot be specified for main channel builds.");
+                A._fail("Versions cannot be specified for main channel builds.");
                 // goto return
                 $async$goto = 1;
                 break;
@@ -5998,10 +5994,7 @@
               $async$handler = 3;
               $async$exception1 = $async$currentError;
               e = A.unwrapException($async$exception1);
-              t1 = self;
-              t2 = type$.JSObject;
-              t2._as(t1.core).error(A.S(e));
-              t2._as(t1.core).setFailed(A.S(e));
+              A._fail(A.S(e));
               // goto after finally
               $async$goto = 6;
               break;
@@ -6108,7 +6101,7 @@
     findLatestSdkForRelease(sdkRelease) {
       var $async$goto = 0,
         $async$completer = A._makeAsyncAwaitCompleter(type$.String),
-        $async$returnValue, t1, t2, result, paths, versions, semvers, $async$temp1;
+        $async$returnValue, versions, semvers, t1, t2, paths, $async$temp1, $async$temp2, $async$temp3;
       var $async$findLatestSdkForRelease = A._wrapJsFunctionForAsync(function($async$errorCode, $async$result) {
         if ($async$errorCode === 1)
           return A._asyncRethrow($async$result, $async$completer);
@@ -6116,28 +6109,23 @@
           switch ($async$goto) {
             case 0:
               // Function start
-              A.print("[sdkRelease=" + sdkRelease + "]");
               t1 = type$.String;
               t2 = type$.JSObject;
-              $async$temp1 = t2;
+              $async$temp1 = J;
+              $async$temp2 = type$.List_dynamic;
+              $async$temp3 = t2;
               $async$goto = 3;
               return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(new self.HttpClient("setup-dart", A._setArrayType([], type$.JSArray_Object), type$.nullable_JSObject._as(A.jsify(A.LinkedHashMap_LinkedHashMap$_literal(["allowRedirects", true, "maxRedirects", 3, "allowRetries", true, "maxRetries", 3], t1, type$.Object))))).getJson("https://storage.googleapis.com/storage/v1/b/dart-archive/o?prefix=" + ("channels/stable/release/" + sdkRelease + ".") + "&delimiter=/")), t2), $async$findLatestSdkForRelease);
             case 3:
               // returning from await.
-              result = $async$temp1._as($async$result.result);
-              A.print(result);
-              paths = J.cast$1$0$ax(type$.List_dynamic._as(result.prefixes), t1);
-              A.print(paths);
+              paths = $async$temp1.cast$1$0$ax($async$temp2._as($async$temp3._as($async$result.result).prefixes), t1);
               t1 = paths.$ti;
               t2 = t1._eval$1("MappedListIterable<ListBase.E,String>");
               versions = A.List_List$of(new A.MappedListIterable(paths, t1._eval$1("String(ListBase.E)")._as(new A.findLatestSdkForRelease_closure()), t2), true, t2._eval$1("ListIterable.E"));
-              A.print(versions);
               t2 = A._arrayInstanceType(versions);
               t1 = t2._eval$1("MappedListIterable<1,Version>");
               semvers = A.List_List$of(new A.MappedListIterable(versions, t2._eval$1("Version(1)")._as(A.version_Version___parse_tearOff$closure()), t1), true, t1._eval$1("ListIterable.E"));
-              A.print(semvers);
               B.JSArray_methods.sort$0(semvers);
-              A.print(semvers);
               $async$returnValue = B.JSArray_methods.get$last(semvers)._version$_text;
               // goto return
               $async$goto = 1;
@@ -6149,22 +6137,13 @@
       });
       return A._asyncStartSync($async$findLatestSdkForRelease, $async$completer);
     },
-    findLatestSdkForRelease_closure: function findLatestSdkForRelease_closure() {
+    _fail(message) {
+      var t1 = self,
+        t2 = type$.JSObject;
+      t2._as(t1.core).error(message);
+      t2._as(t1.core).setFailed(message);
     },
-    printString(string) {
-      if (typeof dartPrint == "function") {
-        dartPrint(string);
-        return;
-      }
-      if (typeof console == "object" && typeof console.log != "undefined") {
-        console.log(string);
-        return;
-      }
-      if (typeof print == "function") {
-        print(string);
-        return;
-      }
-      throw "Unable to print message: " + String(string);
+    findLatestSdkForRelease_closure: function findLatestSdkForRelease_closure() {
     },
     throwLateFieldADI(fieldName) {
       A.throwExpressionWithWrapper(new A.LateError("Field '" + fieldName + "' has been assigned during initialization."), new Error());
