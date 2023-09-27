@@ -1,4 +1,4 @@
-## v1.5.2-wip
+## v1.6.0
 
 * Add support for specifying a wildcard format for provisioning the latest patch
   release of an SDK.

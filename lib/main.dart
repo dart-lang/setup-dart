@@ -47,12 +47,12 @@ void main(List<String> args) async {
     String version;
     String channel;
 
-    if (sdk.endsWith('.x')) {
+    if (sdk.split('.').length == 2) {
+      // Handle the wildcard (`2.19`, `3.1`, ...) format.
       channel = 'stable';
 
-      // Find the latest version for 'sdk'.
-      final versionPrefix = sdk.substring(0, sdk.length - '.x'.length);
-      version = await findLatestSdkForRelease(versionPrefix);
+      // Find the latest version for the given sdk release.
+      version = await findLatestSdkForRelease(sdk);
     } else if (sdk == 'stable' || sdk == 'beta' || sdk == 'dev') {
       channel = sdk;
       version =
