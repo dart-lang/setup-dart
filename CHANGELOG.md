@@ -1,3 +1,8 @@
+## v1.6.0
+
+* Enable provisioning of the latest Dart SDK patch release by specifying just
+  the major and minor version (e.g. `3.2`).
+
 ## v1.5.1
 
 * No longer test the `setup-dart` action on pre-2.12 SDKs.

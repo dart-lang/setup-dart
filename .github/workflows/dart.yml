@@ -82,7 +82,25 @@ jobs:
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
-          architecture: ia32
+
+      - name: Run hello world
+        run: |
+          echo "main() { print('hello world'); }" > hello.dart
+          dart hello.dart
+      - run: dart --version
+
+  # Test getting the latest patch release for a major.minor sdk parameter.
+  test_latest_patch_release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        sdk: [2.19, 3.1]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./
+        with:
+          sdk: ${{ matrix.sdk }}
 
       - name: Run hello world
         run: |
