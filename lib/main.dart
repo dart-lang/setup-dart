@@ -24,6 +24,8 @@ void main(List<String> args) async {
       sdk = 'stable';
     }
 
+    print('*** sdk [$sdk] ***');
+
     // flavor
     var flavor = core.getInput('flavor');
     if (flavor.isEmpty) {
@@ -252,6 +254,9 @@ Future<String> findLatestSdkForRelease(String sdkRelease) async {
 }
 
 void _fail(String message) {
+  // 'core.setFailed' throws when we call it; see #107.
+  // core.setFailed(message);
+
+  process.exitCode = 1;
   core.error(message);
-  core.setFailed(message);
 }
