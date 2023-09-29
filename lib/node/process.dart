@@ -19,5 +19,5 @@ extension type Process (JSObject obj) {
   /// Read the environment variable [variable].
   String? env(String variable) => getProperty<String?>(_env, variable);
 
-  external set exitCode(int value);
+  external int exitCode;
 }
