@@ -1,7 +1,7 @@
 ## v1.6.0
 
-* Add support for specifying a wildcard format for provisioning the latest patch
-  release of an SDK.
+* Enable provisioning of the latest Dart SDK patch release by specifying just
+  the major and minor version (e.g. `3.2`).
 
 ## v1.5.1
 

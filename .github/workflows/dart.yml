@@ -89,8 +89,8 @@ jobs:
           dart hello.dart
       - run: dart --version
 
-  # Test using wildcard versions for the sdk parameter.
-  test_release_wildcards:
+  # Test getting the latest patch release for a major.minor sdk parameter.
+  test_latest_patch_release:
     runs-on: ubuntu-latest
     strategy:
       matrix:
