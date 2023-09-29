@@ -5816,7 +5816,8 @@
               sdk = A._asString(t2._as(t1.core).getInput("sdk"));
               if (J.get$length$asx(sdk) === 0)
                 sdk = "stable";
-              A.printString("*** sdk [" + A.S(sdk) + "] ***");
+              if (A.Primitives_parseInt(sdk, null) != null && !J.contains$1$asx(sdk, "."))
+                sdk = A.S(sdk) + ".0";
               flavor = A._asString(t2._as(t1.core).getInput("flavor"));
               if (J.get$length$asx(flavor) === 0)
                 flavor = J.$eq$(sdk, "main") ? "raw" : "release";
@@ -6141,21 +6142,6 @@
       t2._as(t1.core).error(message);
     },
     findLatestSdkForRelease_closure: function findLatestSdkForRelease_closure() {
-    },
-    printString(string) {
-      if (typeof dartPrint == "function") {
-        dartPrint(string);
-        return;
-      }
-      if (typeof console == "object" && typeof console.log != "undefined") {
-        console.log(string);
-        return;
-      }
-      if (typeof print == "function") {
-        print(string);
-        return;
-      }
-      throw "Unable to print message: " + String(string);
     },
     throwLateFieldADI(fieldName) {
       A.throwExpressionWithWrapper(new A.LateError("Field '" + fieldName + "' has been assigned during initialization."), new Error());

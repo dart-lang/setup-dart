@@ -23,8 +23,12 @@ void main(List<String> args) async {
     if (sdk.isEmpty) {
       sdk = 'stable';
     }
-
-    print('*** sdk [$sdk] ***');
+    // Work around an issue where a `3.0` in a workflow file reaches us as a `3`
+    // here.
+    if (int.tryParse(sdk) != null && !sdk.contains('.')) {
+      // Convert a '3' to a '3.0'.
+      sdk = '$sdk.0';
+    }
 
     // flavor
     var flavor = core.getInput('flavor');
@@ -257,6 +261,7 @@ void _fail(String message) {
   // 'core.setFailed' throws when we call it; see #107.
   // core.setFailed(message);
 
+  // TODO: This line is not properly setting the exit code.
   process.exitCode = 1;
   core.error(message);
 }
