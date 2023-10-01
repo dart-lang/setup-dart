@@ -24,7 +24,7 @@ jobs:
         sdk: [2.12.4, stable, beta, dev]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
@@ -46,7 +46,7 @@ jobs:
         flavor: [raw]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
@@ -60,7 +60,7 @@ jobs:
   test_arch:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./
         with:
           architecture: ia32
@@ -78,7 +78,7 @@ jobs:
         sdk: [2.12.0-29.10.beta]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
@@ -97,7 +97,7 @@ jobs:
         sdk: [2.19, 3.1]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
