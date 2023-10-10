@@ -5858,12 +5858,8 @@
               sdk = A._asString(t2._as(t1.core).getInput("sdk"));
               if (sdk.length === 0)
                 sdk = "stable";
-              if (A.Primitives_parseInt(sdk, null) != null && !B.JSString_methods.contains$1(sdk, ".")) {
-                A._fail("fo bar baz: " + (sdk + ".0"));
-                // goto return
-                $async$goto = 1;
-                break;
-              }
+              if (A.Primitives_parseInt(sdk, null) != null && !B.JSString_methods.contains$1(sdk, "."))
+                sdk += ".0";
               flavor = A._asString(t2._as(t1.core).getInput("flavor"));
               if (J.get$length$asx(flavor) === 0)
                 flavor = sdk === "main" ? "raw" : "release";

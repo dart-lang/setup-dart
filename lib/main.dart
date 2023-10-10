@@ -36,9 +36,6 @@ Future<void> _impl(List<String> args) async {
   if (int.tryParse(sdk) != null && !sdk.contains('.')) {
     // Convert a '3' to a '3.0'.
     sdk = '$sdk.0';
-
-    _fail('fo bar baz: $sdk');
-    return;
   }
 
   // flavor
