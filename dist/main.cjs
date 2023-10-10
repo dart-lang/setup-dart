@@ -507,9 +507,6 @@
     map$1$1$ax(receiver, a0, $T1) {
       return J.getInterceptor$ax(receiver).map$1$1(receiver, a0, $T1);
     },
-    split$1$s(receiver, a0) {
-      return J.getInterceptor$s(receiver).split$1(receiver, a0);
-    },
     toString$0$(receiver) {
       return J.getInterceptor$(receiver).toString$0(receiver);
     },
@@ -624,7 +621,7 @@
       this.__internal$_message = t0;
     },
     CodeUnits: function CodeUnits(t0) {
-      this.__internal$_string = t0;
+      this._string = t0;
     },
     EfficientLengthIterable: function EfficientLengthIterable() {
     },
@@ -1643,13 +1640,13 @@
     },
     _AllMatchesIterable: function _AllMatchesIterable(t0, t1, t2) {
       this._re = t0;
-      this._string = t1;
+      this.__js_helper$_string = t1;
       this.__js_helper$_start = t2;
     },
     _AllMatchesIterator: function _AllMatchesIterator(t0, t1, t2) {
       var _ = this;
       _._regExp = t0;
-      _._string = t1;
+      _.__js_helper$_string = t1;
       _._nextIndex = t2;
       _.__js_helper$_current = null;
     },
@@ -5799,7 +5796,7 @@
     main$body(args) {
       var $async$goto = 0,
         $async$completer = A._makeAsyncAwaitCompleter(type$.dynamic),
-        $async$returnValue, $async$handler = 2, $async$currentError, sdk, flavor, raw, os, architecture, version, channel, url, toolName, sdkPath, archivePath, extractedFolder, pubCache, e, t1, t2, exception, t3, t4, versionFilePath, $async$exception, $async$exception1;
+        $async$handler = 1, $async$currentError, e, exception, $async$exception;
       var $async$main = A._wrapJsFunctionForAsync(function($async$errorCode, $async$result) {
         if ($async$errorCode === 1) {
           $async$currentError = $async$result;
@@ -5809,15 +5806,67 @@
           switch ($async$goto) {
             case 0:
               // Function start
-              $async$handler = 4;
+              $async$handler = 3;
+              $async$goto = 6;
+              return A._asyncAwait(A._impl(args), $async$main);
+            case 6:
+              // returning from await.
+              $async$handler = 1;
+              // goto after finally
+              $async$goto = 5;
+              break;
+            case 3:
+              // catch
+              $async$handler = 2;
+              $async$exception = $async$currentError;
+              e = A.unwrapException($async$exception);
+              A._fail(A.S(e));
+              // goto after finally
+              $async$goto = 5;
+              break;
+            case 2:
+              // uncaught
+              // goto rethrow
+              $async$goto = 1;
+              break;
+            case 5:
+              // after finally
+              // implicit return
+              return A._asyncReturn(null, $async$completer);
+            case 1:
+              // rethrow
+              return A._asyncRethrow($async$currentError, $async$completer);
+          }
+      });
+      return A._asyncStartSync($async$main, $async$completer);
+    },
+    _impl(args) {
+      var $async$goto = 0,
+        $async$completer = A._makeAsyncAwaitCompleter(type$.void),
+        $async$returnValue, $async$handler = 2, $async$currentError, flavor, channel, raw, os, architecture, version, exception, url, toolName, sdkPath, t3, archivePath, extractedFolder, t4, pubCache, versionFilePath, t1, t2, sdk, $async$exception, $async$temp1;
+      var $async$_impl = A._wrapJsFunctionForAsync(function($async$errorCode, $async$result) {
+        if ($async$errorCode === 1) {
+          $async$currentError = $async$result;
+          $async$goto = $async$handler;
+        }
+        while (true)
+          switch ($async$goto) {
+            case 0:
+              // Function start
               t1 = self;
               t2 = type$.JSObject;
               sdk = A._asString(t2._as(t1.core).getInput("sdk"));
-              if (J.get$length$asx(sdk) === 0)
+              if (sdk.length === 0)
                 sdk = "stable";
+              if (A.Primitives_parseInt(sdk, null) != null && !B.JSString_methods.contains$1(sdk, ".")) {
+                A._fail("fo bar baz: " + (sdk + ".0"));
+                // goto return
+                $async$goto = 1;
+                break;
+              }
               flavor = A._asString(t2._as(t1.core).getInput("flavor"));
               if (J.get$length$asx(flavor) === 0)
-                flavor = J.$eq$(sdk, "main") ? "raw" : "release";
+                flavor = sdk === "main" ? "raw" : "release";
               else if (!J.$eq$(flavor, "raw") && !J.$eq$(flavor, "release")) {
                 A._fail("Unrecognized build flavor '" + A.S(flavor) + "'.");
                 // goto return
@@ -5827,141 +5876,140 @@
               raw = J.$eq$(flavor, "raw");
               os = A.getPlatform();
               architecture = A._asString(t2._as(t1.core).getInput("architecture"));
-              if (J.get$length$asx(architecture) === 0)
+              if (architecture.length === 0)
                 architecture = B.JSArray_methods.contains$1(B.List_x64_ia32_arm_arm64, A._asString(t2._as(t1.os).arch())) ? A._asString(t2._as(t1.os).arch()) : "x64";
-              version = null;
               channel = null;
-              $async$goto = J.split$1$s(sdk, ".").length === 2 ? 7 : 9;
+              $async$goto = sdk.split(".").length === 2 ? 3 : 5;
+              break;
+            case 3:
+              // then
+              channel = "stable";
+              $async$goto = 6;
+              return A._asyncAwait(A.findLatestSdkForRelease(sdk), $async$_impl);
+            case 6:
+              // returning from await.
+              version = $async$result;
+              // goto join
+              $async$goto = 4;
+              break;
+            case 5:
+              // else
+              $async$goto = sdk === "stable" || sdk === "beta" || sdk === "dev" ? 7 : 9;
               break;
             case 7:
               // then
-              channel = "stable";
-              $async$goto = 10;
-              return A._asyncAwait(A.findLatestSdkForRelease(sdk), $async$main);
+              channel = sdk;
+              $async$goto = raw ? 10 : 12;
+              break;
             case 10:
+              // then
+              $async$result = "latest";
+              // goto join
+              $async$goto = 11;
+              break;
+            case 12:
+              // else
+              $async$goto = 13;
+              return A._asyncAwait(A.latestPublishedVersion(channel, flavor), $async$_impl);
+            case 13:
               // returning from await.
+            case 11:
+              // join
               version = $async$result;
               // goto join
               $async$goto = 8;
               break;
             case 9:
               // else
-              $async$goto = J.$eq$(sdk, "stable") || J.$eq$(sdk, "beta") || J.$eq$(sdk, "dev") ? 11 : 13;
-              break;
-            case 11:
-              // then
-              channel = sdk;
-              $async$goto = A.boolConversionCheck(raw) ? 14 : 16;
+              $async$goto = sdk === "main" ? 14 : 16;
               break;
             case 14:
               // then
-              $async$result = "latest";
+              $async$handler = 18;
+              channel = "main";
+              $async$goto = 21;
+              return A._asyncAwait(A.latestPublishedVersion(channel, flavor), $async$_impl);
+            case 21:
+              // returning from await.
+              $async$handler = 2;
+              // goto after finally
+              $async$goto = 20;
+              break;
+            case 18:
+              // catch
+              $async$handler = 17;
+              $async$exception = $async$currentError;
+              channel = "be";
+              // goto after finally
+              $async$goto = 20;
+              break;
+            case 17:
+              // uncaught
+              // goto rethrow
+              $async$goto = 2;
+              break;
+            case 20:
+              // after finally
+              version = "latest";
               // goto join
               $async$goto = 15;
               break;
             case 16:
               // else
-              $async$goto = 17;
-              return A._asyncAwait(A.latestPublishedVersion(channel, flavor), $async$main);
-            case 17:
-              // returning from await.
-            case 15:
-              // join
-              version = $async$result;
-              // goto join
-              $async$goto = 12;
-              break;
-            case 13:
-              // else
-              $async$goto = J.$eq$(sdk, "main") ? 18 : 20;
-              break;
-            case 18:
-              // then
-              $async$handler = 22;
-              channel = "main";
-              $async$goto = 25;
-              return A._asyncAwait(A.latestPublishedVersion(channel, flavor), $async$main);
-            case 25:
-              // returning from await.
-              $async$handler = 4;
-              // goto after finally
-              $async$goto = 24;
-              break;
-            case 22:
-              // catch
-              $async$handler = 21;
-              $async$exception = $async$currentError;
-              channel = "be";
-              // goto after finally
-              $async$goto = 24;
-              break;
-            case 21:
-              // uncaught
-              // goto catch
-              $async$goto = 4;
-              break;
-            case 24:
-              // after finally
-              version = "latest";
-              // goto join
-              $async$goto = 19;
-              break;
-            case 20:
-              // else
-              version = sdk;
-              if (J.contains$1$asx(sdk, "dev"))
+              if (B.JSString_methods.contains$1(sdk, "dev"))
                 channel = "dev";
-              else if (J.contains$1$asx(sdk, "beta"))
+              else if (B.JSString_methods.contains$1(sdk, "beta"))
                 channel = "beta";
-              else if (J.contains$1$asx(sdk, "main")) {
+              else if (B.JSString_methods.contains$1(sdk, "main")) {
                 A._fail("Versions cannot be specified for main channel builds.");
                 // goto return
                 $async$goto = 1;
                 break;
               } else
                 channel = "stable";
-            case 19:
-              // join
-            case 12:
+              version = sdk;
+            case 15:
               // join
             case 8:
               // join
-              t2._as(t1.core).info("Installing the " + A.S(os) + "-" + A.S(architecture) + " Dart SDK version " + A.S(version) + " from the " + A.S(channel) + " (" + A.S(flavor) + ") channel.");
-              url = string$.https_ + A.S(channel) + "/" + A.S(flavor) + "/" + A.S(version) + "/sdk/dartsdk-" + A.S(os) + "-" + A.S(architecture) + "-release.zip";
-              toolName = A.boolConversionCheck(raw) ? "dart_raw" : "dart";
-              sdkPath = !A.boolConversionCheck(raw) ? A._asString(t2._as(t1.toolCache).find(toolName, version, architecture)) : "";
-              $async$goto = J.get$length$asx(sdkPath) !== 0 ? 26 : 28;
+            case 4:
+              // join
+              t2._as(t1.core).info("Installing the " + os + "-" + architecture + " Dart SDK version " + version + " from the " + A.S(channel) + " (" + A.S(flavor) + ") channel.");
+              url = string$.https_ + A.S(channel) + "/" + A.S(flavor) + "/" + version + "/sdk/dartsdk-" + os + "-" + architecture + "-release.zip";
+              toolName = raw ? "dart_raw" : "dart";
+              sdkPath = !raw ? A._asString(t2._as(t1.toolCache).find(toolName, version, architecture)) : "";
+              $async$goto = sdkPath.length !== 0 ? 22 : 24;
               break;
-            case 26:
+            case 22:
               // then
-              t2._as(t1.core).info("Using cached sdk from " + A.S(sdkPath) + ".");
+              t2._as(t1.core).info("Using cached sdk from " + sdkPath + ".");
               // goto join
-              $async$goto = 27;
+              $async$goto = 23;
               break;
-            case 28:
+            case 24:
               // else
-              t2._as(t1.core).info(A.S(url) + " ...");
+              t2._as(t1.core).info(url + " ...");
               t3 = type$.String;
-              $async$goto = 29;
-              return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.toolCache).downloadTool(url)), t3), $async$main);
-            case 29:
+              $async$goto = 25;
+              return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.toolCache).downloadTool(url)), t3), $async$_impl);
+            case 25:
               // returning from await.
               archivePath = $async$result;
-              $async$goto = 30;
-              return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.toolCache).extractZip(archivePath)), t3), $async$main);
-            case 30:
+              $async$temp1 = A;
+              $async$goto = 26;
+              return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.toolCache).extractZip(archivePath)), t3), $async$_impl);
+            case 26:
               // returning from await.
-              extractedFolder = $async$result;
-              extractedFolder = A.join(extractedFolder, "dart-sdk");
-              $async$goto = 31;
-              return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.toolCache).cacheDir(extractedFolder, toolName, version, architecture)), t3), $async$main);
-            case 31:
+              extractedFolder = $async$temp1.join($async$result, "dart-sdk");
+              $async$goto = 27;
+              return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.toolCache).cacheDir(extractedFolder, toolName, version, architecture)), t3), $async$_impl);
+            case 27:
               // returning from await.
               sdkPath = $async$result;
-            case 27:
+            case 23:
               // join
               t3 = t2._as(t1.process);
-              t4 = J.$eq$(os, "windows") ? "USERPROFILE" : "HOME";
+              t4 = os === "windows" ? "USERPROFILE" : "HOME";
               t4 = A._asStringQ(t2._as(t3.env)[t4]);
               t4.toString;
               pubCache = A.join(t4, ".pub-cache");
@@ -5969,40 +6017,17 @@
               t2._as(t1.core).addPath(A.join(sdkPath, "bin"));
               t2._as(t1.core).exportVariable("PUB_CACHE", pubCache);
               t2._as(t1.core).addPath(A.join(pubCache, "bin"));
-              $async$goto = 32;
-              return A._asyncAwait(A.createPubOIDCToken(), $async$main);
-            case 32:
+              $async$goto = 28;
+              return A._asyncAwait(A.createPubOIDCToken(), $async$_impl);
+            case 28:
               // returning from await.
               t4 = t2._as(t1.core);
               versionFilePath = A.join(sdkPath, "version");
               t4.setOutput("dart-version", B.JSString_methods.trim$0(A._asString(t2._as(t1.fs).readFileSync(versionFilePath, "utf8"))));
-              $async$goto = 33;
-              return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.exec).exec("dart", A._setArrayType(["--version"], type$.JSArray_String))), type$.void), $async$main);
-            case 33:
+              $async$goto = 29;
+              return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.exec).exec("dart", A._setArrayType(["--version"], type$.JSArray_String))), type$.void), $async$_impl);
+            case 29:
               // returning from await.
-              $async$handler = 2;
-              // goto after finally
-              $async$goto = 6;
-              break;
-            case 4:
-              // catch
-              $async$handler = 3;
-              $async$exception1 = $async$currentError;
-              e = A.unwrapException($async$exception1);
-              A._fail(A.S(e));
-              // goto return
-              $async$goto = 1;
-              break;
-              // goto after finally
-              $async$goto = 6;
-              break;
-            case 3:
-              // uncaught
-              // goto rethrow
-              $async$goto = 2;
-              break;
-            case 6:
-              // after finally
             case 1:
               // return
               return A._asyncReturn($async$returnValue, $async$completer);
@@ -6011,7 +6036,7 @@
               return A._asyncRethrow($async$currentError, $async$completer);
           }
       });
-      return A._asyncStartSync($async$main, $async$completer);
+      return A._asyncStartSync($async$_impl, $async$completer);
     },
     getPlatform() {
       var t1,
@@ -6541,10 +6566,6 @@
         return false;
       return other === this.substring$1(receiver, t1 - otherLength);
     },
-    split$1(receiver, pattern) {
-      var t1 = A._setArrayType(receiver.split(pattern), type$.JSArray_String);
-      return t1;
-    },
     replaceRange$3(receiver, start, end, replacement) {
       var e = A.RangeError_checkValidRange(start, end, receiver.length);
       return receiver.substring(0, start) + replacement + receiver.substring(e);
@@ -6710,10 +6731,10 @@
   };
   A.CodeUnits.prototype = {
     get$length(_) {
-      return this.__internal$_string.length;
+      return this._string.length;
     },
     $index(_, i) {
-      var t1 = this.__internal$_string;
+      var t1 = this._string;
       if (!(i >= 0 && i < t1.length))
         return A.ioore(t1, i);
       return t1.charCodeAt(i);
@@ -7212,7 +7233,7 @@
   A._MatchImplementation.prototype = {$isMatch: 1, $isRegExpMatch: 1};
   A._AllMatchesIterable.prototype = {
     get$iterator(_) {
-      return new A._AllMatchesIterator(this._re, this._string, this.__js_helper$_start);
+      return new A._AllMatchesIterator(this._re, this.__js_helper$_string, this.__js_helper$_start);
     }
   };
   A._AllMatchesIterator.prototype = {
@@ -7222,7 +7243,7 @@
     },
     moveNext$0() {
       var t1, t2, t3, match, t4, nextIndex, _this = this,
-        string = _this._string;
+        string = _this.__js_helper$_string;
       if (string == null)
         return false;
       t1 = _this._nextIndex;
@@ -7260,7 +7281,7 @@
           return true;
         }
       }
-      _this._string = _this.__js_helper$_current = null;
+      _this.__js_helper$_string = _this.__js_helper$_current = null;
       return false;
     },
     $isIterator: 1
