@@ -35,7 +35,6 @@ void main(List<String> args) async {
     flavor = sdk == 'main' ? 'raw' : 'release';
   } else if (flavor != 'raw' && flavor != 'release') {
     _fail("Unrecognized build flavor '$flavor'.");
-    // return;
   }
   final raw = flavor == 'raw';
 
@@ -81,7 +80,6 @@ void main(List<String> args) async {
       channel = 'beta';
     } else if (sdk.contains('main')) {
       _fail('Versions cannot be specified for main channel builds.');
-      // return;
     } else {
       channel = 'stable';
     }
