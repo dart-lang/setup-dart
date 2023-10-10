@@ -91,7 +91,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: ['3.1', 'stable', 'beta']
+        sdk: [3.1, stable, beta]
     steps:
       - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1

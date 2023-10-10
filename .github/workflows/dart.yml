@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: ['2.12.4', 'stable', 'beta', 'dev']
+        sdk: [2.12.4, stable, beta, dev]
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
@@ -42,7 +42,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: ['dev', 'main']
+        sdk: [dev, main]
         flavor: [raw]
       fail-fast: false
     steps:
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        sdk: ['2.12.0-29.10.beta']
+        sdk: [2.12.0-29.10.beta]
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
@@ -94,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        sdk: ['2.19', 3.0, '3.1']
+        sdk: [2.19, 3.0, 3.1]
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
