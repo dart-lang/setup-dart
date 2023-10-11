@@ -18,120 +18,130 @@ import 'node/process.dart';
 
 void main(List<String> args) async {
   try {
-    // sdk
-    var sdk = core.getInput('sdk');
-    if (sdk.isEmpty) {
-      sdk = 'stable';
-    }
-
-    // flavor
-    var flavor = core.getInput('flavor');
-    if (flavor.isEmpty) {
-      flavor = sdk == 'main' ? 'raw' : 'release';
-    } else if (flavor != 'raw' && flavor != 'release') {
-      _fail("Unrecognized build flavor '$flavor'.");
-      return;
-    }
-    final raw = flavor == 'raw';
-
-    // os
-    final os = getPlatform();
-
-    // architecture
-    var architecture = core.getInput('architecture');
-    if (architecture.isEmpty) {
-      architecture = getArch();
-    }
-
-    // calculate version and channel
-    String version;
-    String channel;
-
-    if (sdk.split('.').length == 2) {
-      // Handle the wildcard (`2.19`, `3.1`, ...) format.
-      channel = 'stable';
-
-      // Find the latest version for the given sdk release.
-      version = await findLatestSdkForRelease(sdk);
-    } else if (sdk == 'stable' || sdk == 'beta' || sdk == 'dev') {
-      channel = sdk;
-      version =
-          raw ? 'latest' : (await latestPublishedVersion(channel, flavor));
-    } else if (sdk == 'main') {
-      // Check for `main` first and fall back to `be`. This handles the channel
-      // rename from `be` to `main` (also tracked as b/299435467).
-      try {
-        channel = 'main';
-        await latestPublishedVersion(channel, flavor);
-      } catch (_) {
-        channel = 'be';
-      }
-      version = 'latest';
-    } else {
-      version = sdk;
-
-      // Derive the channel from the version string.
-      if (sdk.contains('dev')) {
-        channel = 'dev';
-      } else if (sdk.contains('beta')) {
-        channel = 'beta';
-      } else if (sdk.contains('main')) {
-        _fail('Versions cannot be specified for main channel builds.');
-        return;
-      } else {
-        channel = 'stable';
-      }
-    }
-
-    core.info('Installing the $os-$architecture Dart SDK version $version from '
-        'the $channel ($flavor) channel.');
-
-    // Calculate url based on https://dart.dev/tools/sdk/archive#download-urls.
-    final url = 'https://storage.googleapis.com/dart-archive/'
-        'channels/$channel/$flavor/$version/sdk/'
-        'dartsdk-$os-$architecture-release.zip';
-
-    // Use a cached sdk or download and cache the sdk; using a 'raw' sdk flavor
-    // disables caching.
-    final toolName = raw ? 'dart_raw' : 'dart';
-    var sdkPath = !raw ? toolCache.find(toolName, version, architecture) : '';
-    if (sdkPath.isNotEmpty) {
-      core.info('Using cached sdk from $sdkPath.');
-    } else {
-      core.info('$url ...');
-
-      final archivePath =
-          await promiseToFuture<String>(toolCache.downloadTool(url));
-      var extractedFolder =
-          await promiseToFuture<String>(toolCache.extractZip(archivePath));
-      extractedFolder = path.join(extractedFolder, 'dart-sdk');
-
-      sdkPath = await promiseToFuture<String>(
-          toolCache.cacheDir(extractedFolder, toolName, version, architecture));
-    }
-
-    final pubCache = path.join(
-        process.env(os == 'windows' ? 'USERPROFILE' : 'HOME')!, '.pub-cache');
-
-    core.exportVariable('DART_HOME', sdkPath);
-    core.addPath(path.join(sdkPath, 'bin'));
-    core.exportVariable('PUB_CACHE', pubCache);
-    core.addPath(path.join(pubCache, 'bin'));
-
-    // Create the OIDC token used for pub.dev publishing.
-    await createPubOIDCToken();
-
-    // Configure the outputs.
-    core.setOutput('dart-version', getVersionFromSdk(sdkPath));
-
-    // Report success; print version.
-    await promiseToFuture<void>(exec.exec(
-      'dart',
-      ['--version'.toJS].toJS,
-    ));
+    await _impl(args);
   } catch (e) {
     _fail('$e');
   }
+}
+
+Future<void> _impl(List<String> args) async {
+  // sdk
+  var sdk = core.getInput('sdk');
+  if (sdk.isEmpty) {
+    sdk = 'stable';
+  }
+
+  // A `3.0` in a workflow file reaches us as a `3` here; to work around that,
+  // we promote any int value back to a double.
+  if (int.tryParse(sdk) != null && !sdk.contains('.')) {
+    // Convert a '3' to a '3.0'.
+    sdk = '$sdk.0';
+  }
+
+  // flavor
+  var flavor = core.getInput('flavor');
+  if (flavor.isEmpty) {
+    flavor = sdk == 'main' ? 'raw' : 'release';
+  } else if (flavor != 'raw' && flavor != 'release') {
+    _fail("Unrecognized build flavor '$flavor'.");
+    return;
+  }
+  final raw = flavor == 'raw';
+
+  // os
+  final os = getPlatform();
+
+  // architecture
+  var architecture = core.getInput('architecture');
+  if (architecture.isEmpty) {
+    architecture = getArch();
+  }
+
+  // calculate version and channel
+  String version;
+  String channel;
+
+  if (sdk.split('.').length == 2) {
+    // Handle the wildcard (`2.19`, `3.1`, ...) format.
+    channel = 'stable';
+
+    // Find the latest version for the given sdk release.
+    version = await findLatestSdkForRelease(sdk);
+  } else if (sdk == 'stable' || sdk == 'beta' || sdk == 'dev') {
+    channel = sdk;
+    version = raw ? 'latest' : (await latestPublishedVersion(channel, flavor));
+  } else if (sdk == 'main') {
+    // Check for `main` first and fall back to `be`. This handles the channel
+    // rename from `be` to `main` (also tracked as b/299435467).
+    try {
+      channel = 'main';
+      await latestPublishedVersion(channel, flavor);
+    } catch (_) {
+      channel = 'be';
+    }
+    version = 'latest';
+  } else {
+    version = sdk;
+
+    // Derive the channel from the version string.
+    if (sdk.contains('dev')) {
+      channel = 'dev';
+    } else if (sdk.contains('beta')) {
+      channel = 'beta';
+    } else if (sdk.contains('main')) {
+      _fail('Versions cannot be specified for main channel builds.');
+      return;
+    } else {
+      channel = 'stable';
+    }
+  }
+
+  core.info('Installing the $os-$architecture Dart SDK version $version from '
+      'the $channel ($flavor) channel.');
+
+  // Calculate url based on https://dart.dev/tools/sdk/archive#download-urls.
+  final url = 'https://storage.googleapis.com/dart-archive/'
+      'channels/$channel/$flavor/$version/sdk/'
+      'dartsdk-$os-$architecture-release.zip';
+
+  // Use a cached sdk or download and cache the sdk; using a 'raw' sdk flavor
+  // disables caching.
+  final toolName = raw ? 'dart_raw' : 'dart';
+  var sdkPath = !raw ? toolCache.find(toolName, version, architecture) : '';
+  if (sdkPath.isNotEmpty) {
+    core.info('Using cached sdk from $sdkPath.');
+  } else {
+    core.info('$url ...');
+
+    final archivePath =
+        await promiseToFuture<String>(toolCache.downloadTool(url));
+    var extractedFolder =
+        await promiseToFuture<String>(toolCache.extractZip(archivePath));
+    extractedFolder = path.join(extractedFolder, 'dart-sdk');
+
+    sdkPath = await promiseToFuture<String>(
+        toolCache.cacheDir(extractedFolder, toolName, version, architecture));
+  }
+
+  final pubCache = path.join(
+      process.env(os == 'windows' ? 'USERPROFILE' : 'HOME')!, '.pub-cache');
+
+  core.exportVariable('DART_HOME', sdkPath);
+  core.addPath(path.join(sdkPath, 'bin'));
+  core.exportVariable('PUB_CACHE', pubCache);
+  core.addPath(path.join(pubCache, 'bin'));
+
+  // Create the OIDC token used for pub.dev publishing.
+  await createPubOIDCToken();
+
+  // Configure the outputs.
+  core.setOutput('dart-version', getVersionFromSdk(sdkPath));
+
+  // Report success; print version.
+  await promiseToFuture<void>(exec.exec(
+    'dart',
+    ['--version'.toJS].toJS,
+  ));
 }
 
 String getVersionFromSdk(String sdkPath) {
@@ -252,6 +262,9 @@ Future<String> findLatestSdkForRelease(String sdkRelease) async {
 }
 
 void _fail(String message) {
+  // 'core.setFailed' throws when we call it; see #107.
+  // core.setFailed(message);
+
   core.error(message);
-  core.setFailed(message);
+  process.exitCode = 1;
 }

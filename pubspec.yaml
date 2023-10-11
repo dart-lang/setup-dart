@@ -4,7 +4,7 @@ description: The setup-dart GitHub Action - download and setup the Dart SDK.
 publish_to: none
 
 environment:
-  sdk: ^3.2.0-0
+  sdk: ^3.3.0-0
 
 dependencies:
   path: ^1.8.0

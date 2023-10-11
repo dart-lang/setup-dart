@@ -6678,7 +6678,6 @@ var _actions_exec__WEBPACK_IMPORTED_MODULE_1___namespace_cache;
 var _actions_tool_cache__WEBPACK_IMPORTED_MODULE_3___namespace_cache;
 var fs__WEBPACK_IMPORTED_MODULE_4___namespace_cache;
 var os__WEBPACK_IMPORTED_MODULE_6___namespace_cache;
-var process__WEBPACK_IMPORTED_MODULE_7___namespace_cache;
 __nccwpck_require__.a(__webpack_module__, async (__webpack_handle_async_dependencies__, __webpack_async_result__) => { try {
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(9935);
 /* harmony import */ var _actions_exec__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(3409);
@@ -6712,7 +6711,7 @@ globalThis.HttpClient = _actions_http_client__WEBPACK_IMPORTED_MODULE_2__.HttpCl
 globalThis.toolCache = /*#__PURE__*/ (_actions_tool_cache__WEBPACK_IMPORTED_MODULE_3___namespace_cache || (_actions_tool_cache__WEBPACK_IMPORTED_MODULE_3___namespace_cache = __nccwpck_require__.t(_actions_tool_cache__WEBPACK_IMPORTED_MODULE_3__, 2)));
 globalThis.fs = /*#__PURE__*/ (fs__WEBPACK_IMPORTED_MODULE_4___namespace_cache || (fs__WEBPACK_IMPORTED_MODULE_4___namespace_cache = __nccwpck_require__.t(fs__WEBPACK_IMPORTED_MODULE_4__, 2)));
 globalThis.os = /*#__PURE__*/ (os__WEBPACK_IMPORTED_MODULE_6___namespace_cache || (os__WEBPACK_IMPORTED_MODULE_6___namespace_cache = __nccwpck_require__.t(os__WEBPACK_IMPORTED_MODULE_6__, 2)));
-globalThis.process = /*#__PURE__*/ (process__WEBPACK_IMPORTED_MODULE_7___namespace_cache || (process__WEBPACK_IMPORTED_MODULE_7___namespace_cache = __nccwpck_require__.t(process__WEBPACK_IMPORTED_MODULE_7__, 2)));
+globalThis.process = process__WEBPACK_IMPORTED_MODULE_7__;
 globalThis.location = { href: `file://${process__WEBPACK_IMPORTED_MODULE_7__.cwd()}/`}
 
 globalThis.dartMainRunner = async function(main, args) {
