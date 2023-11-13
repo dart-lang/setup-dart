@@ -2,13 +2,12 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:crypto/crypto.dart';
 
-void main(List<String> args) async {
+void main(List<String> args) {
   var argsParser = ArgParser()
     ..addFlag(
       'generate',
@@ -32,7 +31,7 @@ void main(List<String> args) async {
     exit(1);
   }
 
-  var sig = await calcSig();
+  var sig = calcSig();
 
   if (generate) {
     File('lib/sig.txt').writeAsStringSync('$sig\n');
@@ -48,27 +47,24 @@ void main(List<String> args) async {
   }
 }
 
-Future<String> calcSig() async {
-  final digest =
-      await _fileLines().transform(utf8.encoder).transform(md5).single;
-
-  return digest.bytes
-      .map((byte) => byte.toRadixString(16).padLeft(2, '0').toUpperCase())
-      .join();
+String calcSig() {
+  final bytes = <int>[];
+  for (var file in _files()) {
+    print(file.path);
+    bytes.addAll(file.readAsBytesSync());
+  }
+  return md5.convert(bytes).toString();
 }
 
-Stream<String> _fileLines() async* {
+List<File> _files() {
   // Collect lib/ Dart files.
   final files = Directory('lib')
       .listSync(recursive: true)
       .whereType<File>()
       .where((file) => file.path.endsWith('.dart'))
-      .toList()
-    ..sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
+      .toList();
+  files.add(File('pubspec.yaml'));
+  files.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
 
-  for (var file in [File('pubspec.yaml'), ...files]) {
-    for (var line in file.readAsLinesSync()) {
-      yield line;
-    }
-  }
+  return files;
 }
