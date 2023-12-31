@@ -8,7 +8,7 @@ import 'dart:js_interop';
 external ToolCache get toolCache;
 
 @JS()
-extension type ToolCache (JSObject obj) {
+extension type ToolCache(JSObject obj) {
   /// Finds the path to a tool version in the local installed tool cache.
   ///
   /// @param toolName      name of the tool
@@ -23,9 +23,10 @@ extension type ToolCache (JSObject obj) {
   /// Download a tool from an url and stream it into a file.
   ///
   /// @param url       url of tool to download
+  /// @param dest      path to download tool
   /// @returns         path to downloaded tool
   // JSPromise<String>
-  external JSPromise downloadTool(String url);
+  external JSPromise downloadTool(String url, [String? dest]);
 
   /// Extract a zip.
   ///
