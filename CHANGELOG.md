@@ -1,3 +1,7 @@
+## v1.6.1
+
+* Updated the google storage url for `main` channel releases.
+
 ## v1.6.0
 
 * Enable provisioning of the latest Dart SDK patch release by specifying just
