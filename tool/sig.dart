@@ -50,7 +50,6 @@ void main(List<String> args) {
 String calcSig() {
   final bytes = <int>[];
   for (var file in _files()) {
-    print(file.path);
     bytes.addAll(file.readAsBytesSync());
   }
   return md5.convert(bytes).toString();
