@@ -71,14 +71,7 @@ Future<void> _impl(List<String> args) async {
     channel = sdk;
     version = raw ? 'latest' : (await latestPublishedVersion(channel, flavor));
   } else if (sdk == 'main') {
-    // Check for `main` first and fall back to `be`. This handles the channel
-    // rename from `be` to `main` (also tracked as b/299435467).
-    try {
-      channel = 'main';
-      await latestPublishedVersion(channel, flavor);
-    } catch (_) {
-      channel = 'be';
-    }
+    channel = 'main';
     version = 'latest';
   } else {
     version = sdk;
