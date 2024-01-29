@@ -1,3 +1,10 @@
+## v1.6.2
+
+* Switch to running the workflow on `node20`` from `node16`. See also
+  [Transitioning from Node 16 to Node 20][].
+
+[Transitioning from Node 16 to Node 20]: https://github.blog/changelog/2023-09-22-github-actions-transitioning-from-node-16-to-node-20/
+
 ## v1.6.1
 
 * Updated the google storage url for `main` channel releases.
