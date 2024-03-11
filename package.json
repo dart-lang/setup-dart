@@ -5,7 +5,7 @@
   "description": "The setup-dart GitHub Action - download and setup the Dart SDK.",
   "main": "lib/main.mjs",
   "scripts": {
-    "build": "dart compile js --enable-experiment=inline-class -olib/main.js lib/main.dart && dart tool/sig.dart --generate",
+    "build": "dart compile js -olib/main.js lib/main.dart && dart tool/sig.dart --generate",
     "dist": "ncc build lib/main.mjs && cp lib/main.js dist/main.cjs && cp lib/sig.txt dist/sig.txt",
     "all": "npm run build && npm run dist"
   },
