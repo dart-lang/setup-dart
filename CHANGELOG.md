@@ -1,3 +1,10 @@
+## v1.6.3
+
+* Roll `undici` dependency to address [CVE-2024-30260][] and [CVE-2024-30261][].
+
+[CVE-2024-30260]: https://github.com/nodejs/undici/security/advisories/GHSA-m4v8-wqvr-p9f7
+[CVE-2024-30261]: https://github.com/nodejs/undici/security/advisories/GHSA-9qxr-qj54-h672
+
 ## v1.6.2
 
 * Switch to running the workflow on `node20`` from `node16`. See also

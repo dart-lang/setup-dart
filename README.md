@@ -1,10 +1,11 @@
 # setup-dart
 
-[setup-dart](https://github.com/dart-lang/setup-dart) installs and sets up a
-Dart SDK for use in GitHub Actions; it:
+[setup-dart][] installs and sets up a Dart SDK for use in GitHub Actions; it:
 
 * downloads the Dart SDK
 * adds the [`dart`](https://dart.dev/tools/dart-tool) tool to the system path
+
+[setup-dart]: https://github.com/marketplace/actions/setup-dart-sdk
 
 ## Usage
 
