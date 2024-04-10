@@ -1,3 +1,7 @@
+## v1.6.4
+
+* Rebuild JS code.
+
 ## v1.6.3
 
 * Roll `undici` dependency to address [CVE-2024-30260][] and [CVE-2024-30261][].
