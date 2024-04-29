@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: [2.12.4, stable, beta, dev]
+        sdk: [2.14.4, stable, beta, dev]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
