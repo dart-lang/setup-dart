@@ -30,7 +30,7 @@ jobs:
       # Checkout repository
       - uses: actions/checkout@v4
       # Setup Dart SDK with JWT token
-      - uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+      - uses: dart-lang/setup-dart@f0ead981b4d9a35b37f30d36160575d60931ec30
       # Minimal package setup and dry run checks.
       - name: Install dependencies
         run: dart pub get
