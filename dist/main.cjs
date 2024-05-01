@@ -5509,8 +5509,8 @@
     },
     ParsedPath_ParsedPath$parse(path, style) {
       var t1, parts, separators, t2, start, i,
-        root = style.getRoot$1(path);
-      style.isRootRelative$1(path);
+        root = style.getRoot$1(path),
+        isRootRelative = style.isRootRelative$1(path);
       if (root != null)
         path = B.JSString_methods.substring$1(path, root.length);
       t1 = type$.JSArray_String;
@@ -5542,15 +5542,18 @@
         B.JSArray_methods.add$1(parts, B.JSString_methods.substring$1(path, start));
         B.JSArray_methods.add$1(separators, "");
       }
-      return new A.ParsedPath(root, parts, separators);
+      return new A.ParsedPath(style, root, isRootRelative, parts, separators);
     },
-    ParsedPath: function ParsedPath(t0, t1, t2) {
-      this.root = t0;
-      this.parts = t1;
-      this.separators = t2;
+    ParsedPath: function ParsedPath(t0, t1, t2, t3, t4) {
+      var _ = this;
+      _.style = t0;
+      _.root = t1;
+      _.isRootRelative = t2;
+      _.parts = t3;
+      _.separators = t4;
     },
     Style__getPlatformStyle() {
-      var userInfo, host, query, fragment, port, t1, hasAuthority, path, t2, pathSegments, _null = null;
+      var userInfo, host, query, fragment, port, t1, hasAuthority, path, _null = null;
       if (A.Uri_base().get$scheme() !== "file")
         return $.$get$Style_url();
       if (!B.JSString_methods.endsWith$1(A.Uri_base().get$path(), "/"))
@@ -5576,23 +5579,7 @@
         path = A._Uri__normalizeRelativePath(path, hasAuthority);
       else
         path = A._Uri__removeDotSegments(path);
-      t2 = A._Uri$_internal("", userInfo, t1 && B.JSString_methods.startsWith$1(path, "//") ? "" : host, port, path, query, fragment);
-      t1 = t2.scheme;
-      if (t1 !== "" && t1 !== "file")
-        A.throwExpression(A.UnsupportedError$("Cannot extract a file path from a " + t1 + " URI"));
-      t1 = t2._query;
-      if ((t1 == null ? "" : t1) !== "")
-        A.throwExpression(A.UnsupportedError$("Cannot extract a file path from a URI with a query component"));
-      t1 = t2._fragment;
-      if ((t1 == null ? "" : t1) !== "")
-        A.throwExpression(A.UnsupportedError$("Cannot extract a file path from a URI with a fragment component"));
-      if (t2._host != null && t2.get$host() !== "")
-        A.throwExpression(A.UnsupportedError$("Cannot extract a non-Windows file path from a file URI with an authority"));
-      pathSegments = t2.get$pathSegments();
-      A._Uri__checkNonWindowsPathReservedCharacters(pathSegments, false);
-      t1 = A.StringBuffer__writeAll(B.JSString_methods.startsWith$1(t2.path, "/") ? "" + "/" : "", pathSegments, "/");
-      t1 = t1.charCodeAt(0) == 0 ? t1 : t1;
-      if (t1 === "a\\b")
+      if (A._Uri$_internal("", userInfo, t1 && B.JSString_methods.startsWith$1(path, "//") ? "" : host, port, path, query, fragment).toFilePath$0() === "a\\b")
         return $.$get$Style_windows();
       return $.$get$Style_posix();
     },
@@ -5851,12 +5838,14 @@
             case 16:
               // else
               t2._as(t1.core).info(url + " ...");
+              t3 = A._asStringQ(t2._as(t2._as(t1.process).env).RUNNER_TEMP);
+              t3.toString;
+              archivePath = A.join(t3, A.ParsedPath_ParsedPath$parse(url, $.$get$url().style).get$basename());
               t3 = type$.String;
               $async$goto = 17;
-              return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.toolCache).downloadTool(url)), t3), $async$_impl);
+              return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.toolCache).downloadTool(url, archivePath)), t3), $async$_impl);
             case 17:
               // returning from await.
-              archivePath = $async$result;
               $async$temp1 = A;
               $async$goto = 18;
               return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.toolCache).extractZip(archivePath)), t3), $async$_impl);
@@ -8795,6 +8784,25 @@
     get$hasFragment() {
       return this._fragment != null;
     },
+    toFilePath$0() {
+      var pathSegments, _this = this,
+        t1 = _this.scheme;
+      if (t1 !== "" && t1 !== "file")
+        throw A.wrapException(A.UnsupportedError$("Cannot extract a file path from a " + t1 + " URI"));
+      t1 = _this._query;
+      if ((t1 == null ? "" : t1) !== "")
+        throw A.wrapException(A.UnsupportedError$("Cannot extract a file path from a URI with a query component"));
+      t1 = _this._fragment;
+      if ((t1 == null ? "" : t1) !== "")
+        throw A.wrapException(A.UnsupportedError$("Cannot extract a file path from a URI with a fragment component"));
+      if (_this._host != null && _this.get$host() !== "")
+        A.throwExpression(A.UnsupportedError$("Cannot extract a non-Windows file path from a file URI with an authority"));
+      pathSegments = _this.get$pathSegments();
+      A._Uri__checkNonWindowsPathReservedCharacters(pathSegments, false);
+      t1 = A.StringBuffer__writeAll(B.JSString_methods.startsWith$1(_this.path, "/") ? "" + "/" : "", pathSegments, "/");
+      t1 = t1.charCodeAt(0) == 0 ? t1 : t1;
+      return t1;
+    },
     toString$0(_) {
       return this.get$_text();
     },
@@ -8932,6 +8940,9 @@
     get$hasAuthority() {
       return this._hostStart > 0;
     },
+    get$hasPort() {
+      return this._hostStart > 0 && this._portStart + 1 < this._pathStart;
+    },
     get$hasQuery() {
       return this._queryStart < this._fragmentStart;
     },
@@ -8969,7 +8980,7 @@
     },
     get$port() {
       var t1, _this = this;
-      if (_this._hostStart > 0 && _this._portStart + 1 < _this._pathStart)
+      if (_this.get$hasPort())
         return A.int_parse(B.JSString_methods.substring$2(_this._uri, _this._portStart + 1, _this._pathStart), null);
       t1 = _this._schemeEnd;
       if (t1 === 4 && B.JSString_methods.startsWith$1(_this._uri, "http"))
@@ -9157,16 +9168,48 @@
     }
   };
   A.ParsedPath.prototype = {
+    get$basename() {
+      var _this = this,
+        t1 = _this.root,
+        t2 = type$.String,
+        t3 = A.List_List$from(_this.parts, true, t2);
+      new A.ParsedPath(_this.style, t1, _this.isRootRelative, t3, A.List_List$from(_this.separators, true, t2)).removeTrailingSeparators$0();
+      if (t3.length === 0) {
+        t1 = _this.root;
+        return t1 == null ? "" : t1;
+      }
+      return B.JSArray_methods.get$last(t3);
+    },
+    removeTrailingSeparators$0() {
+      var t1 = this.parts,
+        t2 = this.separators;
+      while (true) {
+        if (!(t1.length !== 0 && J.$eq$(B.JSArray_methods.get$last(t1), "")))
+          break;
+        if (0 >= t1.length)
+          return A.ioore(t1, -1);
+        t1.pop();
+        if (0 >= t2.length)
+          return A.ioore(t2, -1);
+        t2.pop();
+      }
+      t1 = t2.length;
+      if (t1 !== 0)
+        B.JSArray_methods.$indexSet(t2, t1 - 1, "");
+    },
     toString$0(_) {
-      var t2, t3, t4, t5, i,
+      var t2, t3, i, t4,
         t1 = this.root;
       t1 = t1 != null ? "" + t1 : "";
-      for (t2 = this.parts, t3 = this.separators, t4 = t2.length, t5 = t3.length, i = 0; i < t4; ++i) {
-        if (!(i < t5))
+      for (t2 = this.parts, t3 = this.separators, i = 0; i < t2.length; ++i, t1 = t4) {
+        if (!(i < t3.length))
           return A.ioore(t3, i);
-        t1 = t1 + t3[i] + t2[i];
+        t4 = A.S(t3[i]);
+        if (!(i < t2.length))
+          return A.ioore(t2, i);
+        t4 = t1 + t4 + A.S(t2[i]);
       }
-      t1 += B.JSArray_methods.get$last(t3);
+      t1 += A.S(B.JSArray_methods.get$last(t3));
       return t1.charCodeAt(0) == 0 ? t1 : t1;
     }
   };
@@ -9860,6 +9903,10 @@
     _lazyFinal($, "_Utf8Decoder__decoderNonfatal", "$get$_Utf8Decoder__decoderNonfatal", () => new A._Utf8Decoder__decoderNonfatal_closure().call$0());
     _lazyFinal($, "_Base64Decoder__inverseAlphabet", "$get$_Base64Decoder__inverseAlphabet", () => new Int8Array(A._ensureNativeList(A._setArrayType([-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -1, -2, -2, -2, -2, -2, 62, -2, 62, -2, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -2, -2, -2, -1, -2, -2, -2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -2, -2, -2, -2, 63, -2, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -2, -2, -2, -2, -2], type$.JSArray_int))));
     _lazyFinal($, "_scannerTables", "$get$_scannerTables", () => A._createTables());
+    _lazyFinal($, "url", "$get$url", () => {
+      var style = $.$get$Style_url();
+      return new A.Context(style);
+    });
     _lazyFinal($, "context", "$get$context", () => new A.Context($.$get$Style_platform()));
     _lazyFinal($, "Style_posix", "$get$Style_posix", () => new A.PosixStyle(A.RegExp_RegExp("/"), A.RegExp_RegExp("[^/]$"), A.RegExp_RegExp("^/")));
     _lazyFinal($, "Style_windows", "$get$Style_windows", () => new A.WindowsStyle(A.RegExp_RegExp("[/\\\\]"), A.RegExp_RegExp("[^/\\\\]$"), A.RegExp_RegExp("^(\\\\\\\\[^\\\\]+\\\\[^\\\\/]+|[a-zA-Z]:[/\\\\])"), A.RegExp_RegExp("^[/\\\\](?![/\\\\])")));
