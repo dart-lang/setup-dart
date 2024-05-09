@@ -8,6 +8,10 @@ updates:
       interval: monthly
     labels:
       - autosubmit
+    groups:
+      github-actions:
+        patterns:
+          - "*"
 
   - package-ecosystem: npm
     directory: /
