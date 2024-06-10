@@ -108,7 +108,7 @@ Future<void> _impl(List<String> args) async {
 
     final archivePath = path.join(
       // `RUNNER_TEMP` variable is guaranteed to be present.
-      // https://github.com/actions/toolkit/blob/5430c5d84832076372990c7c27f900878ff66dc9/packages/tool-cache/src/tool-cache.ts#L756
+      // https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
       process.env('RUNNER_TEMP')!,
       path.url.basename(url),
     );
