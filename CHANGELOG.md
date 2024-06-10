@@ -1,3 +1,9 @@
+## v1.6.5-wip
+
+- Fix zip path handling on Windows 11 ([#118][])
+
+[#118]: https://github.com/dart-lang/setup-dart/issues/118
+
 ## v1.6.4
 
 * Rebuild JS code.
