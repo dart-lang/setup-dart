@@ -11,7 +11,7 @@ import 'dart:js_util';
 external Process get process;
 
 @JS()
-extension type Process (JSObject obj) {
+extension type Process(JSObject obj) {
   @JS('env')
   // Map<String, String?>
   external JSObject get _env;
