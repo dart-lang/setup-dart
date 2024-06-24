@@ -1,4 +1,4 @@
-## v1.6.5-wip
+## v1.6.5
 
 - Fix zip path handling on Windows 11 ([#118][])
 
