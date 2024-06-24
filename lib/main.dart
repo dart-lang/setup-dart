@@ -106,8 +106,13 @@ Future<void> _impl(List<String> args) async {
   } else {
     core.info('$url ...');
 
-    final archivePath =
-        await promiseToFuture<String>(toolCache.downloadTool(url));
+    final archivePath = path.join(
+      // `RUNNER_TEMP` variable is guaranteed to be present.
+      // https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
+      process.env('RUNNER_TEMP')!,
+      path.url.basename(url),
+    );
+    await promiseToFuture<String>(toolCache.downloadTool(url, archivePath));
     var extractedFolder =
         await promiseToFuture<String>(toolCache.extractZip(archivePath));
     extractedFolder = path.join(extractedFolder, 'dart-sdk');
