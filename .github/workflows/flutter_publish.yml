@@ -3,7 +3,7 @@ name: Publish flutter to pub.dev
 ## Caller of this workflow should use it as follows:
 ## jobs:
 ##   publish:
-##     uses: dart-lang/setup-dart/.github/workflows/publish.yml@main [or a recent commit hash / version tag]
+##     uses: dart-lang/setup-dart/.github/workflows/flutter_publish.yml@main [or a recent commit hash / version tag]
 ##     # with:
 ##     #   working-directory: path/to/sub/directory
 
@@ -24,7 +24,7 @@ on:
         type: boolean
 
 jobs:
-  publish:
+  flutter_publish:
     name: 'Publish to pub.dev'
     environment: ${{ inputs.environment }}
     permissions:
