@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: dart pub get
         working-directory: ${{ inputs.working-directory }}
+      - name: Run build_runner
+        run: dart run build_runner build
+        working-directory: ${{ inputs.working-directory }}
       - name: Publish - dry run
         run: dart pub publish --dry-run
         working-directory: ${{ inputs.working-directory }}
