@@ -1,4 +1,4 @@
-name: Publish to pub.dev
+name: Publish flutter to pub.dev
 
 ## Caller of this workflow should use it as follows:
 ## jobs:
