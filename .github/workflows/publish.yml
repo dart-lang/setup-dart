@@ -31,6 +31,12 @@ jobs:
       - uses: actions/checkout@v4
       # Setup Dart SDK with JWT token
       - uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
+      # Download flutter SDK - needed for publishing Flutter packages. Can also
+      # publish pure Dart packages.
+      #
+      # This will add the flutter/bin/dart executable to path, that sets up
+      # FLUTTER_ROOT.
+      - uses: flutter-actions/setup-flutter@d030cb603380106494f72d65a7e52462f380781f
       # Minimal package setup and dry run checks.
       - name: Install dependencies
         run: dart pub get
