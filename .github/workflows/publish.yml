@@ -11,11 +11,11 @@ on:
   workflow_call:
     inputs:
       environment:
-        description: if specified, the workflow is required to be run in this environment (with additional approvals)
+        description: If specified, the workflow is required to be run in this environment (with additional approvals).
         required: false
         type: string
       working-directory:
-        description: directory with-in the repository where the package is located (if not in the repository root)
+        description: The directory within the repository where the package is located (if not in the repository root).
         required: false
         type: string
 
