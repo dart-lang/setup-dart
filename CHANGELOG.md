@@ -1,3 +1,10 @@
+## v1.7.0
+
+- Install flutter sdk in publishing step, allowing Flutter packages to be
+  published ([#68][]) 
+  
+  [68]: https://github.com/dart-lang/setup-dart/issues/68
+
 ## v1.6.5
 
 - Fix zip path handling on Windows 11 ([#118][])
