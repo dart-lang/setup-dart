@@ -5450,7 +5450,7 @@
     _impl(args) {
       var $async$goto = 0,
         $async$completer = A._makeAsyncAwaitCompleter(type$.void),
-        $async$returnValue, flavor, raw, os, architecture, channel, version, url, toolName, sdkPath, t3, archivePath, extractedFolder, t4, pubCache, versionFilePath, t1, t2, sdk, $async$temp1;
+        $async$returnValue, flavor, raw, os, architecture, channel, version, url, toolName, sdkPath, t3, archivePath, extractedFolder, pubCache, versionFilePath, t1, t2, sdk, $async$temp1;
       var $async$_impl = A._wrapJsFunctionForAsync(function($async$errorCode, $async$result) {
         if ($async$errorCode === 1)
           return A._asyncRethrow($async$result, $async$completer);
@@ -5556,7 +5556,7 @@
             case 16:
               // else
               t2._as(t1.core).info(url + " ...");
-              t3 = A._asStringQ(t2._as(t2._as(t1.process).env).RUNNER_TEMP);
+              t3 = A.Process_env(t2._as(t1.process), "RUNNER_TEMP");
               t3.toString;
               archivePath = A.join(t3, A.ParsedPath_ParsedPath$parse(url, $.$get$url().style).get$basename());
               t3 = type$.String;
@@ -5578,10 +5578,9 @@
             case 15:
               // join
               t3 = t2._as(t1.process);
-              t4 = os === "windows" ? "USERPROFILE" : "HOME";
-              t4 = A._asStringQ(t2._as(t3.env)[t4]);
-              t4.toString;
-              pubCache = A.join(t4, ".pub-cache");
+              t3 = A.Process_env(t3, os === "windows" ? "USERPROFILE" : "HOME");
+              t3.toString;
+              pubCache = A.join(t3, ".pub-cache");
               t2._as(t1.core).exportVariable("DART_HOME", sdkPath);
               t2._as(t1.core).addPath(A.join(sdkPath, "bin"));
               t2._as(t1.core).exportVariable("PUB_CACHE", pubCache);
@@ -5590,9 +5589,9 @@
               return A._asyncAwait(A.createPubOIDCToken(), $async$_impl);
             case 20:
               // returning from await.
-              t4 = t2._as(t1.core);
+              t3 = t2._as(t1.core);
               versionFilePath = A.join(sdkPath, "version");
-              t4.setOutput("dart-version", B.JSString_methods.trim$0(A._asString(t2._as(t1.fs).readFileSync(versionFilePath, "utf8"))));
+              t3.setOutput("dart-version", B.JSString_methods.trim$0(A._asString(t2._as(t1.fs).readFileSync(versionFilePath, "utf8"))));
               $async$goto = 21;
               return A._asyncAwait(A.promiseToFuture(t2._as(t2._as(t1.exec).exec("dart", A._setArrayType(["--version"], type$.JSArray_String))), type$.nullable_Object), $async$_impl);
             case 21:
@@ -5634,8 +5633,8 @@
               // Function start
               t1 = self;
               t2 = type$.JSObject;
-              tokenRequestUrl = A._asStringQ(t2._as(t2._as(t1.process).env).ACTIONS_ID_TOKEN_REQUEST_URL);
-              tokenRequestToken = A._asStringQ(t2._as(t2._as(t1.process).env).ACTIONS_ID_TOKEN_REQUEST_TOKEN);
+              tokenRequestUrl = A.Process_env(t2._as(t1.process), "ACTIONS_ID_TOKEN_REQUEST_URL");
+              tokenRequestToken = A.Process_env(t2._as(t1.process), "ACTIONS_ID_TOKEN_REQUEST_TOKEN");
               if (tokenRequestUrl == null || tokenRequestToken == null) {
                 // goto return
                 $async$goto = 1;
@@ -5804,6 +5803,10 @@
       if (path.charCodeAt(t2) !== 47)
         return _null;
       return index + 3;
+    },
+    Process_env(_this, variable) {
+      var t1 = A._asStringQ(type$.JSObject._as(_this.env)[variable]);
+      return t1 == null ? null : t1;
     }
   },
   B = {};
