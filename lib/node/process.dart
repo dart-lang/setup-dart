@@ -17,6 +17,7 @@ extension type Process(JSObject obj) {
   external JSObject get _env;
 
   /// Read the environment variable [variable].
+  // TODO(devoncarew): move away from using dart:js_util `getProperty`.
   String? env(String variable) => getProperty<String?>(_env, variable);
 
   external int exitCode;
