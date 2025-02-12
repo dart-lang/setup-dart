@@ -210,7 +210,7 @@ Future<String> latestPublishedVersion(String channel, String flavor) async {
       'maxRedirects': 3,
       'allowRetries': true,
       'maxRetries': 3,
-    }.toJSBox,
+    }.jsify() as JSObject?,
   );
 
   var response = (await http.get(url).toDart) as HttpClientResponse;
@@ -235,7 +235,7 @@ Future<String> findLatestSdkForRelease(String sdkRelease) async {
       'maxRedirects': 3,
       'allowRetries': true,
       'maxRetries': 3,
-    }.toJSBox,
+    }.jsify() as JSObject?,
   );
 
   // {
