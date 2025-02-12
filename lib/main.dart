@@ -2,8 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:convert';
 import 'dart:js_interop';
-import 'dart:js_util';
 
 import 'package:path/path.dart' as path;
 import 'package:pub_semver/pub_semver.dart';
@@ -112,13 +112,15 @@ Future<void> _impl(List<String> args) async {
       process.env('RUNNER_TEMP')!,
       path.url.basename(url),
     );
-    await promiseToFuture<String>(toolCache.downloadTool(url, archivePath));
+    await toolCache.downloadTool(url, archivePath).toDart;
     var extractedFolder =
-        await promiseToFuture<String>(toolCache.extractZip(archivePath));
+        (await toolCache.extractZip(archivePath).toDart).toDart;
     extractedFolder = path.join(extractedFolder, 'dart-sdk');
 
-    sdkPath = await promiseToFuture<String>(
-        toolCache.cacheDir(extractedFolder, toolName, version, architecture));
+    sdkPath = (await toolCache
+            .cacheDir(extractedFolder, toolName, version, architecture)
+            .toDart)
+        .toDart;
   }
 
   final pubCache = path.join(
@@ -136,10 +138,7 @@ Future<void> _impl(List<String> args) async {
   core.setOutput('dart-version', getVersionFromSdk(sdkPath));
 
   // Report success; print version.
-  await promiseToFuture<void>(exec.exec(
-    'dart',
-    ['--version'.toJS].toJS,
-  ));
+  await exec.exec('dart', ['--version'.toJS].toJS).toDart;
 }
 
 String getVersionFromSdk(String sdkPath) {
@@ -172,22 +171,22 @@ Future<void> createPubOIDCToken() async {
     return;
   }
 
-  final token =
-      await promiseToFuture<String>(core.getIDToken('https://pub.dev'));
+  final token = (await core.getIDToken('https://pub.dev').toDart).toDart;
 
   core.exportVariable('PUB_TOKEN', token);
 
-  await promiseToFuture<void>(exec.exec(
-    'dart',
-    [
-      'pub'.toJS,
-      'token'.toJS,
-      'add'.toJS,
-      'https://pub.dev'.toJS,
-      '--env-var'.toJS,
-      'PUB_TOKEN'.toJS,
-    ].toJS,
-  ));
+  await exec
+      .exec(
+          'dart',
+          [
+            'pub'.toJS,
+            'token'.toJS,
+            'add'.toJS,
+            'https://pub.dev'.toJS,
+            '--env-var'.toJS,
+            'PUB_TOKEN'.toJS,
+          ].toJS)
+      .toDart;
 }
 
 // https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION
@@ -206,17 +205,18 @@ Future<String> latestPublishedVersion(String channel, String flavor) async {
   final http = HttpClient(
     'setup-dart',
     <JSAny>[].toJS,
-    jsify({
+    {
       'allowRedirects': true,
       'maxRedirects': 3,
       'allowRetries': true,
       'maxRetries': 3,
-    }) as JSObject?,
+    }.toJSBox,
   );
 
-  var response = await promiseToFuture<JSObject>(http.getJson(url));
-  var result = getProperty<JSObject>(response, 'result');
-  return getProperty(result, 'version');
+  var response = (await http.get(url).toDart) as HttpClientResponse;
+  var data = (await response.readBody().toDart).toDart;
+  var json = (jsonDecode(data) as Map).cast<String, Object?>();
+  return json['version'] as String;
 }
 
 /// Find the latest SDK patch version for the given SDK release.
@@ -230,12 +230,12 @@ Future<String> findLatestSdkForRelease(String sdkRelease) async {
   final http = HttpClient(
     'setup-dart',
     <JSAny>[].toJS,
-    jsify({
+    {
       'allowRedirects': true,
       'maxRedirects': 3,
       'allowRetries': true,
       'maxRetries': 3,
-    }) as JSObject?,
+    }.toJSBox,
   );
 
   // {
@@ -247,10 +247,11 @@ Future<String> findLatestSdkForRelease(String sdkRelease) async {
   //     "channels/stable/release/2.19.6/"
   //   ]
   // }
-  var response = await promiseToFuture<JSObject>(http.getJson(url));
-  var result = getProperty<JSObject>(response, 'result');
+  var response = (await http.get(url).toDart) as HttpClientResponse;
+  var data = (await response.readBody().toDart).toDart;
+  var json = (jsonDecode(data) as Map).cast<String, Object?>();
 
-  final paths = (getProperty(result, 'prefixes') as List).cast<String>();
+  final paths = (json['prefixes'] as List).cast<String>();
   final versions = paths.map((p) => (p.split('/')..removeLast()).last).toList();
 
   // Sort versions by semver and return the highest version.

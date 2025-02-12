@@ -21,6 +21,5 @@ extension type Core(JSObject obj) {
 
   external void exportVariable(String name, String value);
 
-  // JSPromise<String>
-  external JSPromise getIDToken(String audience);
+  external JSPromise<JSString> getIDToken(String audience);
 }

@@ -12,6 +12,12 @@ extension type HttpClient._(JSObject obj) {
     JSObject? requestOptions,
   ]);
 
-  // JSPromise<JSObject>
-  external JSPromise getJson(String requestUrl);
+  // JSPromise<HttpClientResponse>
+  external JSPromise<JSObject> get(String requestUrl);
+  external JSPromise<JSObject?> getJson(String requestUrl);
+}
+
+@JS()
+extension type HttpClientResponse._(JSObject obj) {
+  external JSPromise<JSString> readBody();
 }
