@@ -25,14 +25,13 @@ extension type ToolCache(JSObject obj) {
   /// @param url       url of tool to download
   /// @param dest      path to download tool
   /// @returns         path to downloaded tool
-  // JSPromise<String>
-  external JSPromise downloadTool(String url, [String? dest]);
+  external JSPromise<JSString> downloadTool(String url, [String? dest]);
 
   /// Extract a zip.
   ///
   /// @param file     path to the zip
   /// @returns        path to the destination directory
-  external JSPromise extractZip(String file);
+  external JSPromise<JSString> extractZip(String file);
 
   /// Caches a directory and installs it into the tool cacheDir
   ///
@@ -41,7 +40,7 @@ extension type ToolCache(JSObject obj) {
   /// @param version       version of the tool.  semver format
   /// @param arch          architecture of the tool.  Optional.
   ///                      Defaults to machine architecture
-  external JSPromise cacheDir(
+  external JSPromise<JSString> cacheDir(
     String sourceDir,
     String tool,
     String version, [

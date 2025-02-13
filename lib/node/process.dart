@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:js_interop';
-import 'dart:js_util';
+import 'dart:js_interop_unsafe';
 
 /// Provides information about, and control over, the current Node.js process.
 /// Wraps https://nodejs.org/api/process.html
@@ -17,7 +17,9 @@ extension type Process(JSObject obj) {
   external JSObject get _env;
 
   /// Read the environment variable [variable].
-  String? env(String variable) => getProperty<String?>(_env, variable);
+  String? env(String variable) {
+    return _env.getProperty<JSString?>(variable.toJS)?.toDart;
+  }
 
   external int exitCode;
 }
