@@ -1,8 +1,8 @@
 ## v1.7.1
 
-- Roll `undici` dependency to address [CVE-2025-22150][].
-- Update to the latest npm dependencies.
-- Recompile the action using the new Dart / JavaScript interop.
+* Roll `undici` dependency to address [CVE-2025-22150][].
+* Update to the latest npm dependencies.
+* Recompile the action using the new Dart / JavaScript interop.
 
 [CVE-2025-22150]: https://github.com/nodejs/undici/security/advisories/GHSA-c76h-2ccp-4975
 
