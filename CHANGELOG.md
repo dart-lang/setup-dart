@@ -1,13 +1,21 @@
+## v1.7.1
+
+- Roll `undici` dependency to address [CVE-2025-22150][].
+- Update to the latest npm dependencies.
+- Recompile the action using the new Dart / JavaScript interop.
+
+[CVE-2025-22150]: https://github.com/nodejs/undici/security/advisories/GHSA-c76h-2ccp-4975
+
 ## v1.7.0
 
-- Install flutter sdk in publishing step, allowing Flutter packages to be
+* Install flutter sdk in publishing step, allowing Flutter packages to be
   published ([#68][]) 
   
   [#68]: https://github.com/dart-lang/setup-dart/issues/68
 
 ## v1.6.5
 
-- Fix zip path handling on Windows 11 ([#118][])
+* Fix zip path handling on Windows 11 ([#118][])
 
 [#118]: https://github.com/dart-lang/setup-dart/issues/118
 
