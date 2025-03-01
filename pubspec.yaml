@@ -13,4 +13,4 @@ dependencies:
 dev_dependencies:
   args: ^2.4.0
   crypto: ^3.0.0
-  dart_flutter_team_lints: ^2.0.0
+  dart_flutter_team_lints: ^3.0.0
