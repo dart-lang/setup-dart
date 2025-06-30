@@ -58,7 +58,7 @@ jobs:
 
   # Test the architecture input parameter.
   test_arch:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: ./
