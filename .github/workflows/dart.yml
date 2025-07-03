@@ -86,7 +86,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./
         with:
-          architecture: arm64
+          architecture: ${{ matrix.arch }}
+          sdk: ${{ matrix.sdk }}
 
       - name: Run hello world
         run: |
