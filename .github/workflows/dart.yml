@@ -58,7 +58,9 @@ jobs:
 
   # Test the architecture input parameter.
   test_arch:
-    runs-on: ubuntu-latest
+    # there is no 'ubuntu-arm-latest' runner, so pinning to 24.04: 
+    # https://github.com/orgs/community/discussions/148648#discussioncomment-11858187
+    runs-on: ubuntu-24.04-arm 
     steps:
       - uses: actions/checkout@v4
       - uses: ./
