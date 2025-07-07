@@ -1,6 +1,7 @@
 # Validate that the compiled artifacts are up-to-date.
 
 name: Build
+permissions: read-all
 
 on:
   pull_request:
