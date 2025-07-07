@@ -58,12 +58,36 @@ jobs:
 
   # Test the architecture input parameter.
   test_arch:
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Available runners in public repos:
+        # https://docs.github.com/en/actions/how-tos/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
+        include:
+          # The default MacOS tests above use x64; here we cover arm64.
+          - os: macos-latest
+            arch: arm64
+            sdk: dev
+          - os: macos-latest
+            arch: arm64
+            sdk: stable
+          # The default linux tests above use x64; here we cover arm64. 
+          # There is no 'ubuntu-arm-latest' runner, so we're pinning to 24.04: 
+          # https://github.com/orgs/community/discussions/148648#discussioncomment-11858187
+          - os: ubuntu-24.04-arm
+            arch: arm64
+            sdk: dev
+          - os: ubuntu-24.04-arm
+            arch: arm64
+            sdk: stable
+
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./
         with:
-          architecture: ia32
+          architecture: ${{ matrix.arch }}
+          sdk: ${{ matrix.sdk }}
 
       - name: Run hello world
         run: |
