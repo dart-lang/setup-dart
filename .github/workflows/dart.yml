@@ -25,7 +25,7 @@ jobs:
         sdk: [2.14.4, stable, beta, dev]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
@@ -47,7 +47,7 @@ jobs:
         flavor: [raw]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
@@ -84,7 +84,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./
         with:
           architecture: ${{ matrix.arch }}
@@ -103,7 +103,7 @@ jobs:
         sdk: [2.12.0-29.10.beta]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
@@ -122,7 +122,7 @@ jobs:
         sdk: [2.19, 3.0, 3.1]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./
         with:
           sdk: ${{ matrix.sdk }}
