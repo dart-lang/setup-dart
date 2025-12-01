@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checkout repository
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       # Set up the Dart SDK and provision the OIDC token used for publishing.
       # The `dart` command from this step will be shadowed by the one from the
       # Flutter SDK below. 
