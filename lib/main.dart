@@ -131,8 +131,14 @@ Future<void> _impl(List<String> args) async {
   core.exportVariable('PUB_CACHE', pubCache);
   core.addPath(path.join(pubCache, 'bin'));
 
-  // Create the OIDC token used for pub.dev publishing.
-  await createPubOIDCToken();
+  // Optionally create the OIDC token used for pub.dev publishing.
+  // This is only done when explicitly requested via the pub-dev-credentials input,
+  // as automatic token creation can cause issues on self-hosted runners where
+  // the credential persists but the environment variable does not.
+  final pubDevCredentials = core.getInput('pub-dev-credentials');
+  if (pubDevCredentials.toLowerCase() == 'true') {
+    await createPubOIDCToken();
+  }
 
   // Configure the outputs.
   core.setOutput('dart-version', getVersionFromSdk(sdkPath));
