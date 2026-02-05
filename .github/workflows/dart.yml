@@ -16,9 +16,6 @@ jobs:
   # Default test configurations.
   test:
     runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        working-directory: example
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
@@ -30,12 +27,18 @@ jobs:
         with:
           sdk: ${{ matrix.sdk }}
 
+      - uses: ./.github/workflows/pubget.yaml
+        with:
+          working-directory: example
+
       - name: Print DART_HOME
         run: echo "Dart SDK installed in $DART_HOME"
-      - run: dart pub get
       - run: dart run bin/main.dart
+        working-directory: example
       - run: dart analyze
+        working-directory: example
       - run: dart test
+        working-directory: example
 
   # Test the raw SDK flavor.
   test_raw:
