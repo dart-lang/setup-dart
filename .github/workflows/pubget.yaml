@@ -1,0 +1,45 @@
+name: "Dart Pub Get with Caching"
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: "The directory to run pub get in."
+        required: false
+        default: "."
+        type: string
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu, macos, windows]
+        sdk: [dev, stable]
+
+    runs-on: ${{ matrix.os }}-latest
+
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - name: "Calculate Cache Key"
+        id: cache-key
+        shell: bash
+        run: |
+          # Generates a hash based on the pubspec.lock (more precise) or pubspec.yaml
+          HASH=${{ hashFiles(format('{0}/pubspec.yaml', inputs.working-directory)) }}
+          echo "key=pub-cache-${{ runner.os }}-${{ inputs.working-directory }}-${HASH}" >> $GITHUB_OUTPUT
+
+      - name: "Cache Pub Dependencies"
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.PUB_CACHE }}
+          key: ${{ steps.cache-key.outputs.key }}
+          restore-keys: |
+            pub-cache-${{ runner.os }}-
+
+      - name: "Install Dependencies"
+        shell: bash
+        working-directory: ${{ inputs.working-directory }}
+        run: dart pub get
