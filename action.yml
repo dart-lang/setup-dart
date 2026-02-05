@@ -29,11 +29,11 @@ runs:
   using: composite
   steps:
   - uses: actions/setup-node@v4
-    id: setup-step
     with:
       node-version: 24
 
   - name: "Run setup"
+    id: setup-step
     run: node dist/index.mjs
     shell: bash
 
