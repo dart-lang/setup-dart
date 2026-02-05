@@ -136,7 +136,7 @@ Future<void> _impl(List<String> args) async {
 
   // Configure the outputs.
   core.setOutput('dart-version', getVersionFromSdk(sdkPath));
-  core.setOutput('cache-path', [sdkPath, pubCache].join('\n'));
+  core.setOutput('cache-path', sdkPath);
   core.setOutput('cache-key', '$channel-$flavor-$version-$os-$architecture');
 
   // Report success; print version.
