@@ -22,7 +22,7 @@
   "license": "BSD",
   "dependencies": {
     "@actions/core": "^3.0.0",
-    "@actions/exec": "^1.1.1",
+    "@actions/exec": "^3.0.0",
     "@actions/http-client": "^4.0.0",
     "@actions/tool-cache": "^4.0.0"
   }
