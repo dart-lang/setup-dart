@@ -24,6 +24,6 @@
     "@actions/core": "^1.11.1",
     "@actions/exec": "^1.1.1",
     "@actions/http-client": "^4.0.0",
-    "@actions/tool-cache": "^2.0.2"
+    "@actions/tool-cache": "^4.0.0"
   }
 }
