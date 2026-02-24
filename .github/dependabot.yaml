@@ -17,3 +17,7 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
