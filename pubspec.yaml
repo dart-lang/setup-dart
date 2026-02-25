@@ -7,10 +7,10 @@ environment:
   sdk: ^3.3.0
 
 dependencies:
-  path: ^1.8.0
-  pub_semver: ^2.1.0
+  path: ^1.9.1
+  pub_semver: ^2.2.0
 
 dev_dependencies:
-  args: ^2.4.0
-  crypto: ^3.0.0
-  dart_flutter_team_lints: ^3.0.0
+  args: ^2.7.0
+  crypto: ^3.0.7
+  dart_flutter_team_lints: ^3.5.2

@@ -17,9 +17,42 @@ inputs:
   flavor:
     description: "The build flavor ('release' or 'raw')."
     required: false
+  cache:
+    description: "Whether to cache the Dart SDK and the pub cache."
+    required: false
+    default: true
 outputs:
   dart-version:
     description: 'The installed Dart version.'
+
 runs:
-  using: "node20"
-  main: "dist/index.mjs"
+  using: composite
+  steps:
+  - uses: actions/setup-node@v4
+    with:
+      node-version: 24
+
+  - name: "Run setup"
+    id: setup-step
+    run: node dist/index.mjs
+    shell: bash
+
+  - name: Cache Dart SDK
+    if: ${{ inputs.cache == 'true' }}
+    id: dart-cache
+    uses: actions/cache@v5
+    with:
+      path: ${{ steps.setup-step.outputs.cache-path }}
+      key: ${{ steps.setup-step.outputs.cache-key }}
+
+  - name: Print Cache Status
+    if: ${{ inputs.cache == 'true' }}
+    run: |
+      if [ "${{ steps.dart-cache.outputs.cache-hit }}" == "true" ]; then
+        echo "Dart SDK cache hit! 🚀"
+        echo "Key used: ${{ steps.setup-step.outputs.cache-key }}"
+      else
+        echo "Dart SDK cache miss. 📥"
+        echo "Could not find cache for key: ${{ steps.setup-step.outputs.cache-key }}"
+      fi
+    shell: bash
