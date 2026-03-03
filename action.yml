@@ -17,6 +17,16 @@ inputs:
   flavor:
     description: "The build flavor ('release' or 'raw')."
     required: false
+  pub-dev-credentials:
+    description: >-
+      Whether to automatically configure OIDC credentials for pub.dev publishing.
+      When 'true' and the workflow has 'id-token: write' permission, this action
+      will obtain an OIDC token and configure 'dart pub' to use it for pub.dev.
+      Set to 'false' if you use 'id-token: write' for other purposes (e.g., Azure,
+      AWS, or GCP OIDC) and don't want pub.dev credentials to be configured.
+      This is especially important for self-hosted runners where credentials persist.
+    required: false
+    default: "true"
 outputs:
   dart-version:
     description: 'The installed Dart version.'

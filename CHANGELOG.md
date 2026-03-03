@@ -1,3 +1,23 @@
+## v1.8.0
+
+* Added `pub-dev-credentials` input to control automatic pub.dev OIDC credential
+  configuration (defaults to `true`, preserving existing behavior).
+  
+  When a workflow has `id-token: write` permission, this action automatically
+  configures credentials for pub.dev publishing. However, this can cause issues
+  on self-hosted runners where the credential entry persists in
+  `~/.config/dart/pub-tokens.json` but the `PUB_TOKEN` environment variable
+  does not, breaking subsequent `dart pub` operations.
+  
+  Users who need `id-token: write` for other OIDC providers (e.g., Azure, AWS,
+  GCP) and don't want pub.dev credentials configured can now disable this:
+  
+  ```yaml
+  - uses: dart-lang/setup-dart@v1
+    with:
+      pub-dev-credentials: false
+  ```
+
 ## v1.7.1
 
 * Roll `undici` dependency to address [CVE-2025-22150][].

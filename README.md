@@ -60,6 +60,14 @@ The action takes the following inputs:
       [Dart system requirements](https://dart.dev/get-dart#system-requirements)
       for valid combinations.
 
+  * `pub-dev-credentials`: Whether to configure OIDC credentials for pub.dev.
+    * Defaults to `true`. When the workflow has `id-token: write` permission,
+      this action will automatically configure credentials for pub.dev publishing.
+    * Set to `false` if you use `id-token: write` for other purposes (e.g.,
+      Azure, AWS, or GCP OIDC) and don't want pub.dev credentials configured.
+    * See [Automated publishing to pub.dev](#automated-publishing-to-pubdev)
+      for more details.
+
 ## Outputs
 
 The action produces the following output:
@@ -105,6 +113,67 @@ jobs:
       - name: Run tests
         run: dart test
 ```
+
+## Automated publishing to pub.dev
+
+To publish packages to pub.dev using GitHub's OIDC authentication, you need to:
+
+1. Configure your package on pub.dev to trust GitHub Actions
+   (see [Automated publishing on pub.dev](https://dart.dev/tools/pub/automated-publishing))
+2. Grant `id-token: write` permission in your workflow
+
+When `id-token: write` is granted, this action automatically configures
+credentials for pub.dev publishing (controlled by the `pub-dev-credentials`
+input, which defaults to `true`).
+
+```yml
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for OIDC authentication
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+
+      - run: dart pub publish --force
+```
+
+### Disabling pub.dev credentials
+
+If you use `id-token: write` for other purposes (e.g., Azure, AWS, or GCP OIDC)
+and don't need to publish to pub.dev, set `pub-dev-credentials: false`:
+
+```yml
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # For Azure/AWS/GCP OIDC, not pub.dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          pub-dev-credentials: false  # Don't configure pub.dev credentials
+
+      - run: dart pub get
+      # ... other steps using OIDC for non-pub.dev purposes
+```
+
+> **Note for self-hosted runners**: When `pub-dev-credentials` is `true`, this
+> action stores a credential in `~/.config/dart/pub-tokens.json` that references
+> the `PUB_TOKEN` environment variable. On self-hosted runners, this file
+> persists between jobs, but the environment variable does not. This can cause
+> authentication failures in subsequent jobs. If you use `id-token: write` for
+> purposes other than pub.dev publishing, set `pub-dev-credentials: false` to
+> avoid these issues.
 
 ## License
 
