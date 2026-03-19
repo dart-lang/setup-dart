@@ -4,6 +4,9 @@
   "private": true,
   "description": "The setup-dart GitHub Action - download and setup the Dart SDK.",
   "main": "lib/main.mjs",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "build": "dart compile js -olib/main.js lib/main.dart && dart tool/sig.dart --generate",
     "dist": "ncc build lib/main.mjs && cp lib/main.js dist/main.cjs && cp lib/sig.txt dist/sig.txt",
@@ -25,5 +28,8 @@
     "@actions/exec": "^3.0.0",
     "@actions/http-client": "^4.0.0",
     "@actions/tool-cache": "^4.0.0"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.4"
   }
 }
