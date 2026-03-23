@@ -1,3 +1,10 @@
+## v1.7.2
+
+* Update Node.js requirement to Node 24.
+* Fix open Dependabot alerts by bumping `undici` to `>=6.24.0`.
+* Update GitHub Action dependencies (`@actions/core`, `@actions/exec`, `@actions/tool-cache`, `@actions/http-client`).
+* Update workflow actions to their latest versions (`actions/checkout` v6, `setup-flutter`).
+
 ## v1.7.1
 
 * Roll `undici` dependency to address [CVE-2025-22150][].
