@@ -32,13 +32,13 @@ jobs:
       # Set up the Dart SDK and provision the OIDC token used for publishing.
       # The `dart` command from this step will be shadowed by the one from the
       # Flutter SDK below. 
-      - uses: dart-lang/setup-dart@e51d8e571e22473a2ddebf0ef8a2123f0ab2c02c
+      - uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
       # Download flutter SDK - needed for publishing Flutter packages. Can also
       # publish pure Dart packages.
       #
       # The dart binary from a Flutter SDK facilitates publishing both Flutter
       # and pure-dart packages.
-      - uses: flutter-actions/setup-flutter@d4e97a6e7467ef062618c9af927f90bc9651b876
+      - uses: flutter-actions/setup-flutter@18c66a64fb6f6d3338c63cabbc5cd6da395e7f1d
       # Minimal package setup and dry run checks.
       - name: Install dependencies
         run: dart pub get
