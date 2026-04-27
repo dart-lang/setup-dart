@@ -17,6 +17,10 @@ inputs:
   flavor:
     description: "The build flavor ('release' or 'raw')."
     required: false
+  problem-matcher:
+    description: "Register a problem matcher for dart analyze. Set to 'false' to disable."
+    required: false
+    default: "true"
 outputs:
   dart-version:
     description: 'The installed Dart version.'

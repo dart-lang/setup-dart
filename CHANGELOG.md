@@ -1,3 +1,7 @@
+## v1.8.0-wip
+
+* Add a problem matcher for `dart analyze` to automatically create inline annotations on GitHub pull requests.
+
 ## v1.7.2
 
 * Update Node.js requirement to Node 24.
