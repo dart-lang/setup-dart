@@ -141,7 +141,7 @@ Future<void> _impl(List<String> args) async {
   final problemMatcher = core.getInput('problem-matcher');
   if (problemMatcher != 'false') {
     final actionPath = process.env('GITHUB_ACTION_PATH') ?? '.';
-    core.addMatcher(path.join(actionPath, 'dart-analyzer.json'));
+    print('::add-matcher::${path.join(actionPath, 'dart-analyzer.json')}');
   }
 
   // Report success; print version.

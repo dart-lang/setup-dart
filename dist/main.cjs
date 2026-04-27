@@ -5642,9 +5642,7 @@
               t2.setOutput("dart-version", B.JSString_methods.trim$0(A._asString(A._asJSObject(t1.fs).readFileSync(versionFilePath, "utf8"))));
               if (A._asString(A._asJSObject(t1.core).getInput("problem-matcher")) !== "false") {
                 actionPath = A.Process_env(A._asJSObject(t1.process), "GITHUB_ACTION_PATH");
-                if (actionPath == null)
-                  actionPath = ".";
-                A._asJSObject(t1.core).addMatcher(A.join(actionPath, "dart-analyzer.json"));
+                A.printString("::add-matcher::" + A.join(actionPath == null ? "." : actionPath, "dart-analyzer.json"));
               }
               $async$goto = 21;
               return A._asyncAwait(A.promiseToFuture(A._asJSObject(A._asJSObject(t1.exec).exec("dart", A._setArrayType(["--version"], type$.JSArray_String))), type$.nullable_Object), $async$_impl);
@@ -5796,6 +5794,21 @@
       A._asJSObject(t1.process).exitCode = 1;
     },
     findLatestSdkForRelease_closure: function findLatestSdkForRelease_closure() {
+    },
+    printString(string) {
+      if (typeof dartPrint == "function") {
+        dartPrint(string);
+        return;
+      }
+      if (typeof console == "object" && typeof console.log != "undefined") {
+        console.log(string);
+        return;
+      }
+      if (typeof print == "function") {
+        print(string);
+        return;
+      }
+      throw "Unable to print message: " + String(string);
     },
     throwLateFieldADI(fieldName) {
       throw A.initializeExceptionWrapper(A.LateError$fieldADI(fieldName), new Error());
