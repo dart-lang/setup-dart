@@ -1,9 +1,9 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 import 'package:test_process/test_process.dart';
+import 'dart:convert';
+import 'dart:io';
 
 void main() {
   late RegExp bulletRegExp;
@@ -18,7 +18,7 @@ void main() {
     final matchers = json['problemMatcher'] as List;
 
     final bulletMatcher = matchers[0] as Map;
-    final bulletPattern = (bulletMatcher['pattern'] as List).single as Map;
+    final bulletPattern = (bulletMatcher["pattern"] as List).single as Map;
     bulletRegExp = RegExp(bulletPattern['regexp'] as String);
 
     final dashMatcher = matchers[1] as Map;
