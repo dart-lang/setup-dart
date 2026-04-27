@@ -1,0 +1,32 @@
+{
+  "problemMatcher": [
+    {
+      "owner": "dart-analyzer-bullet",
+      "pattern": [
+        {
+          "regexp": "^\\s*(error|warning|info)\\s*•\\s*(.+):(\\d+):(\\d+)\\s*•\\s*(.+?)\\s*•\\s*(.+)$",
+          "severity": 1,
+          "file": 2,
+          "line": 3,
+          "column": 4,
+          "message": 5,
+          "code": 6
+        }
+      ]
+    },
+    {
+      "owner": "dart-analyzer-dash",
+      "pattern": [
+        {
+          "regexp": "^\\s*(error|warning|info)\\s*-\\s*(.+):(\\d+):(\\d+)\\s*-\\s*(.+?)\\s*-\\s*(.+)$",
+          "severity": 1,
+          "file": 2,
+          "line": 3,
+          "column": 4,
+          "message": 5,
+          "code": 6
+        }
+      ]
+    }
+  ]
+}

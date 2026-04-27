@@ -137,6 +137,18 @@ Future<void> _impl(List<String> args) async {
   // Configure the outputs.
   core.setOutput('dart-version', getVersionFromSdk(sdkPath));
 
+  // Register problem matcher.
+  final problemMatcher = core.getInput('problem-matcher');
+  if (problemMatcher != 'false') {
+    final actionPath = process.env('GITHUB_ACTION_PATH');
+    if (actionPath != null) {
+      core.addMatcher(path.join(actionPath, 'dart-analyzer.json'));
+    } else {
+      core.warning(
+          'GITHUB_ACTION_PATH is not set; cannot register problem matcher.');
+    }
+  }
+
   // Report success; print version.
   await exec.exec('dart', ['--version'.toJS].toJS).toDart;
 }
