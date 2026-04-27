@@ -5642,10 +5642,9 @@
               t2.setOutput("dart-version", B.JSString_methods.trim$0(A._asString(A._asJSObject(t1.fs).readFileSync(versionFilePath, "utf8"))));
               if (A._asString(A._asJSObject(t1.core).getInput("problem-matcher")) !== "false") {
                 actionPath = A.Process_env(A._asJSObject(t1.process), "GITHUB_ACTION_PATH");
-                if (actionPath != null)
-                  A._asJSObject(t1.core).addMatcher(A.join(actionPath, "dart-analyzer.json"));
-                else
-                  A._asJSObject(t1.core).warning("GITHUB_ACTION_PATH is not set; cannot register problem matcher.");
+                if (actionPath == null)
+                  actionPath = ".";
+                A._asJSObject(t1.core).addMatcher(A.join(actionPath, "dart-analyzer.json"));
               }
               $async$goto = 21;
               return A._asyncAwait(A.promiseToFuture(A._asJSObject(A._asJSObject(t1.exec).exec("dart", A._setArrayType(["--version"], type$.JSArray_String))), type$.nullable_Object), $async$_impl);
