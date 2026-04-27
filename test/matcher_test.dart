@@ -4,6 +4,7 @@ import 'package:test_descriptor/test_descriptor.dart' as d;
 import 'package:test_process/test_process.dart';
 import 'dart:convert';
 import 'dart:io';
+import 'package:path/path.dart' as path;
 
 void main() {
   late RegExp bulletRegExp;
