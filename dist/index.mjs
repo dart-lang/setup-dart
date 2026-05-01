@@ -30589,6 +30589,13 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("tls");
 
 /***/ }),
 
+/***/ 7016:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("url");
+
+/***/ }),
+
 /***/ 9023:
 /***/ ((module) => {
 
@@ -30610,6 +30617,8 @@ __nccwpck_require__.a(__webpack_module__, async (__webpack_handle_async_dependen
 /* harmony import */ var module__WEBPACK_IMPORTED_MODULE_5__ = __nccwpck_require__(3339);
 /* harmony import */ var os__WEBPACK_IMPORTED_MODULE_6__ = __nccwpck_require__(857);
 /* harmony import */ var process__WEBPACK_IMPORTED_MODULE_7__ = __nccwpck_require__(932);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_8__ = __nccwpck_require__(6928);
+/* harmony import */ var url__WEBPACK_IMPORTED_MODULE_9__ = __nccwpck_require__(7016);
 // Copyright (c) 2023, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
@@ -30623,7 +30632,13 @@ __nccwpck_require__.a(__webpack_module__, async (__webpack_handle_async_dependen
 
 
 
+
+
+
 const require = module__WEBPACK_IMPORTED_MODULE_5__.createRequire(import.meta.url);
+
+const __filename = (0,url__WEBPACK_IMPORTED_MODULE_9__.fileURLToPath)(import.meta.url);
+const __dirname = path__WEBPACK_IMPORTED_MODULE_8__.dirname(__filename);
 
 // Setup properties for JS interop in Dart.
 
@@ -30635,6 +30650,7 @@ globalThis.toolCache = _actions_tool_cache__WEBPACK_IMPORTED_MODULE_3__;
 globalThis.fs = /*#__PURE__*/ (fs__WEBPACK_IMPORTED_MODULE_4___namespace_cache || (fs__WEBPACK_IMPORTED_MODULE_4___namespace_cache = __nccwpck_require__.t(fs__WEBPACK_IMPORTED_MODULE_4__, 2)));
 globalThis.os = /*#__PURE__*/ (os__WEBPACK_IMPORTED_MODULE_6___namespace_cache || (os__WEBPACK_IMPORTED_MODULE_6___namespace_cache = __nccwpck_require__.t(os__WEBPACK_IMPORTED_MODULE_6__, 2)));
 globalThis.process = process__WEBPACK_IMPORTED_MODULE_7__;
+globalThis.actionRepoRoot = path__WEBPACK_IMPORTED_MODULE_8__.join(__dirname, '..');
 globalThis.location = { href: `file://${process__WEBPACK_IMPORTED_MODULE_7__.cwd()}/`}
 
 globalThis.dartMainRunner = async function(main, args) {
