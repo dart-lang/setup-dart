@@ -16,6 +16,10 @@ import 'node/fs.dart';
 import 'node/os.dart';
 import 'node/process.dart';
 
+/// The path of the directory where setup-dart is checked out
+@JS('actionRepoRoot')
+external String? get actionRepoRoot;
+
 void main(List<String> args) async {
   try {
     await _impl(args);
@@ -140,7 +144,10 @@ Future<void> _impl(List<String> args) async {
   // Register problem matcher.
   final problemMatcher = core.getInput('problem-matcher');
   if (problemMatcher != 'false') {
-    final actionPath = process.env('GITHUB_ACTION_PATH') ?? '.';
+    var actionPath = process.env('GITHUB_ACTION_PATH') ?? '';
+    if (actionPath.isEmpty) {
+      actionPath = actionRepoRoot ?? '.';
+    }
     print('::add-matcher::${path.join(actionPath, 'dart-analyzer.json')}');
   }
 
