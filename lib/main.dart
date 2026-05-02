@@ -16,6 +16,7 @@ import 'node/fs.dart';
 import 'node/os.dart';
 import 'node/process.dart';
 
+/// The path of the directory where setup-dart is checked out
 @JS('actionRepoRoot')
 external String? get actionRepoRoot;
 
