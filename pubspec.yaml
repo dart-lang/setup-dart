@@ -7,9 +7,9 @@ environment:
   sdk: ^3.3.0
 
 dependencies:
+  dart_data_home: ^0.1.0
   path: ^1.8.0
   pub_semver: ^2.1.0
-  dart_data_home: ^0.1.0
 
 dev_dependencies:
   args: ^2.4.0

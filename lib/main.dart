@@ -138,7 +138,12 @@ Future<void> _impl(List<String> args) async {
 
   // Add the directory where 'dart install' places executables.
   final env = <String, String>{};
-  for (final key in ['DART_DATA_HOME', 'LOCALAPPDATA', 'HOME', 'XDG_STATE_HOME']) {
+  for (final key in [
+    'DART_DATA_HOME',
+    'LOCALAPPDATA',
+    'HOME',
+    'XDG_STATE_HOME'
+  ]) {
     final value = process.env(key);
     if (value != null) {
       env[key] = value;
