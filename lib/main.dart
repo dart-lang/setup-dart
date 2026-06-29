@@ -5,6 +5,7 @@
 import 'dart:convert';
 import 'dart:js_interop';
 
+import 'package:dart_data_home/dart_data_home.dart';
 import 'package:path/path.dart' as path;
 import 'package:pub_semver/pub_semver.dart';
 
@@ -134,6 +135,20 @@ Future<void> _impl(List<String> args) async {
   core.addPath(path.join(sdkPath, 'bin'));
   core.exportVariable('PUB_CACHE', pubCache);
   core.addPath(path.join(pubCache, 'bin'));
+
+  // Add the directory where 'dart install' places executables.
+  final env = <String, String>{};
+  for (final key in ['DART_DATA_HOME', 'LOCALAPPDATA', 'HOME', 'XDG_STATE_HOME']) {
+    final value = process.env(key);
+    if (value != null) {
+      env[key] = value;
+    }
+  }
+  final dartInstallBin = path.join(
+    getDartDataHome('install', environment: env),
+    'bin',
+  );
+  core.addPath(dartInstallBin);
 
   // Create the OIDC token used for pub.dev publishing.
   await createPubOIDCToken();
