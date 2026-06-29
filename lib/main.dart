@@ -196,7 +196,8 @@ String getPlatform() {
 
 /// This is basically the same as from `package:dart_data_home`, but without
 /// using `dart:io` (which is not available in this action).
-String _getDartDataHome(String packageName, String os, Map<String, String> env) {
+String _getDartDataHome(
+    String packageName, String os, Map<String, String> env) {
   final overridden = env['DART_DATA_HOME'];
   if (overridden != null) {
     return path.join(overridden, packageName);
