@@ -822,14 +822,6 @@
         return A.IndexError$withLength(index, $length, indexable, _s5_);
       return new A.RangeError(null, null, true, index, _s5_, "Value not in range");
     },
-    diagnoseRangeError(start, end, $length) {
-      if (start > $length)
-        return A.RangeError$range(start, 0, $length, "start", null);
-      if (end != null)
-        if (end < start || end > $length)
-          return A.RangeError$range(end, start, $length, "end", null);
-      return new A.ArgumentError(true, end, "end", null);
-    },
     argumentErrorValue(object) {
       return new A.ArgumentError(true, object, null, null);
     },
@@ -1629,16 +1621,6 @@
     _checkValidIndex(index, list, $length) {
       if (index >>> 0 !== index || index >= $length)
         throw A.wrapException(A.diagnoseIndexError(list, index));
-    },
-    _checkValidRange(start, end, $length) {
-      var t1;
-      if (!(start >>> 0 !== start))
-        t1 = end >>> 0 !== end || start > end || end > $length;
-      else
-        t1 = true;
-      if (t1)
-        throw A.wrapException(A.diagnoseRangeError(start, end, $length));
-      return end;
     },
     NativeByteBuffer: function NativeByteBuffer() {
     },
@@ -3796,12 +3778,6 @@
     },
     Utf8Codec: function Utf8Codec() {
     },
-    Utf8Encoder: function Utf8Encoder() {
-    },
-    _Utf8Encoder: function _Utf8Encoder(t0) {
-      this._bufferIndex = 0;
-      this._buffer = t0;
-    },
     Utf8Decoder: function Utf8Decoder(t0) {
       this._allowMalformed = t0;
     },
@@ -3902,26 +3878,6 @@
       $.Uri__cachedBaseUri = uri;
       $.Uri__cachedBaseString = current;
       return uri;
-    },
-    _Uri__uriEncode(canonicalMask, text, encoding, spaceToPlus) {
-      var t1, bytes, i, t2, byte,
-        _s16_ = "0123456789ABCDEF";
-      if (encoding === B.C_Utf8Codec) {
-        t1 = $.$get$_Uri__needsNoEncoding();
-        t1 = t1._nativeRegExp.test(text);
-      } else
-        t1 = false;
-      if (t1)
-        return text;
-      bytes = B.C_Utf8Encoder.convert$1(text);
-      for (t1 = bytes.length, i = 0, t2 = ""; i < t1; ++i) {
-        byte = bytes[i];
-        if (byte < 128 && (string$.______.charCodeAt(byte) & canonicalMask) !== 0)
-          t2 += A.Primitives_stringFromCharCode(byte);
-        else
-          t2 = spaceToPlus && byte === 32 ? t2 + "+" : t2 + "%" + _s16_[byte >>> 4 & 15] + _s16_[byte & 15];
-      }
-      return t2.charCodeAt(0) == 0 ? t2 : t2;
     },
     StackTrace_current() {
       return A.getTraceFromException(new Error());
@@ -4489,31 +4445,6 @@
     _Uri$_internal(scheme, _userInfo, _host, _port, path, _query, _fragment) {
       return new A._Uri(scheme, _userInfo, _host, _port, path, _query, _fragment);
     },
-    _Uri__Uri(host, path, pathSegments, scheme) {
-      var userInfo, query, fragment, port, isFile, t1, hasAuthority, t2, _null = null;
-      scheme = scheme == null ? "" : A._Uri__makeScheme(scheme, 0, scheme.length);
-      userInfo = A._Uri__makeUserInfo(_null, 0, 0);
-      host = A._Uri__makeHost(host, 0, host == null ? 0 : host.length, false);
-      query = A._Uri__makeQuery(_null, 0, 0, _null);
-      fragment = A._Uri__makeFragment(_null, 0, 0);
-      port = A._Uri__makePort(_null, scheme);
-      isFile = scheme === "file";
-      if (host == null)
-        t1 = userInfo.length !== 0 || port != null || isFile;
-      else
-        t1 = false;
-      if (t1)
-        host = "";
-      t1 = host == null;
-      hasAuthority = !t1;
-      path = A._Uri__makePath(path, 0, path == null ? 0 : path.length, pathSegments, scheme, hasAuthority);
-      t2 = scheme.length === 0;
-      if (t2 && t1 && !B.JSString_methods.startsWith$1(path, "/"))
-        path = A._Uri__normalizeRelativePath(path, !t2 || hasAuthority);
-      else
-        path = A._Uri__removeDotSegments(path);
-      return A._Uri$_internal(scheme, userInfo, t1 && B.JSString_methods.startsWith$1(path, "//") ? "" : host, port, path, query, fragment);
-    },
     _Uri__defaultPort(scheme) {
       if (scheme === "http")
         return 80;
@@ -4533,16 +4464,6 @@
           throw A.wrapException(t1);
         }
       }
-    },
-    _Uri__makeFileUri(path, slashTerminated) {
-      var _null = null,
-        segments = A._setArrayType(path.split("/"), type$.JSArray_String);
-      if (slashTerminated && segments.length !== 0 && B.JSArray_methods.get$last(segments).length !== 0)
-        B.JSArray_methods.add$1(segments, "");
-      if (B.JSString_methods.startsWith$1(path, "/"))
-        return A._Uri__Uri(_null, _null, segments, "file");
-      else
-        return A._Uri__Uri(_null, _null, segments, _null);
     },
     _Uri__makePort(port, scheme) {
       if (port != null && port === A._Uri__defaultPort(scheme))
@@ -4791,16 +4712,11 @@
       return A._Uri__normalizeOrSubstring(userInfo, start, end, 16, false, false);
     },
     _Uri__makePath(path, start, end, pathSegments, scheme, hasAuthority) {
-      var t1, result,
+      var result,
         isFile = scheme === "file",
         ensureLeadingSlash = isFile || hasAuthority;
-      if (path == null) {
-        if (pathSegments == null)
-          return isFile ? "/" : "";
-        t1 = A._arrayInstanceType(pathSegments);
-        result = new A.MappedListIterable(pathSegments, t1._eval$1("String(1)")._as(new A._Uri__makePath_closure()), t1._eval$1("MappedListIterable<1,String>")).join$1(0, "/");
-      } else if (pathSegments != null)
-        throw A.wrapException(A.ArgumentError$("Both path and pathSegments specified", null));
+      if (path == null)
+        return isFile ? "/" : "";
       else
         result = A._Uri__normalizeOrSubstring(path, start, end, 128, true, true);
       if (result.length === 0) {
@@ -5055,11 +4971,6 @@
         }
       return path;
     },
-    _Uri__packageNameEnd(uri, path) {
-      if (uri.isScheme$1("package") && uri._host == null)
-        return A._skipPackageNameChars(path, 0, path.length);
-      return -1;
-    },
     _Uri__hexCharPairToByte(s, pos) {
       var t1, byte, i, t2, charCode;
       for (t1 = s.length, byte = 0, i = 0; i < 2; ++i) {
@@ -5199,43 +5110,6 @@
       }
       return state;
     },
-    _skipPackageNameChars(source, start, end) {
-      var t1, i, dots, char;
-      for (t1 = source.length, i = start, dots = 0; i < end; ++i) {
-        if (!(i >= 0 && i < t1))
-          return A.ioore(source, i);
-        char = source.charCodeAt(i);
-        if (char === 47)
-          return dots !== 0 ? i : -1;
-        if (char === 37 || char === 58)
-          return -1;
-        dots |= char ^ 46;
-      }
-      return -1;
-    },
-    _caseInsensitiveCompareStart(prefix, string, start) {
-      var t1, t2, result, i, t3, stringChar, delta, lowerChar;
-      for (t1 = prefix.length, t2 = string.length, result = 0, i = 0; i < t1; ++i) {
-        t3 = start + i;
-        if (!(t3 < t2))
-          return A.ioore(string, t3);
-        stringChar = string.charCodeAt(t3);
-        delta = prefix.charCodeAt(i) ^ stringChar;
-        if (delta !== 0) {
-          if (delta === 32) {
-            lowerChar = stringChar | delta;
-            if (97 <= lowerChar && lowerChar <= 122) {
-              result = 32;
-              continue;
-            }
-          }
-          return -1;
-        }
-      }
-      return result;
-    },
-    _Enum: function _Enum() {
-    },
     Error: function Error() {
     },
     AssertionError: function AssertionError(t0) {
@@ -5316,8 +5190,6 @@
       _._fragment = t6;
       _.___Uri_hashCode_FI = _.___Uri_pathSegments_FI = _.___Uri__text_FI = $;
     },
-    _Uri__makePath_closure: function _Uri__makePath_closure() {
-    },
     UriData: function UriData(t0, t1, t2) {
       this._text = t0;
       this._separatorIndices = t1;
@@ -5346,36 +5218,6 @@
       _._fragment = t6;
       _.___Uri_hashCode_FI = _.___Uri_pathSegments_FI = _.___Uri__text_FI = $;
     },
-    _Platform__operatingSystem() {
-      throw A.wrapException(A.UnsupportedError$("Platform._operatingSystem"));
-    },
-    Directory_Directory(path) {
-      $.$get$_ioOverridesToken();
-      A.FileSystemEntity__toNullTerminatedUtf8Array(B.C_Utf8Encoder.convert$1(path));
-      return new A._Directory(path);
-    },
-    FileSystemEntity__toNullTerminatedUtf8Array(l) {
-      var t2, tmp,
-        t1 = l.length;
-      if (t1 !== 0)
-        t2 = !B.NativeUint8List_methods.get$isEmpty(l) && B.NativeUint8List_methods.get$last(l) !== 0;
-      else
-        t2 = true;
-      if (t2) {
-        tmp = new Uint8Array(t1 + 1);
-        B.NativeUint8List_methods.setRange$3(tmp, 0, t1, l);
-        return tmp;
-      } else
-        return l;
-    },
-    _Platform_operatingSystem() {
-      return A._Platform__operatingSystem();
-    },
-    _Directory: function _Directory(t0) {
-      this._path = t0;
-    },
-    FileSystemEntity: function FileSystemEntity() {
-    },
     NullRejectionException: function NullRejectionException(t0) {
       this.isUndefined = t0;
     },
@@ -5402,18 +5244,6 @@
     },
     promiseToFuture_closure0: function promiseToFuture_closure0(t0) {
       this.completer = t0;
-    },
-    EnvironmentNotFoundException: function EnvironmentNotFoundException(t0) {
-      this.entryName = t0;
-    },
-    BaseDirectories: function BaseDirectories(t0, t1) {
-      this.tool = t0;
-      this._environment = t1;
-      this.__BaseDirectories_stateHome_FI = $;
-    },
-    _XdgBaseDirectoryKind: function _XdgBaseDirectoryKind(t0, t1) {
-      this.index = t0;
-      this._name = t1;
     },
     DefaultEquality: function DefaultEquality(t0) {
       this.$ti = t0;
@@ -5499,11 +5329,33 @@
       _.separators = t4;
     },
     Style__getPlatformStyle() {
+      var userInfo, host, query, fragment, port, t1, hasAuthority, path, _null = null;
       if (A.Uri_base().get$scheme() !== "file")
         return $.$get$Style_url();
       if (!B.JSString_methods.endsWith$1(A.Uri_base().get$path(), "/"))
         return $.$get$Style_url();
-      if (A._Uri__Uri(null, "a/b", null, null).toFilePath$0() === "a\\b")
+      userInfo = A._Uri__makeUserInfo(_null, 0, 0);
+      host = A._Uri__makeHost(_null, 0, 0, false);
+      query = A._Uri__makeQuery(_null, 0, 0, _null);
+      fragment = A._Uri__makeFragment(_null, 0, 0);
+      port = A._Uri__makePort(_null, "");
+      if (host == null)
+        if (userInfo.length === 0)
+          t1 = port != null;
+        else
+          t1 = true;
+      else
+        t1 = false;
+      if (t1)
+        host = "";
+      t1 = host == null;
+      hasAuthority = !t1;
+      path = A._Uri__makePath("a/b", 0, 3, _null, "", hasAuthority);
+      if (t1 && !B.JSString_methods.startsWith$1(path, "/"))
+        path = A._Uri__normalizeRelativePath(path, hasAuthority);
+      else
+        path = A._Uri__removeDotSegments(path);
+      if (A._Uri$_internal("", userInfo, t1 && B.JSString_methods.startsWith$1(path, "//") ? "" : host, port, path, query, fragment).toFilePath$0() === "a\\b")
         return $.$get$Style_windows();
       return $.$get$Style_posix();
     },
@@ -5654,7 +5506,7 @@
     _impl(args) {
       var $async$goto = 0,
         $async$completer = A._makeAsyncAwaitCompleter(type$.void),
-        $async$returnValue, flavor, raw, os, architecture, channel, version, url, toolName, sdkPath, t2, archivePath, extractedFolder, pubCache, env, _i, key, value, overridden, dartDataHome, dartBaseDirectories, result, dartInstallBin, versionFilePath, actionPath, t1, sdk, $async$temp1;
+        $async$returnValue, flavor, raw, os, architecture, channel, version, url, toolName, sdkPath, t2, archivePath, extractedFolder, pubCache, env, _i, key, value, dartInstallBin, versionFilePath, actionPath, t1, sdk, $async$temp1;
       var $async$_impl = A._wrapJsFunctionForAsync(function($async$errorCode, $async$result) {
         if ($async$errorCode === 1)
           return A._asyncRethrow($async$result, $async$completer);
@@ -5798,20 +5650,7 @@
                 if (value != null)
                   env.$indexSet(0, key, value);
               }
-              overridden = env.$index(0, "DART_DATA_HOME");
-              if (overridden != null)
-                dartDataHome = A.Directory_Directory(overridden);
-              else {
-                dartBaseDirectories = new A.BaseDirectories("Dart", env);
-                t2 = dartBaseDirectories._baseDirectory$1(B._XdgBaseDirectoryKind_4);
-                t2.toString;
-                result = A.join(t2, "Dart", null, null);
-                dartBaseDirectories.__BaseDirectories_stateHome_FI !== $ && A.throwLateFieldADI("stateHome");
-                dartBaseDirectories.__BaseDirectories_stateHome_FI = result;
-                dartDataHome = A.Directory_Directory(result);
-              }
-              t2 = A._Uri__makeFileUri(dartDataHome._path, true);
-              dartInstallBin = A.join(t2.resolveUri$1(A.Uri_parse("install/")).toFilePath$0(), "bin", null, null);
+              dartInstallBin = A.join(A._getDartDataHome("install", os, env), "bin", null, null);
               A._asJSObject(t1.core).addPath(dartInstallBin);
               $async$goto = 20;
               return A._asyncAwait(A.createPubOIDCToken(), $async$_impl);
@@ -5859,6 +5698,30 @@
       }
       return t1;
     },
+    _getDartDataHome(packageName, os, env) {
+      var localAppData, baseDir, $home, xdgState, _null = null, _s4_ = "Dart",
+        overridden = env.$index(0, "DART_DATA_HOME");
+      if (overridden != null)
+        return A.join(overridden, packageName, _null, _null);
+      if (os === "windows") {
+        localAppData = env.$index(0, "LOCALAPPDATA");
+        baseDir = A.join(localAppData == null ? "" : localAppData, _s4_, _null, _null);
+      } else if (os === "macos") {
+        $home = env.$index(0, "HOME");
+        baseDir = A.join($home == null ? "" : $home, "Library", "Application Support", _s4_);
+      } else {
+        xdgState = env.$index(0, "XDG_STATE_HOME");
+        if (xdgState == null)
+          xdgState = "";
+        if (xdgState.length !== 0)
+          baseDir = A.join(xdgState, _s4_, _null, _null);
+        else {
+          $home = env.$index(0, "HOME");
+          baseDir = A.join($home == null ? "" : $home, ".local", "state", _s4_);
+        }
+      }
+      return A.join(baseDir, packageName, _null, _null);
+    },
     createPubOIDCToken() {
       var $async$goto = 0,
         $async$completer = A._makeAsyncAwaitCompleter(type$.void),
@@ -5898,7 +5761,7 @@
     latestPublishedVersion(channel, flavor) {
       var $async$goto = 0,
         $async$completer = A._makeAsyncAwaitCompleter(type$.String),
-        $async$returnValue, t1, $async$temp1, $async$temp2, $async$temp3, $async$temp4, $async$temp5;
+        $async$returnValue, t1, json, $async$temp1, $async$temp2, $async$temp3, $async$temp4;
       var $async$latestPublishedVersion = A._wrapJsFunctionForAsync(function($async$errorCode, $async$result) {
         if ($async$errorCode === 1)
           return A._asyncRethrow($async$result, $async$completer);
@@ -5907,20 +5770,20 @@
             case 0:
               // Function start
               t1 = type$.String;
-              $async$temp1 = A;
-              $async$temp2 = type$.Map_dynamic_dynamic;
-              $async$temp3 = B.C_JsonCodec;
+              $async$temp1 = type$.Map_dynamic_dynamic;
+              $async$temp2 = B.C_JsonCodec;
+              $async$temp3 = A;
               $async$temp4 = A;
-              $async$temp5 = A;
               $async$goto = 4;
               return A._asyncAwait(A.promiseToFuture(A._asJSObject(A._asJSObject(new init.G.HttpClient("setup-dart", A._setArrayType([], type$.JSArray_Object), A._asJSObjectQ(A.jsify(A.LinkedHashMap_LinkedHashMap$_literal(["allowRedirects", true, "maxRedirects", 3, "allowRetries", true, "maxRetries", 3], t1, type$.Object))))).get(string$.https_ + channel + "/" + flavor + "/latest/VERSION")), type$.JSObject), $async$latestPublishedVersion);
             case 4:
               // returning from await.
               $async$goto = 3;
-              return A._asyncAwait($async$temp4.promiseToFuture($async$temp5._asJSObject($async$result.readBody()), t1), $async$latestPublishedVersion);
+              return A._asyncAwait($async$temp3.promiseToFuture($async$temp4._asJSObject($async$result.readBody()), t1), $async$latestPublishedVersion);
             case 3:
               // returning from await.
-              $async$returnValue = $async$temp1._asString($async$temp2._as($async$temp3.decode$2$reviver($async$result, null)).cast$2$0(0, t1, type$.nullable_Object).$index(0, "version"));
+              json = $async$temp1._as($async$temp2.decode$2$reviver($async$result, null)).cast$2$0(0, t1, type$.nullable_Object);
+              $async$returnValue = A._asString(json.$ti._eval$1("4?")._as(json._source.$index(0, "version")));
               // goto return
               $async$goto = 1;
               break;
@@ -5934,7 +5797,7 @@
     findLatestSdkForRelease(sdkRelease) {
       var $async$goto = 0,
         $async$completer = A._makeAsyncAwaitCompleter(type$.String),
-        $async$returnValue, t2, versions, semvers, t1, paths, $async$temp1, $async$temp2, $async$temp3, $async$temp4, $async$temp5, $async$temp6;
+        $async$returnValue, t2, versions, semvers, t1, json, paths, $async$temp1, $async$temp2, $async$temp3, $async$temp4;
       var $async$findLatestSdkForRelease = A._wrapJsFunctionForAsync(function($async$errorCode, $async$result) {
         if ($async$errorCode === 1)
           return A._asyncRethrow($async$result, $async$completer);
@@ -5943,21 +5806,20 @@
             case 0:
               // Function start
               t1 = type$.String;
-              $async$temp1 = J;
-              $async$temp2 = type$.List_dynamic;
-              $async$temp3 = type$.Map_dynamic_dynamic;
-              $async$temp4 = B.C_JsonCodec;
-              $async$temp5 = A;
-              $async$temp6 = A;
+              $async$temp1 = type$.Map_dynamic_dynamic;
+              $async$temp2 = B.C_JsonCodec;
+              $async$temp3 = A;
+              $async$temp4 = A;
               $async$goto = 4;
               return A._asyncAwait(A.promiseToFuture(A._asJSObject(A._asJSObject(new init.G.HttpClient("setup-dart", A._setArrayType([], type$.JSArray_Object), A._asJSObjectQ(A.jsify(A.LinkedHashMap_LinkedHashMap$_literal(["allowRedirects", true, "maxRedirects", 3, "allowRetries", true, "maxRetries", 3], t1, type$.Object))))).get("https://storage.googleapis.com/storage/v1/b/dart-archive/o?prefix=" + ("channels/stable/release/" + sdkRelease + ".") + "&delimiter=/")), type$.JSObject), $async$findLatestSdkForRelease);
             case 4:
               // returning from await.
               $async$goto = 3;
-              return A._asyncAwait($async$temp5.promiseToFuture($async$temp6._asJSObject($async$result.readBody()), t1), $async$findLatestSdkForRelease);
+              return A._asyncAwait($async$temp3.promiseToFuture($async$temp4._asJSObject($async$result.readBody()), t1), $async$findLatestSdkForRelease);
             case 3:
               // returning from await.
-              paths = $async$temp1.cast$1$0$ax($async$temp2._as($async$temp3._as($async$temp4.decode$2$reviver($async$result, null)).cast$2$0(0, t1, type$.nullable_Object).$index(0, "prefixes")), t1);
+              json = $async$temp1._as($async$temp2.decode$2$reviver($async$result, null)).cast$2$0(0, t1, type$.nullable_Object);
+              paths = J.cast$1$0$ax(type$.List_dynamic._as(json.$ti._eval$1("4?")._as(json._source.$index(0, "prefixes"))), t1);
               t1 = paths.$ti;
               t2 = t1._eval$1("MappedListIterable<ListBase.E,String>");
               versions = A.List_List$_of(new A.MappedListIterable(paths, t1._eval$1("String(ListBase.E)")._as(new A.findLatestSdkForRelease_closure()), t2), t2._eval$1("ListIterable.E"));
@@ -6484,21 +6346,6 @@
     },
     indexOf$1(receiver, pattern) {
       return this.indexOf$2(receiver, pattern, 0);
-    },
-    lastIndexOf$2(receiver, pattern, start) {
-      var t1, t2;
-      if (start == null)
-        start = receiver.length;
-      else if (start < 0 || start > receiver.length)
-        throw A.wrapException(A.RangeError$range(start, 0, receiver.length, null, null));
-      t1 = pattern.length;
-      t2 = receiver.length;
-      if (start + t1 > t2)
-        start = t2 - t1;
-      return receiver.lastIndexOf(pattern, start);
-    },
-    lastIndexOf$1(receiver, pattern) {
-      return this.lastIndexOf$2(receiver, pattern, null);
     },
     contains$1(receiver, other) {
       return A.stringContainsUnchecked(receiver, other, 0);
@@ -7289,7 +7136,7 @@
       receiver[index] = value;
     },
     setRange$4(receiver, start, end, iterable, skipCount) {
-      var targetLength, count, sourceLength, source;
+      var targetLength, count, source;
       type$.Iterable_int._as(iterable);
       receiver.$flags & 2 && A.throwUnsupportedOperation(receiver, 5);
       targetLength = receiver.length;
@@ -7300,15 +7147,11 @@
       count = end - start;
       if (skipCount < 0)
         A.throwExpression(A.ArgumentError$(skipCount, null));
-      sourceLength = iterable.length;
-      if (sourceLength - skipCount < count)
+      if (16 - skipCount < count)
         A.throwExpression(A.StateError$("Not enough elements"));
-      source = skipCount !== 0 || sourceLength !== count ? iterable.subarray(skipCount, skipCount + count) : iterable;
+      source = skipCount !== 0 || 16 !== count ? iterable.subarray(skipCount, skipCount + count) : iterable;
       receiver.set(source, start);
       return;
-    },
-    setRange$3(receiver, start, end, iterable) {
-      return this.setRange$4(receiver, start, end, iterable, 0);
     },
     $isEfficientLengthIterable: 1,
     $isIterable: 1,
@@ -7442,7 +7285,7 @@
       t1.storedCallback = null;
       f.call$0();
     },
-    $signature: 4
+    $signature: 3
   };
   A._AsyncRun__initializeScheduleImmediate_closure.prototype = {
     call$1(callback) {
@@ -7458,13 +7301,13 @@
     call$0() {
       this.callback.call$0();
     },
-    $signature: 5
+    $signature: 4
   };
   A._AsyncRun__scheduleImmediateWithSetImmediate_internalCallback.prototype = {
     call$0() {
       this.callback.call$0();
     },
-    $signature: 5
+    $signature: 4
   };
   A._TimerImpl.prototype = {
     _TimerImpl$2(milliseconds, callback) {
@@ -7805,7 +7648,7 @@
     call$1(__wc0_formal) {
       this.joinedResult._completeWithResultOf$1(this.originalSource);
     },
-    $signature: 4
+    $signature: 3
   };
   A._Future__propagateToListeners_handleWhenCompleteCallback_closure0.prototype = {
     call$2(e, s) {
@@ -8112,14 +7955,6 @@
     elementAt$1(receiver, index) {
       return this.$index(receiver, index);
     },
-    get$isEmpty(receiver) {
-      return this.get$length(receiver) === 0;
-    },
-    get$last(receiver) {
-      if (this.get$length(receiver) === 0)
-        throw A.wrapException(A.IterableElementError_noElement());
-      return this.$index(receiver, this.get$length(receiver) - 1);
-    },
     map$1$1(receiver, f, $T) {
       var t1 = A.instanceType(receiver);
       return new A.MappedListIterable(receiver, t1._bind$1($T)._eval$1("1(ListBase.E)")._as(f), t1._eval$1("@<ListBase.E>")._bind$1($T)._eval$1("MappedListIterable<1,2>"));
@@ -8272,7 +8107,7 @@
       }
       return null;
     },
-    $signature: 6
+    $signature: 5
   };
   A._Utf8Decoder__decoderNonfatal_closure.prototype = {
     call$0() {
@@ -8284,7 +8119,7 @@
       }
       return null;
     },
-    $signature: 6
+    $signature: 5
   };
   A.Base64Codec.prototype = {
     normalize$3(source, start, end) {
@@ -8405,146 +8240,6 @@
   };
   A.JsonDecoder.prototype = {};
   A.Utf8Codec.prototype = {};
-  A.Utf8Encoder.prototype = {
-    convert$1(string) {
-      var t1, t2, encoder, t3,
-        stringLength = string.length,
-        end = A.RangeError_checkValidRange(0, null, stringLength);
-      if (end === 0)
-        return new Uint8Array(0);
-      t1 = end * 3;
-      t2 = new Uint8Array(t1);
-      encoder = new A._Utf8Encoder(t2);
-      if (encoder._fillBuffer$3(string, 0, end) !== end) {
-        t3 = end - 1;
-        if (!(t3 >= 0 && t3 < stringLength))
-          return A.ioore(string, t3);
-        encoder._writeReplacementCharacter$0();
-      }
-      return new Uint8Array(t2.subarray(0, A._checkValidRange(0, encoder._bufferIndex, t1)));
-    }
-  };
-  A._Utf8Encoder.prototype = {
-    _writeReplacementCharacter$0() {
-      var t4, _this = this,
-        t1 = _this._buffer,
-        t2 = _this._bufferIndex,
-        t3 = _this._bufferIndex = t2 + 1;
-      t1.$flags & 2 && A.throwUnsupportedOperation(t1);
-      t4 = t1.length;
-      if (!(t2 < t4))
-        return A.ioore(t1, t2);
-      t1[t2] = 239;
-      t2 = _this._bufferIndex = t3 + 1;
-      if (!(t3 < t4))
-        return A.ioore(t1, t3);
-      t1[t3] = 191;
-      _this._bufferIndex = t2 + 1;
-      if (!(t2 < t4))
-        return A.ioore(t1, t2);
-      t1[t2] = 189;
-    },
-    _writeSurrogate$2(leadingSurrogate, nextCodeUnit) {
-      var rune, t1, t2, t3, t4, _this = this;
-      if ((nextCodeUnit & 64512) === 56320) {
-        rune = 65536 + ((leadingSurrogate & 1023) << 10) | nextCodeUnit & 1023;
-        t1 = _this._buffer;
-        t2 = _this._bufferIndex;
-        t3 = _this._bufferIndex = t2 + 1;
-        t1.$flags & 2 && A.throwUnsupportedOperation(t1);
-        t4 = t1.length;
-        if (!(t2 < t4))
-          return A.ioore(t1, t2);
-        t1[t2] = rune >>> 18 | 240;
-        t2 = _this._bufferIndex = t3 + 1;
-        if (!(t3 < t4))
-          return A.ioore(t1, t3);
-        t1[t3] = rune >>> 12 & 63 | 128;
-        t3 = _this._bufferIndex = t2 + 1;
-        if (!(t2 < t4))
-          return A.ioore(t1, t2);
-        t1[t2] = rune >>> 6 & 63 | 128;
-        _this._bufferIndex = t3 + 1;
-        if (!(t3 < t4))
-          return A.ioore(t1, t3);
-        t1[t3] = rune & 63 | 128;
-        return true;
-      } else {
-        _this._writeReplacementCharacter$0();
-        return false;
-      }
-    },
-    _fillBuffer$3(str, start, end) {
-      var t1, t2, t3, t4, stringIndex, codeUnit, t5, t6, _this = this;
-      if (start !== end) {
-        t1 = end - 1;
-        if (!(t1 >= 0 && t1 < str.length))
-          return A.ioore(str, t1);
-        t1 = (str.charCodeAt(t1) & 64512) === 55296;
-      } else
-        t1 = false;
-      if (t1)
-        --end;
-      for (t1 = _this._buffer, t2 = t1.$flags | 0, t3 = t1.length, t4 = str.length, stringIndex = start; stringIndex < end; ++stringIndex) {
-        if (!(stringIndex < t4))
-          return A.ioore(str, stringIndex);
-        codeUnit = str.charCodeAt(stringIndex);
-        if (codeUnit <= 127) {
-          t5 = _this._bufferIndex;
-          if (t5 >= t3)
-            break;
-          _this._bufferIndex = t5 + 1;
-          t2 & 2 && A.throwUnsupportedOperation(t1);
-          t1[t5] = codeUnit;
-        } else {
-          t5 = codeUnit & 64512;
-          if (t5 === 55296) {
-            if (_this._bufferIndex + 4 > t3)
-              break;
-            t5 = stringIndex + 1;
-            if (!(t5 < t4))
-              return A.ioore(str, t5);
-            if (_this._writeSurrogate$2(codeUnit, str.charCodeAt(t5)))
-              stringIndex = t5;
-          } else if (t5 === 56320) {
-            if (_this._bufferIndex + 3 > t3)
-              break;
-            _this._writeReplacementCharacter$0();
-          } else if (codeUnit <= 2047) {
-            t5 = _this._bufferIndex;
-            t6 = t5 + 1;
-            if (t6 >= t3)
-              break;
-            _this._bufferIndex = t6;
-            t2 & 2 && A.throwUnsupportedOperation(t1);
-            if (!(t5 < t3))
-              return A.ioore(t1, t5);
-            t1[t5] = codeUnit >>> 6 | 192;
-            _this._bufferIndex = t6 + 1;
-            t1[t6] = codeUnit & 63 | 128;
-          } else {
-            t5 = _this._bufferIndex;
-            if (t5 + 2 >= t3)
-              break;
-            t6 = _this._bufferIndex = t5 + 1;
-            t2 & 2 && A.throwUnsupportedOperation(t1);
-            if (!(t5 < t3))
-              return A.ioore(t1, t5);
-            t1[t5] = codeUnit >>> 12 | 224;
-            t5 = _this._bufferIndex = t6 + 1;
-            if (!(t6 < t3))
-              return A.ioore(t1, t6);
-            t1[t6] = codeUnit >>> 6 & 63 | 128;
-            _this._bufferIndex = t5 + 1;
-            if (!(t5 < t3))
-              return A.ioore(t1, t5);
-            t1[t5] = codeUnit & 63 | 128;
-          }
-        }
-      }
-      return stringIndex;
-    }
-  };
   A.Utf8Decoder.prototype = {
     convert$1(codeUnits) {
       return new A._Utf8Decoder(this._allowMalformed)._convertGeneral$4(type$.List_int._as(codeUnits), 0, null, true);
@@ -8710,11 +8405,6 @@
       _this._charOrIndex = char;
       t1 = buffer._contents;
       return t1.charCodeAt(0) == 0 ? t1 : t1;
-    }
-  };
-  A._Enum.prototype = {
-    toString$0(_) {
-      return this._enumToString$0();
     }
   };
   A.Error.prototype = {
@@ -9077,116 +8767,6 @@
       var t1 = this._fragment;
       return t1 == null ? "" : t1;
     },
-    isScheme$1(scheme) {
-      var thisScheme = this.scheme;
-      if (scheme.length !== thisScheme.length)
-        return false;
-      return A._caseInsensitiveCompareStart(scheme, thisScheme, 0) >= 0;
-    },
-    replace$1$scheme(scheme) {
-      var isFile, userInfo, port, host, currentPath, t1, path, _this = this;
-      scheme = A._Uri__makeScheme(scheme, 0, scheme.length);
-      isFile = scheme === "file";
-      userInfo = _this._userInfo;
-      port = _this._port;
-      if (scheme !== _this.scheme)
-        port = A._Uri__makePort(port, scheme);
-      host = _this._host;
-      if (!(host != null))
-        host = userInfo.length !== 0 || port != null || isFile ? "" : null;
-      currentPath = _this.path;
-      if (!isFile)
-        t1 = host != null && currentPath.length !== 0;
-      else
-        t1 = true;
-      if (t1 && !B.JSString_methods.startsWith$1(currentPath, "/"))
-        currentPath = "/" + currentPath;
-      path = currentPath;
-      return A._Uri$_internal(scheme, userInfo, host, port, path, _this._query, _this._fragment);
-    },
-    _mergePaths$2(base, reference) {
-      var backCount, refStart, baseEnd, t1, newEnd, delta, t2, t3, t4;
-      for (backCount = 0, refStart = 0; B.JSString_methods.startsWith$2(reference, "../", refStart);) {
-        refStart += 3;
-        ++backCount;
-      }
-      baseEnd = B.JSString_methods.lastIndexOf$1(base, "/");
-      t1 = base.length;
-      for (;;) {
-        if (!(baseEnd > 0 && backCount > 0))
-          break;
-        newEnd = B.JSString_methods.lastIndexOf$2(base, "/", baseEnd - 1);
-        if (newEnd < 0)
-          break;
-        delta = baseEnd - newEnd;
-        t2 = delta !== 2;
-        t3 = false;
-        if (!t2 || delta === 3) {
-          t4 = newEnd + 1;
-          if (!(t4 < t1))
-            return A.ioore(base, t4);
-          if (base.charCodeAt(t4) === 46)
-            if (t2) {
-              t2 = newEnd + 2;
-              if (!(t2 < t1))
-                return A.ioore(base, t2);
-              t2 = base.charCodeAt(t2) === 46;
-            } else
-              t2 = true;
-          else
-            t2 = t3;
-        } else
-          t2 = t3;
-        if (t2)
-          break;
-        --backCount;
-        baseEnd = newEnd;
-      }
-      return B.JSString_methods.replaceRange$3(base, baseEnd + 1, null, B.JSString_methods.substring$1(reference, refStart - 3 * backCount));
-    },
-    resolveUri$1(reference) {
-      var targetScheme, t1, targetUserInfo, targetHost, targetPort, targetPath, targetQuery, packageNameEnd, packageName, mergedPath, fragment, _this = this;
-      if (reference.get$scheme().length !== 0)
-        return reference;
-      else {
-        targetScheme = _this.scheme;
-        if (reference.get$hasAuthority()) {
-          t1 = reference.replace$1$scheme(targetScheme);
-          return t1;
-        } else {
-          targetUserInfo = _this._userInfo;
-          targetHost = _this._host;
-          targetPort = _this._port;
-          targetPath = _this.path;
-          if (reference.get$hasEmptyPath())
-            targetQuery = reference.get$hasQuery() ? reference.get$query() : _this._query;
-          else {
-            packageNameEnd = A._Uri__packageNameEnd(_this, targetPath);
-            if (packageNameEnd > 0) {
-              packageName = B.JSString_methods.substring$2(targetPath, 0, packageNameEnd);
-              targetPath = reference.get$hasAbsolutePath() ? packageName + A._Uri__removeDotSegments(reference.get$path()) : packageName + A._Uri__removeDotSegments(_this._mergePaths$2(B.JSString_methods.substring$1(targetPath, packageName.length), reference.get$path()));
-            } else if (reference.get$hasAbsolutePath())
-              targetPath = A._Uri__removeDotSegments(reference.get$path());
-            else if (targetPath.length === 0)
-              if (targetHost == null)
-                targetPath = targetScheme.length === 0 ? reference.get$path() : A._Uri__removeDotSegments(reference.get$path());
-              else
-                targetPath = A._Uri__removeDotSegments("/" + reference.get$path());
-            else {
-              mergedPath = _this._mergePaths$2(targetPath, reference.get$path());
-              t1 = targetScheme.length === 0;
-              if (!t1 || targetHost != null || B.JSString_methods.startsWith$1(targetPath, "/"))
-                targetPath = A._Uri__removeDotSegments(mergedPath);
-              else
-                targetPath = A._Uri__normalizeRelativePath(mergedPath, !t1 || targetHost != null);
-            }
-            targetQuery = reference.get$hasQuery() ? reference.get$query() : null;
-          }
-        }
-      }
-      fragment = reference.get$hasFragment() ? reference.get$fragment() : null;
-      return A._Uri$_internal(targetScheme, targetUserInfo, targetHost, targetPort, targetPath, targetQuery, fragment);
-    },
     get$hasAuthority() {
       return this._host != null;
     },
@@ -9196,12 +8776,6 @@
     get$hasFragment() {
       return this._fragment != null;
     },
-    get$hasEmptyPath() {
-      return this.path.length === 0;
-    },
-    get$hasAbsolutePath() {
-      return B.JSString_methods.startsWith$1(this.path, "/");
-    },
     toFilePath$0() {
       var pathSegments, _this = this,
         t1 = _this.scheme;
@@ -9209,12 +8783,12 @@
         throw A.wrapException(A.UnsupportedError$("Cannot extract a file path from a " + t1 + " URI"));
       t1 = _this._query;
       if ((t1 == null ? "" : t1) !== "")
-        throw A.wrapException(A.UnsupportedError$(string$.Cannotfq));
+        throw A.wrapException(A.UnsupportedError$("Cannot extract a file path from a URI with a query component"));
       t1 = _this._fragment;
       if ((t1 == null ? "" : t1) !== "")
-        throw A.wrapException(A.UnsupportedError$(string$.Cannotff));
+        throw A.wrapException(A.UnsupportedError$("Cannot extract a file path from a URI with a fragment component"));
       if (_this._host != null && _this.get$host() !== "")
-        A.throwExpression(A.UnsupportedError$(string$.Cannotn));
+        A.throwExpression(A.UnsupportedError$("Cannot extract a non-Windows file path from a file URI with an authority"));
       pathSegments = _this.get$pathSegments();
       A._Uri__checkNonWindowsPathReservedCharacters(pathSegments, false);
       t1 = A.StringBuffer__writeAll(B.JSString_methods.startsWith$1(_this.path, "/") ? "/" : "", pathSegments, "/");
@@ -9263,12 +8837,6 @@
       return this.path;
     }
   };
-  A._Uri__makePath_closure.prototype = {
-    call$1(s) {
-      return A._Uri__uriEncode(64, A._asString(s), B.C_Utf8Codec, false);
-    },
-    $signature: 2
-  };
   A.UriData.prototype = {
     get$uri() {
       var t2, queryIndex, end, query, _this = this, _null = null,
@@ -9311,12 +8879,6 @@
     },
     get$hasFragment() {
       return this._fragmentStart < this._uri.length;
-    },
-    get$hasAbsolutePath() {
-      return B.JSString_methods.startsWith$2(this._uri, "/", this._pathStart);
-    },
-    get$hasEmptyPath() {
-      return this._pathStart === this._queryStart;
     },
     get$scheme() {
       var t1 = this._schemeCache;
@@ -9371,58 +8933,6 @@
         t2 = this._uri;
       return t1 < t2.length ? B.JSString_methods.substring$1(t2, t1 + 1) : "";
     },
-    replace$1$scheme(scheme) {
-      var schemeChanged, isFile, t1, userInfo, port, host, t2, path, t3, query, fragment, _this = this, _null = null;
-      scheme = A._Uri__makeScheme(scheme, 0, scheme.length);
-      schemeChanged = !(_this._schemeEnd === scheme.length && B.JSString_methods.startsWith$1(_this._uri, scheme));
-      isFile = scheme === "file";
-      t1 = _this._hostStart;
-      userInfo = t1 > 0 ? B.JSString_methods.substring$2(_this._uri, _this._schemeEnd + 3, t1) : "";
-      port = _this.get$hasPort() ? _this.get$port() : _null;
-      if (schemeChanged)
-        port = A._Uri__makePort(port, scheme);
-      t1 = _this._hostStart;
-      if (t1 > 0)
-        host = B.JSString_methods.substring$2(_this._uri, t1, _this._portStart);
-      else
-        host = userInfo.length !== 0 || port != null || isFile ? "" : _null;
-      t1 = _this._uri;
-      t2 = _this._queryStart;
-      path = B.JSString_methods.substring$2(t1, _this._pathStart, t2);
-      if (!isFile)
-        t3 = host != null && path.length !== 0;
-      else
-        t3 = true;
-      if (t3 && !B.JSString_methods.startsWith$1(path, "/"))
-        path = "/" + path;
-      t3 = _this._fragmentStart;
-      query = t2 < t3 ? B.JSString_methods.substring$2(t1, t2 + 1, t3) : _null;
-      t2 = _this._fragmentStart;
-      fragment = t2 < t1.length ? B.JSString_methods.substring$1(t1, t2 + 1) : _null;
-      return A._Uri$_internal(scheme, userInfo, host, port, path, query, fragment);
-    },
-    toFilePath$0() {
-      var t2, _this = this,
-        t1 = _this._schemeEnd;
-      if (t1 >= 0) {
-        t2 = !(t1 === 4 && B.JSString_methods.startsWith$1(_this._uri, "file"));
-        t1 = t2;
-      } else
-        t1 = false;
-      if (t1)
-        throw A.wrapException(A.UnsupportedError$("Cannot extract a file path from a " + _this.get$scheme() + " URI"));
-      t1 = _this._queryStart;
-      t2 = _this._uri;
-      if (t1 < t2.length) {
-        if (t1 < _this._fragmentStart)
-          throw A.wrapException(A.UnsupportedError$(string$.Cannotfq));
-        throw A.wrapException(A.UnsupportedError$(string$.Cannotff));
-      }
-      if (_this._hostStart < _this._portStart)
-        A.throwExpression(A.UnsupportedError$(string$.Cannotn));
-      t1 = B.JSString_methods.substring$2(t2, _this._pathStart, t1);
-      return t1;
-    },
     get$hashCode(_) {
       var t1 = this._hashCodeCache;
       return t1 == null ? this._hashCodeCache = B.JSString_methods.get$hashCode(this._uri) : t1;
@@ -9440,12 +8950,6 @@
     $isUri: 1
   };
   A._DataUri.prototype = {};
-  A._Directory.prototype = {
-    toString$0(_) {
-      return "Directory: '" + this._path + "'";
-    }
-  };
-  A.FileSystemEntity.prototype = {};
   A.NullRejectionException.prototype = {
     toString$0(_) {
       return "Promise was rejected with a value of `" + (this.isUndefined ? "undefined" : "null") + "`.";
@@ -9459,7 +8963,7 @@
       t1 = this._convertedObjects;
       if (t1.containsKey$1(o))
         return t1.$index(0, o);
-      if (type$.Map_dynamic_dynamic._is(o)) {
+      if (o instanceof A.MapBase) {
         convertedMap = {};
         t1.$indexSet(0, o, convertedMap);
         for (t1 = o.get$keys(), t1 = t1.get$iterator(t1); t1.moveNext$0();) {
@@ -9490,105 +8994,6 @@
       return this.completer.completeError$1(e);
     },
     $signature: 1
-  };
-  A.EnvironmentNotFoundException.prototype = {
-    toString$0(_) {
-      return "Environment variable '" + this.entryName + "' is not defined!";
-    }
-  };
-  A.BaseDirectories.prototype = {
-    _baseDirectory$1(directoryKind) {
-      if ($.$get$Platform_isWindows())
-        return this._baseDirectoryWindows$1(directoryKind);
-      if ($.$get$Platform_isMacOS())
-        return this._baseDirectoryMacOs$1(directoryKind);
-      if ($.$get$Platform_isLinux())
-        return this._baseDirectoryLinux$1(directoryKind);
-      throw A.wrapException(A.UnsupportedError$("Unsupported platform: " + A.S($.$get$Platform_operatingSystem())));
-    },
-    _baseDirectoryWindows$1(dir) {
-      var t1;
-      $label0$0: {
-        if (B._XdgBaseDirectoryKind_1 === dir || B._XdgBaseDirectoryKind_2 === dir) {
-          t1 = this._requireEnv$1("APPDATA");
-          break $label0$0;
-        }
-        if (B._XdgBaseDirectoryKind_0 === dir || B._XdgBaseDirectoryKind_3 === dir || B._XdgBaseDirectoryKind_4 === dir) {
-          t1 = this._requireEnv$1("LOCALAPPDATA");
-          break $label0$0;
-        }
-        t1 = null;
-      }
-      return t1;
-    },
-    _baseDirectoryMacOs$1(dir) {
-      var t1, _s4_ = "HOME",
-        _s7_ = "Library";
-      $label0$0: {
-        if (B._XdgBaseDirectoryKind_1 === dir || B._XdgBaseDirectoryKind_2 === dir || B._XdgBaseDirectoryKind_4 === dir) {
-          t1 = A.join(this._requireEnv$1(_s4_), _s7_, "Application Support", null);
-          break $label0$0;
-        }
-        if (B._XdgBaseDirectoryKind_0 === dir) {
-          t1 = A.join(this._requireEnv$1(_s4_), _s7_, "Caches", null);
-          break $label0$0;
-        }
-        if (B._XdgBaseDirectoryKind_3 === dir) {
-          t1 = A.join(this._requireEnv$1(_s4_), _s7_, "Caches", "TemporaryItems");
-          break $label0$0;
-        }
-        t1 = null;
-      }
-      return t1;
-    },
-    _baseDirectoryLinux$1(dir) {
-      var t1, envVar, _this = this, _null = null, _s4_ = "HOME";
-      if ($.$get$Platform_isLinux()) {
-        switch (dir.index) {
-          case 1:
-            t1 = "XDG_CONFIG_HOME";
-            break;
-          case 2:
-            t1 = "XDG_DATA_HOME";
-            break;
-          case 4:
-            t1 = "XDG_STATE_HOME";
-            break;
-          case 0:
-            t1 = "XDG_CACHE_HOME";
-            break;
-          case 3:
-            t1 = "XDG_RUNTIME_DIR";
-            break;
-          default:
-            t1 = _null;
-        }
-        envVar = _this._environment.$index(0, t1);
-        if (envVar != null)
-          return envVar;
-      }
-      switch (dir.index) {
-        case 3:
-          return _null;
-        case 0:
-          return A.join(_this._requireEnv$1(_s4_), ".cache", _null, _null);
-        case 1:
-          return A.join(_this._requireEnv$1(_s4_), ".config", _null, _null);
-        case 2:
-          return A.join(_this._requireEnv$1(_s4_), ".local", "share", _null);
-        case 4:
-          return A.join(_this._requireEnv$1(_s4_), ".local", "state", _null);
-      }
-    },
-    _requireEnv$1($name) {
-      var t1 = this._environment.$index(0, $name);
-      return t1 == null ? A.throwExpression(new A.EnvironmentNotFoundException($name)) : t1;
-    }
-  };
-  A._XdgBaseDirectoryKind.prototype = {
-    _enumToString$0() {
-      return "_XdgBaseDirectoryKind." + this._name;
-    }
   };
   A.DefaultEquality.prototype = {};
   A.IterableEquality.prototype = {
@@ -10023,7 +9428,7 @@
       t1.pop();
       return B.JSArray_methods.get$last(t1);
     },
-    $signature: 2
+    $signature: 6
   };
   (function aliases() {
     var _ = J.LegacyJavaScriptObject.prototype;
@@ -10034,11 +9439,11 @@
       _static_1 = hunkHelpers._static_1,
       _static_0 = hunkHelpers._static_0;
     _static_2(J, "_interceptors_JSArray__compareAny$closure", "JSArray__compareAny", 20);
-    _static_1(A, "async__AsyncRun__scheduleImmediateJsOverride$closure", "_AsyncRun__scheduleImmediateJsOverride", 3);
-    _static_1(A, "async__AsyncRun__scheduleImmediateWithSetImmediate$closure", "_AsyncRun__scheduleImmediateWithSetImmediate", 3);
-    _static_1(A, "async__AsyncRun__scheduleImmediateWithTimer$closure", "_AsyncRun__scheduleImmediateWithTimer", 3);
+    _static_1(A, "async__AsyncRun__scheduleImmediateJsOverride$closure", "_AsyncRun__scheduleImmediateJsOverride", 2);
+    _static_1(A, "async__AsyncRun__scheduleImmediateWithSetImmediate$closure", "_AsyncRun__scheduleImmediateWithSetImmediate", 2);
+    _static_1(A, "async__AsyncRun__scheduleImmediateWithTimer$closure", "_AsyncRun__scheduleImmediateWithTimer", 2);
     _static_0(A, "async___startMicrotaskLoop$closure", "_startMicrotaskLoop", 0);
-    _static_1(A, "core_Uri_decodeComponent$closure", "Uri_decodeComponent", 2);
+    _static_1(A, "core_Uri_decodeComponent$closure", "Uri_decodeComponent", 6);
     _static_1(A, "version_Version___parse_tearOff$closure", "Version___parse_tearOff", 21);
   })();
   (function inheritance() {
@@ -10046,7 +9451,7 @@
       _inherit = hunkHelpers.inherit,
       _inheritMany = hunkHelpers.inheritMany;
     _inherit(A.Object, null);
-    _inheritMany(A.Object, [A.JS_CONST, J.Interceptor, A.SafeToStringHook, J.ArrayIterator, A.Iterable, A.CastIterator, A.MapBase, A.Closure, A.Error, A.ListBase, A.ListIterator, A.MappedIterator, A.WhereIterator, A.WhereTypeIterator, A.FixedLengthListMixin, A.UnmodifiableListMixin, A.TypeErrorDecoder, A.NullThrownFromJavaScriptException, A.ExceptionAndStackTrace, A._StackTrace, A.LinkedHashMapCell, A.LinkedHashMapKeyIterator, A.JSSyntaxRegExp, A._MatchImplementation, A._AllMatchesIterator, A.StringMatch, A._StringAllMatchesIterator, A.Rti, A._FunctionParameters, A._Type, A._TimerImpl, A._AsyncAwaitCompleter, A.AsyncError, A._Completer, A._FutureListener, A._Future, A._AsyncCallbackEntry, A._StreamIterator, A._Zone, A._HashMapKeyIterator, A.Codec, A.Converter, A._Utf8Encoder, A._Utf8Decoder, A._Enum, A.OutOfMemoryError, A.StackOverflowError, A._Exception, A.FormatException, A.Null, A._StringStackTrace, A.StringBuffer, A._Uri, A.UriData, A._SimpleUri, A.FileSystemEntity, A.NullRejectionException, A.EnvironmentNotFoundException, A.BaseDirectories, A.DefaultEquality, A.IterableEquality, A.Context, A.Style, A.ParsedPath, A.Version]);
+    _inheritMany(A.Object, [A.JS_CONST, J.Interceptor, A.SafeToStringHook, J.ArrayIterator, A.Iterable, A.CastIterator, A.MapBase, A.Closure, A.Error, A.ListBase, A.ListIterator, A.MappedIterator, A.WhereIterator, A.WhereTypeIterator, A.FixedLengthListMixin, A.UnmodifiableListMixin, A.TypeErrorDecoder, A.NullThrownFromJavaScriptException, A.ExceptionAndStackTrace, A._StackTrace, A.LinkedHashMapCell, A.LinkedHashMapKeyIterator, A.JSSyntaxRegExp, A._MatchImplementation, A._AllMatchesIterator, A.StringMatch, A._StringAllMatchesIterator, A.Rti, A._FunctionParameters, A._Type, A._TimerImpl, A._AsyncAwaitCompleter, A.AsyncError, A._Completer, A._FutureListener, A._Future, A._AsyncCallbackEntry, A._StreamIterator, A._Zone, A._HashMapKeyIterator, A.Codec, A.Converter, A._Utf8Decoder, A.OutOfMemoryError, A.StackOverflowError, A._Exception, A.FormatException, A.Null, A._StringStackTrace, A.StringBuffer, A._Uri, A.UriData, A._SimpleUri, A.NullRejectionException, A.DefaultEquality, A.IterableEquality, A.Context, A.Style, A.ParsedPath, A.Version]);
     _inheritMany(J.Interceptor, [J.JSBool, J.JSNull, J.JavaScriptObject, J.JavaScriptBigInt, J.JavaScriptSymbol, J.JSNumber, J.JSString]);
     _inheritMany(J.JavaScriptObject, [J.LegacyJavaScriptObject, J.JSArray, A.NativeByteBuffer, A.NativeTypedData]);
     _inheritMany(J.LegacyJavaScriptObject, [J.PlainJavaScriptObject, J.UnknownJavaScriptObject, J.JavaScriptFunction]);
@@ -10059,7 +9464,7 @@
     _inherit(A._CastListBase, A.__CastListBase__CastIterableBase_ListMixin);
     _inherit(A.CastList, A._CastListBase);
     _inheritMany(A.MapBase, [A.CastMap, A.JsLinkedHashMap, A._HashMap, A._JsonMap]);
-    _inheritMany(A.Closure, [A.Closure2Args, A.Closure0Args, A.TearOffClosure, A.initHooks_closure, A.initHooks_closure1, A._AsyncRun__initializeScheduleImmediate_internalCallback, A._AsyncRun__initializeScheduleImmediate_closure, A._awaitOnObject_closure, A._Future__propagateToListeners_handleWhenCompleteCallback_closure, A._Uri__makePath_closure, A.jsify__convert, A.promiseToFuture_closure, A.promiseToFuture_closure0, A.Context_joinAll_closure, A._validateArgList_closure, A.Version__splitParts_closure, A.findLatestSdkForRelease_closure]);
+    _inheritMany(A.Closure, [A.Closure2Args, A.Closure0Args, A.TearOffClosure, A.initHooks_closure, A.initHooks_closure1, A._AsyncRun__initializeScheduleImmediate_internalCallback, A._AsyncRun__initializeScheduleImmediate_closure, A._awaitOnObject_closure, A._Future__propagateToListeners_handleWhenCompleteCallback_closure, A.jsify__convert, A.promiseToFuture_closure, A.promiseToFuture_closure0, A.Context_joinAll_closure, A._validateArgList_closure, A.Version__splitParts_closure, A.findLatestSdkForRelease_closure]);
     _inheritMany(A.Closure2Args, [A.CastMap_forEach_closure, A.initHooks_closure0, A._awaitOnObject_closure0, A._wrapJsFunctionForAsync_closure, A._Future__propagateToListeners_handleWhenCompleteCallback_closure0, A.MapBase_mapToString_closure, A.Uri_parseIPv6Address_error]);
     _inheritMany(A.Error, [A.LateError, A.TypeError, A.JsNoSuchMethodError, A.UnknownJsTypeError, A.RuntimeError, A._Error, A.AssertionError, A.ArgumentError, A.UnsupportedError, A.UnimplementedError, A.StateError, A.ConcurrentModificationError]);
     _inherit(A.UnmodifiableListBase, A.ListBase);
@@ -10083,12 +9488,10 @@
     _inherit(A._RootZone, A._Zone);
     _inherit(A._IdentityHashMap, A._HashMap);
     _inheritMany(A.Codec, [A.Base64Codec, A.Encoding, A.JsonCodec]);
-    _inheritMany(A.Converter, [A.Base64Encoder, A.JsonDecoder, A.Utf8Encoder, A.Utf8Decoder]);
+    _inheritMany(A.Converter, [A.Base64Encoder, A.JsonDecoder, A.Utf8Decoder]);
     _inherit(A.Utf8Codec, A.Encoding);
     _inheritMany(A.ArgumentError, [A.RangeError, A.IndexError]);
     _inherit(A._DataUri, A._Uri);
-    _inherit(A._Directory, A.FileSystemEntity);
-    _inherit(A._XdgBaseDirectoryKind, A._Enum);
     _inherit(A.InternalStyle, A.Style);
     _inheritMany(A.InternalStyle, [A.PosixStyle, A.UrlStyle, A.WindowsStyle]);
     _mixin(A.UnmodifiableListBase, A.UnmodifiableListMixin);
@@ -10103,18 +9506,15 @@
     typeUniverse: {eC: new Map(), tR: {}, eT: {}, tPV: {}, sEA: []},
     mangledGlobalNames: {int: "int", double: "double", num: "num", String: "String", bool: "bool", Null: "Null", List: "List", Object: "Object", Map: "Map", JSObject: "JSObject"},
     mangledNames: {},
-    types: ["~()", "~(@)", "String(String)", "~(~())", "Null(@)", "Null()", "@()", "@(@)", "@(@,String)", "@(String)", "Null(~())", "Null(@,StackTrace)", "~(int,@)", "Null(Object,StackTrace)", "~(Object?,Object?)", "0&(String,int?)", "Object?(Object?)", "bool(String)", "String(String?)", "Object(String)", "int(@,@)", "Version(String)"],
+    types: ["~()", "~(@)", "~(~())", "Null(@)", "Null()", "@()", "String(String)", "@(@)", "@(@,String)", "@(String)", "Null(~())", "Null(@,StackTrace)", "~(int,@)", "Null(Object,StackTrace)", "~(Object?,Object?)", "0&(String,int?)", "Object?(Object?)", "bool(String)", "String(String?)", "Object(String)", "int(@,@)", "Version(String)"],
     interceptorsByTag: null,
     leafTags: null,
     arrayRti: Symbol("$ti")
   };
-  A._Universe_addRules(init.typeUniverse, JSON.parse('{"PlainJavaScriptObject":"LegacyJavaScriptObject","UnknownJavaScriptObject":"LegacyJavaScriptObject","JavaScriptFunction":"LegacyJavaScriptObject","NativeArrayBuffer":"NativeByteBuffer","JSBool":{"bool":[],"TrustedGetRuntimeType":[]},"JSNull":{"TrustedGetRuntimeType":[]},"JavaScriptObject":{"JSObject":[]},"LegacyJavaScriptObject":{"JSObject":[]},"JSArray":{"List":["1"],"EfficientLengthIterable":["1"],"JSObject":[],"Iterable":["1"]},"JSArraySafeToStringHook":{"SafeToStringHook":[]},"JSUnmodifiableArray":{"JSArray":["1"],"List":["1"],"EfficientLengthIterable":["1"],"JSObject":[],"Iterable":["1"]},"ArrayIterator":{"Iterator":["1"]},"JSNumber":{"double":[],"num":[],"Comparable":["num"]},"JSInt":{"double":[],"int":[],"num":[],"Comparable":["num"],"TrustedGetRuntimeType":[]},"JSNumNotInt":{"double":[],"num":[],"Comparable":["num"],"TrustedGetRuntimeType":[]},"JSString":{"String":[],"Comparable":["String"],"Pattern":[],"TrustedGetRuntimeType":[]},"_CastIterableBase":{"Iterable":["2"]},"CastIterator":{"Iterator":["2"]},"CastIterable":{"_CastIterableBase":["1","2"],"Iterable":["2"],"Iterable.E":"2"},"_EfficientLengthCastIterable":{"CastIterable":["1","2"],"_CastIterableBase":["1","2"],"EfficientLengthIterable":["2"],"Iterable":["2"],"Iterable.E":"2"},"_CastListBase":{"ListBase":["2"],"List":["2"],"_CastIterableBase":["1","2"],"EfficientLengthIterable":["2"],"Iterable":["2"]},"CastList":{"_CastListBase":["1","2"],"ListBase":["2"],"List":["2"],"_CastIterableBase":["1","2"],"EfficientLengthIterable":["2"],"Iterable":["2"],"ListBase.E":"2","Iterable.E":"2"},"CastMap":{"MapBase":["3","4"],"Map":["3","4"],"MapBase.K":"3","MapBase.V":"4"},"LateError":{"Error":[]},"CodeUnits":{"ListBase":["int"],"UnmodifiableListMixin":["int"],"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"],"ListBase.E":"int","UnmodifiableListMixin.E":"int"},"EfficientLengthIterable":{"Iterable":["1"]},"ListIterable":{"EfficientLengthIterable":["1"],"Iterable":["1"]},"SubListIterable":{"ListIterable":["1"],"EfficientLengthIterable":["1"],"Iterable":["1"],"ListIterable.E":"1","Iterable.E":"1"},"ListIterator":{"Iterator":["1"]},"MappedIterable":{"Iterable":["2"],"Iterable.E":"2"},"EfficientLengthMappedIterable":{"MappedIterable":["1","2"],"EfficientLengthIterable":["2"],"Iterable":["2"],"Iterable.E":"2"},"MappedIterator":{"Iterator":["2"]},"MappedListIterable":{"ListIterable":["2"],"EfficientLengthIterable":["2"],"Iterable":["2"],"ListIterable.E":"2","Iterable.E":"2"},"WhereIterable":{"Iterable":["1"],"Iterable.E":"1"},"WhereIterator":{"Iterator":["1"]},"WhereTypeIterable":{"Iterable":["1"],"Iterable.E":"1"},"WhereTypeIterator":{"Iterator":["1"]},"UnmodifiableListBase":{"ListBase":["1"],"UnmodifiableListMixin":["1"],"List":["1"],"EfficientLengthIterable":["1"],"Iterable":["1"]},"NullError":{"TypeError":[],"Error":[]},"JsNoSuchMethodError":{"Error":[]},"UnknownJsTypeError":{"Error":[]},"_StackTrace":{"StackTrace":[]},"Closure":{"Function":[]},"Closure0Args":{"Function":[]},"Closure2Args":{"Function":[]},"TearOffClosure":{"Function":[]},"StaticClosure":{"Function":[]},"BoundClosure":{"Function":[]},"RuntimeError":{"Error":[]},"JsLinkedHashMap":{"MapBase":["1","2"],"LinkedHashMap":["1","2"],"Map":["1","2"],"MapBase.K":"1","MapBase.V":"2"},"LinkedHashMapKeysIterable":{"EfficientLengthIterable":["1"],"Iterable":["1"],"Iterable.E":"1"},"LinkedHashMapKeyIterator":{"Iterator":["1"]},"JSSyntaxRegExp":{"RegExp":[],"Pattern":[]},"_MatchImplementation":{"RegExpMatch":[],"Match":[]},"_AllMatchesIterable":{"Iterable":["RegExpMatch"],"Iterable.E":"RegExpMatch"},"_AllMatchesIterator":{"Iterator":["RegExpMatch"]},"StringMatch":{"Match":[]},"_StringAllMatchesIterable":{"Iterable":["Match"],"Iterable.E":"Match"},"_StringAllMatchesIterator":{"Iterator":["Match"]},"NativeByteBuffer":{"JSObject":[],"ByteBuffer":[],"TrustedGetRuntimeType":[]},"NativeTypedData":{"JSObject":[]},"NativeByteData":{"ByteData":[],"JSObject":[],"TrustedGetRuntimeType":[]},"NativeTypedArray":{"JavaScriptIndexingBehavior":["1"],"JSObject":[]},"NativeTypedArrayOfDouble":{"ListBase":["double"],"NativeTypedArray":["double"],"List":["double"],"JavaScriptIndexingBehavior":["double"],"EfficientLengthIterable":["double"],"JSObject":[],"Iterable":["double"],"FixedLengthListMixin":["double"]},"NativeTypedArrayOfInt":{"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"]},"NativeFloat32List":{"Float32List":[],"ListBase":["double"],"NativeTypedArray":["double"],"List":["double"],"JavaScriptIndexingBehavior":["double"],"EfficientLengthIterable":["double"],"JSObject":[],"Iterable":["double"],"FixedLengthListMixin":["double"],"TrustedGetRuntimeType":[],"ListBase.E":"double"},"NativeFloat64List":{"Float64List":[],"ListBase":["double"],"NativeTypedArray":["double"],"List":["double"],"JavaScriptIndexingBehavior":["double"],"EfficientLengthIterable":["double"],"JSObject":[],"Iterable":["double"],"FixedLengthListMixin":["double"],"TrustedGetRuntimeType":[],"ListBase.E":"double"},"NativeInt16List":{"Int16List":[],"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"],"TrustedGetRuntimeType":[],"ListBase.E":"int"},"NativeInt32List":{"Int32List":[],"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"],"TrustedGetRuntimeType":[],"ListBase.E":"int"},"NativeInt8List":{"Int8List":[],"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"],"TrustedGetRuntimeType":[],"ListBase.E":"int"},"NativeUint16List":{"Uint16List":[],"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"],"TrustedGetRuntimeType":[],"ListBase.E":"int"},"NativeUint32List":{"Uint32List":[],"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"],"TrustedGetRuntimeType":[],"ListBase.E":"int"},"NativeUint8ClampedList":{"Uint8ClampedList":[],"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"],"TrustedGetRuntimeType":[],"ListBase.E":"int"},"NativeUint8List":{"Uint8List":[],"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"],"TrustedGetRuntimeType":[],"ListBase.E":"int"},"_Error":{"Error":[]},"_TypeError":{"TypeError":[],"Error":[]},"AsyncError":{"Error":[]},"_AsyncCompleter":{"_Completer":["1"]},"_Future":{"Future":["1"]},"_Zone":{"Zone":[]},"_RootZone":{"_Zone":[],"Zone":[]},"_HashMap":{"MapBase":["1","2"],"Map":["1","2"]},"_IdentityHashMap":{"_HashMap":["1","2"],"MapBase":["1","2"],"Map":["1","2"],"MapBase.K":"1","MapBase.V":"2"},"_HashMapKeyIterable":{"EfficientLengthIterable":["1"],"Iterable":["1"],"Iterable.E":"1"},"_HashMapKeyIterator":{"Iterator":["1"]},"ListBase":{"List":["1"],"EfficientLengthIterable":["1"],"Iterable":["1"]},"MapBase":{"Map":["1","2"]},"_JsonMap":{"MapBase":["String","@"],"Map":["String","@"],"MapBase.K":"String","MapBase.V":"@"},"_JsonMapKeyIterable":{"ListIterable":["String"],"EfficientLengthIterable":["String"],"Iterable":["String"],"ListIterable.E":"String","Iterable.E":"String"},"Base64Codec":{"Codec":["List<int>","String"]},"Encoding":{"Codec":["String","List<int>"]},"JsonCodec":{"Codec":["Object?","String"]},"Utf8Codec":{"Codec":["String","List<int>"]},"double":{"num":[],"Comparable":["num"]},"int":{"num":[],"Comparable":["num"]},"List":{"EfficientLengthIterable":["1"],"Iterable":["1"]},"num":{"Comparable":["num"]},"RegExpMatch":{"Match":[]},"String":{"Comparable":["String"],"Pattern":[]},"AssertionError":{"Error":[]},"TypeError":{"Error":[]},"ArgumentError":{"Error":[]},"RangeError":{"Error":[]},"IndexError":{"Error":[]},"UnsupportedError":{"Error":[]},"UnimplementedError":{"Error":[]},"StateError":{"Error":[]},"ConcurrentModificationError":{"Error":[]},"OutOfMemoryError":{"Error":[]},"StackOverflowError":{"Error":[]},"_StringStackTrace":{"StackTrace":[]},"StringBuffer":{"StringSink":[]},"_Uri":{"Uri":[]},"_SimpleUri":{"Uri":[]},"_DataUri":{"Uri":[]},"PosixStyle":{"InternalStyle":[]},"UrlStyle":{"InternalStyle":[]},"WindowsStyle":{"InternalStyle":[]},"Version":{"VersionRange":[],"Comparable":["VersionRange"]},"Int8List":{"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"]},"Uint8List":{"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"]},"Uint8ClampedList":{"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"]},"Int16List":{"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"]},"Uint16List":{"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"]},"Int32List":{"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"]},"Uint32List":{"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"]},"Float32List":{"List":["double"],"EfficientLengthIterable":["double"],"Iterable":["double"]},"Float64List":{"List":["double"],"EfficientLengthIterable":["double"],"Iterable":["double"]},"VersionRange":{"Comparable":["VersionRange"]}}'));
+  A._Universe_addRules(init.typeUniverse, JSON.parse('{"PlainJavaScriptObject":"LegacyJavaScriptObject","UnknownJavaScriptObject":"LegacyJavaScriptObject","JavaScriptFunction":"LegacyJavaScriptObject","NativeArrayBuffer":"NativeByteBuffer","JSBool":{"bool":[],"TrustedGetRuntimeType":[]},"JSNull":{"TrustedGetRuntimeType":[]},"JavaScriptObject":{"JSObject":[]},"LegacyJavaScriptObject":{"JSObject":[]},"JSArray":{"List":["1"],"EfficientLengthIterable":["1"],"JSObject":[],"Iterable":["1"]},"JSArraySafeToStringHook":{"SafeToStringHook":[]},"JSUnmodifiableArray":{"JSArray":["1"],"List":["1"],"EfficientLengthIterable":["1"],"JSObject":[],"Iterable":["1"]},"ArrayIterator":{"Iterator":["1"]},"JSNumber":{"double":[],"num":[],"Comparable":["num"]},"JSInt":{"double":[],"int":[],"num":[],"Comparable":["num"],"TrustedGetRuntimeType":[]},"JSNumNotInt":{"double":[],"num":[],"Comparable":["num"],"TrustedGetRuntimeType":[]},"JSString":{"String":[],"Comparable":["String"],"Pattern":[],"TrustedGetRuntimeType":[]},"_CastIterableBase":{"Iterable":["2"]},"CastIterator":{"Iterator":["2"]},"CastIterable":{"_CastIterableBase":["1","2"],"Iterable":["2"],"Iterable.E":"2"},"_EfficientLengthCastIterable":{"CastIterable":["1","2"],"_CastIterableBase":["1","2"],"EfficientLengthIterable":["2"],"Iterable":["2"],"Iterable.E":"2"},"_CastListBase":{"ListBase":["2"],"List":["2"],"_CastIterableBase":["1","2"],"EfficientLengthIterable":["2"],"Iterable":["2"]},"CastList":{"_CastListBase":["1","2"],"ListBase":["2"],"List":["2"],"_CastIterableBase":["1","2"],"EfficientLengthIterable":["2"],"Iterable":["2"],"ListBase.E":"2","Iterable.E":"2"},"CastMap":{"MapBase":["3","4"],"Map":["3","4"],"MapBase.K":"3","MapBase.V":"4"},"LateError":{"Error":[]},"CodeUnits":{"ListBase":["int"],"UnmodifiableListMixin":["int"],"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"],"ListBase.E":"int","UnmodifiableListMixin.E":"int"},"EfficientLengthIterable":{"Iterable":["1"]},"ListIterable":{"EfficientLengthIterable":["1"],"Iterable":["1"]},"SubListIterable":{"ListIterable":["1"],"EfficientLengthIterable":["1"],"Iterable":["1"],"Iterable.E":"1","ListIterable.E":"1"},"ListIterator":{"Iterator":["1"]},"MappedIterable":{"Iterable":["2"],"Iterable.E":"2"},"EfficientLengthMappedIterable":{"MappedIterable":["1","2"],"EfficientLengthIterable":["2"],"Iterable":["2"],"Iterable.E":"2"},"MappedIterator":{"Iterator":["2"]},"MappedListIterable":{"ListIterable":["2"],"EfficientLengthIterable":["2"],"Iterable":["2"],"Iterable.E":"2","ListIterable.E":"2"},"WhereIterable":{"Iterable":["1"],"Iterable.E":"1"},"WhereIterator":{"Iterator":["1"]},"WhereTypeIterable":{"Iterable":["1"],"Iterable.E":"1"},"WhereTypeIterator":{"Iterator":["1"]},"UnmodifiableListBase":{"ListBase":["1"],"UnmodifiableListMixin":["1"],"List":["1"],"EfficientLengthIterable":["1"],"Iterable":["1"]},"NullError":{"TypeError":[],"Error":[]},"JsNoSuchMethodError":{"Error":[]},"UnknownJsTypeError":{"Error":[]},"_StackTrace":{"StackTrace":[]},"Closure":{"Function":[]},"Closure0Args":{"Function":[]},"Closure2Args":{"Function":[]},"TearOffClosure":{"Function":[]},"StaticClosure":{"Function":[]},"BoundClosure":{"Function":[]},"RuntimeError":{"Error":[]},"JsLinkedHashMap":{"MapBase":["1","2"],"LinkedHashMap":["1","2"],"Map":["1","2"],"MapBase.K":"1","MapBase.V":"2"},"LinkedHashMapKeysIterable":{"EfficientLengthIterable":["1"],"Iterable":["1"],"Iterable.E":"1"},"LinkedHashMapKeyIterator":{"Iterator":["1"]},"JSSyntaxRegExp":{"RegExp":[],"Pattern":[]},"_MatchImplementation":{"RegExpMatch":[],"Match":[]},"_AllMatchesIterable":{"Iterable":["RegExpMatch"],"Iterable.E":"RegExpMatch"},"_AllMatchesIterator":{"Iterator":["RegExpMatch"]},"StringMatch":{"Match":[]},"_StringAllMatchesIterable":{"Iterable":["Match"],"Iterable.E":"Match"},"_StringAllMatchesIterator":{"Iterator":["Match"]},"NativeByteBuffer":{"JSObject":[],"ByteBuffer":[],"TrustedGetRuntimeType":[]},"NativeTypedData":{"JSObject":[]},"NativeByteData":{"ByteData":[],"JSObject":[],"TrustedGetRuntimeType":[]},"NativeTypedArray":{"JavaScriptIndexingBehavior":["1"],"JSObject":[]},"NativeTypedArrayOfDouble":{"ListBase":["double"],"NativeTypedArray":["double"],"List":["double"],"JavaScriptIndexingBehavior":["double"],"EfficientLengthIterable":["double"],"JSObject":[],"Iterable":["double"],"FixedLengthListMixin":["double"]},"NativeTypedArrayOfInt":{"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"]},"NativeFloat32List":{"Float32List":[],"ListBase":["double"],"NativeTypedArray":["double"],"List":["double"],"JavaScriptIndexingBehavior":["double"],"EfficientLengthIterable":["double"],"JSObject":[],"Iterable":["double"],"FixedLengthListMixin":["double"],"TrustedGetRuntimeType":[],"ListBase.E":"double"},"NativeFloat64List":{"Float64List":[],"ListBase":["double"],"NativeTypedArray":["double"],"List":["double"],"JavaScriptIndexingBehavior":["double"],"EfficientLengthIterable":["double"],"JSObject":[],"Iterable":["double"],"FixedLengthListMixin":["double"],"TrustedGetRuntimeType":[],"ListBase.E":"double"},"NativeInt16List":{"Int16List":[],"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"],"TrustedGetRuntimeType":[],"ListBase.E":"int"},"NativeInt32List":{"Int32List":[],"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"],"TrustedGetRuntimeType":[],"ListBase.E":"int"},"NativeInt8List":{"Int8List":[],"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"],"TrustedGetRuntimeType":[],"ListBase.E":"int"},"NativeUint16List":{"Uint16List":[],"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"],"TrustedGetRuntimeType":[],"ListBase.E":"int"},"NativeUint32List":{"Uint32List":[],"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"],"TrustedGetRuntimeType":[],"ListBase.E":"int"},"NativeUint8ClampedList":{"Uint8ClampedList":[],"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"],"TrustedGetRuntimeType":[],"ListBase.E":"int"},"NativeUint8List":{"Uint8List":[],"ListBase":["int"],"NativeTypedArray":["int"],"List":["int"],"JavaScriptIndexingBehavior":["int"],"EfficientLengthIterable":["int"],"JSObject":[],"Iterable":["int"],"FixedLengthListMixin":["int"],"TrustedGetRuntimeType":[],"ListBase.E":"int"},"_Error":{"Error":[]},"_TypeError":{"TypeError":[],"Error":[]},"AsyncError":{"Error":[]},"_AsyncCompleter":{"_Completer":["1"]},"_Future":{"Future":["1"]},"_Zone":{"Zone":[]},"_RootZone":{"_Zone":[],"Zone":[]},"_HashMap":{"MapBase":["1","2"],"Map":["1","2"]},"_IdentityHashMap":{"_HashMap":["1","2"],"MapBase":["1","2"],"Map":["1","2"],"MapBase.K":"1","MapBase.V":"2"},"_HashMapKeyIterable":{"EfficientLengthIterable":["1"],"Iterable":["1"],"Iterable.E":"1"},"_HashMapKeyIterator":{"Iterator":["1"]},"ListBase":{"List":["1"],"EfficientLengthIterable":["1"],"Iterable":["1"]},"MapBase":{"Map":["1","2"]},"_JsonMap":{"MapBase":["String","@"],"Map":["String","@"],"MapBase.K":"String","MapBase.V":"@"},"_JsonMapKeyIterable":{"ListIterable":["String"],"EfficientLengthIterable":["String"],"Iterable":["String"],"Iterable.E":"String","ListIterable.E":"String"},"Base64Codec":{"Codec":["List<int>","String"]},"Encoding":{"Codec":["String","List<int>"]},"JsonCodec":{"Codec":["Object?","String"]},"Utf8Codec":{"Codec":["String","List<int>"]},"double":{"num":[],"Comparable":["num"]},"int":{"num":[],"Comparable":["num"]},"List":{"EfficientLengthIterable":["1"],"Iterable":["1"]},"num":{"Comparable":["num"]},"RegExpMatch":{"Match":[]},"String":{"Comparable":["String"],"Pattern":[]},"AssertionError":{"Error":[]},"TypeError":{"Error":[]},"ArgumentError":{"Error":[]},"RangeError":{"Error":[]},"IndexError":{"Error":[]},"UnsupportedError":{"Error":[]},"UnimplementedError":{"Error":[]},"StateError":{"Error":[]},"ConcurrentModificationError":{"Error":[]},"OutOfMemoryError":{"Error":[]},"StackOverflowError":{"Error":[]},"_StringStackTrace":{"StackTrace":[]},"StringBuffer":{"StringSink":[]},"_Uri":{"Uri":[]},"_SimpleUri":{"Uri":[]},"_DataUri":{"Uri":[]},"PosixStyle":{"InternalStyle":[]},"UrlStyle":{"InternalStyle":[]},"WindowsStyle":{"InternalStyle":[]},"Version":{"VersionRange":[],"Comparable":["VersionRange"]},"Int8List":{"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"]},"Uint8List":{"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"]},"Uint8ClampedList":{"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"]},"Int16List":{"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"]},"Uint16List":{"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"]},"Int32List":{"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"]},"Uint32List":{"List":["int"],"EfficientLengthIterable":["int"],"Iterable":["int"]},"Float32List":{"List":["double"],"EfficientLengthIterable":["double"],"Iterable":["double"]},"Float64List":{"List":["double"],"EfficientLengthIterable":["double"],"Iterable":["double"]},"VersionRange":{"Comparable":["VersionRange"]}}'));
   A._Universe_addErasedTypes(init.typeUniverse, JSON.parse('{"UnmodifiableListBase":1,"__CastListBase__CastIterableBase_ListMixin":2,"NativeTypedArray":1,"Converter":2}'));
   var string$ = {
     ______: "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\u03f6\x00\u0404\u03f4 \u03f4\u03f6\u01f6\u01f6\u03f6\u03fc\u01f4\u03ff\u03ff\u0584\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u05d4\u01f4\x00\u01f4\x00\u0504\u05c4\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u0400\x00\u0400\u0200\u03f7\u0200\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u03ff\u0200\u0200\u0200\u03f7\x00",
-    Cannotff: "Cannot extract a file path from a URI with a fragment component",
-    Cannotfq: "Cannot extract a file path from a URI with a query component",
-    Cannotn: "Cannot extract a non-Windows file path from a file URI with an authority",
     Error_: "Error handler must accept one Object or one Object and a StackTrace as arguments, and return a value of the returned future's type",
     https_: "https://storage.googleapis.com/dart-archive/channels/"
   };
@@ -10339,7 +9739,6 @@
     B.C_JsonCodec = new A.JsonCodec();
     B.C_OutOfMemoryError = new A.OutOfMemoryError();
     B.C_Utf8Codec = new A.Utf8Codec();
-    B.C_Utf8Encoder = new A.Utf8Encoder();
     B.C__RootZone = new A._RootZone();
     B.C__StringStackTrace = new A._StringStackTrace();
     B.JsonDecoder_null = new A.JsonDecoder(null);
@@ -10357,11 +9756,6 @@
     B.Type_Uint8ClampedList_04U = A.typeLiteral("Uint8ClampedList");
     B.Type_Uint8List_8Eb = A.typeLiteral("Uint8List");
     B.Utf8Decoder_false = new A.Utf8Decoder(false);
-    B._XdgBaseDirectoryKind_0 = new A._XdgBaseDirectoryKind(0, "cache");
-    B._XdgBaseDirectoryKind_1 = new A._XdgBaseDirectoryKind(1, "config");
-    B._XdgBaseDirectoryKind_2 = new A._XdgBaseDirectoryKind(2, "data");
-    B._XdgBaseDirectoryKind_3 = new A._XdgBaseDirectoryKind(3, "runtime");
-    B._XdgBaseDirectoryKind_4 = new A._XdgBaseDirectoryKind(4, "state");
   })();
   (function staticFields() {
     $._JS_INTEROP_INTERCEPTOR_TAG = null;
@@ -10384,8 +9778,7 @@
     $.Uri__cachedBaseUri = null;
   })();
   (function lazyInitializers() {
-    var _lazyFinal = hunkHelpers.lazyFinal,
-      _lazy = hunkHelpers.lazy;
+    var _lazyFinal = hunkHelpers.lazyFinal;
     _lazyFinal($, "DART_CLOSURE_PROPERTY_NAME", "$get$DART_CLOSURE_PROPERTY_NAME", () => A.getIsolateAffinityTag("_$dart_dartClosure"));
     _lazyFinal($, "DART_CLOSURE_DART_JSINTEROP_PROPERTY_NAME", "$get$DART_CLOSURE_DART_JSINTEROP_PROPERTY_NAME", () => A.getIsolateAffinityTag("_$dart_dartClosure_dartJSInterop"));
     _lazyFinal($, "_safeToStringHooks", "$get$_safeToStringHooks", () => A._setArrayType([new J.JSArraySafeToStringHook()], A.findType("JSArray<SafeToStringHook>")));
@@ -10438,21 +9831,6 @@
     _lazyFinal($, "_Utf8Decoder__decoder", "$get$_Utf8Decoder__decoder", () => new A._Utf8Decoder__decoder_closure().call$0());
     _lazyFinal($, "_Utf8Decoder__decoderNonfatal", "$get$_Utf8Decoder__decoderNonfatal", () => new A._Utf8Decoder__decoderNonfatal_closure().call$0());
     _lazyFinal($, "_Base64Decoder__inverseAlphabet", "$get$_Base64Decoder__inverseAlphabet", () => new Int8Array(A._ensureNativeList(A._setArrayType([-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -1, -2, -2, -2, -2, -2, 62, -2, 62, -2, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -2, -2, -2, -1, -2, -2, -2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -2, -2, -2, -2, 63, -2, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -2, -2, -2, -2, -2], type$.JSArray_int))));
-    _lazyFinal($, "_Uri__needsNoEncoding", "$get$_Uri__needsNoEncoding", () => A.RegExp_RegExp("^[\\-\\.0-9A-Z_a-z~]*$"));
-    _lazyFinal($, "_ioOverridesToken", "$get$_ioOverridesToken", () => new A.Object());
-    _lazyFinal($, "Platform_operatingSystem", "$get$Platform_operatingSystem", () => A._Platform_operatingSystem());
-    _lazyFinal($, "Platform_isLinux", "$get$Platform_isLinux", () => {
-      $.$get$Platform_operatingSystem();
-      return false;
-    });
-    _lazyFinal($, "Platform_isMacOS", "$get$Platform_isMacOS", () => {
-      $.$get$Platform_operatingSystem();
-      return false;
-    });
-    _lazy($, "Platform_isWindows", "$get$Platform_isWindows", () => {
-      $.$get$Platform_operatingSystem();
-      return false;
-    });
     _lazyFinal($, "url", "$get$url", () => {
       var style = $.$get$Style_url();
       return new A.Context(style);
