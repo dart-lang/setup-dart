@@ -135,6 +135,25 @@ Future<void> _impl(List<String> args) async {
   core.exportVariable('PUB_CACHE', pubCache);
   core.addPath(path.join(pubCache, 'bin'));
 
+  // Add the directory where 'dart install' places executables.
+  final env = <String, String>{};
+  for (final key in [
+    'DART_DATA_HOME',
+    'LOCALAPPDATA',
+    'HOME',
+    'XDG_STATE_HOME'
+  ]) {
+    final value = process.env(key);
+    if (value != null) {
+      env[key] = value;
+    }
+  }
+  final dartInstallBin = path.join(
+    _getDartDataHome('install', os, env),
+    'bin',
+  );
+  core.addPath(dartInstallBin);
+
   // Create the OIDC token used for pub.dev publishing.
   await createPubOIDCToken();
 
@@ -173,6 +192,35 @@ String getPlatform() {
     'darwin' => 'macos',
     _ => 'linux'
   };
+}
+
+/// This is basically the same as from `package:dart_data_home`, but without
+/// using `dart:io` (which is not available in this action).
+String _getDartDataHome(
+    String packageName, String os, Map<String, String> env) {
+  final overridden = env['DART_DATA_HOME'];
+  if (overridden != null) {
+    return path.join(overridden, packageName);
+  }
+
+  String baseDir;
+  if (os == 'windows') {
+    final localAppData = env['LOCALAPPDATA'] ?? '';
+    baseDir = path.join(localAppData, 'Dart');
+  } else if (os == 'macos') {
+    final home = env['HOME'] ?? '';
+    baseDir = path.join(home, 'Library', 'Application Support', 'Dart');
+  } else {
+    final xdgState = env['XDG_STATE_HOME'] ?? '';
+    if (xdgState.isNotEmpty) {
+      baseDir = path.join(xdgState, 'Dart');
+    } else {
+      final home = env['HOME'] ?? '';
+      baseDir = path.join(home, '.local', 'state', 'Dart');
+    }
+  }
+
+  return path.join(baseDir, packageName);
 }
 
 // When enabled through env variables, create an OIDC token for publishing on
