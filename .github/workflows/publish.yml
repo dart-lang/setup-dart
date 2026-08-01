@@ -38,7 +38,7 @@ jobs:
       #
       # The dart binary from a Flutter SDK facilitates publishing both Flutter
       # and pure-dart packages.
-      - uses: flutter-actions/setup-flutter@18c66a64fb6f6d3338c63cabbc5cd6da395e7f1d
+      - uses: flutter-actions/setup-flutter@adb607ae976a9e00473569facfc69813c637a060
       # Minimal package setup and dry run checks.
       - name: Install dependencies
         run: dart pub get
