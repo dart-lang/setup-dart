@@ -1,6 +1,11 @@
-## v1.8.0-wip
+## v1.8.0
 
 * Add a problem matcher for `dart analyze` to automatically create inline annotations on GitHub pull requests.
+* Update `publish.yml` reusable workflow to reference `setup-dart@v1.7.2` (running on Node 24) ([#188][]).
+* Update GitHub Action dependencies (`actions/checkout` v7).
+* Bump `undici` to `6.27.0` and update npm dependencies.
+
+[#188]: https://github.com/dart-lang/setup-dart/issues/188
 
 ## v1.7.2
 
