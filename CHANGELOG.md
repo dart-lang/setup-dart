@@ -1,6 +1,6 @@
 ## v1.8.1
 
-* Update `publish.yml` reusable workflow to pin `actions/checkout` to a commit SHA.
+* Update workflows to pin `actions/checkout` to a commit SHA.
 * Update `publish.yml` reusable workflow to reference `setup-dart@v1.8.0` and latest `setup-flutter`.
 * Bump `undici` to `6.28.0` and `@vercel/ncc` to `0.44.1`.
 
