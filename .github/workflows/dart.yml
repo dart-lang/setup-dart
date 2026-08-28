@@ -1,7 +1,8 @@
 # Tests for general `setup-dart` configurations.
 
 name: Dart
-permissions: read-all
+permissions:
+  contents: read
 
 on:
   push:
