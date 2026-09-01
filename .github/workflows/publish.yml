@@ -7,6 +7,7 @@ name: Publish to pub.dev
 ##     permissions:
 ##       id-token: write # Required for OIDC token minting
 ##       attestations: write # Required for publishing artifact attestations
+##       contents: read # Required for actions/checkout
 ##     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v2
 ##     # with:
 ##     #   working-directory: path/to/sub/directory
