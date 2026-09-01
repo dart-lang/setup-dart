@@ -73,7 +73,7 @@ jobs:
           PKG_DIR: ${{ inputs.working-directory }}
         run: |
           mkdir -p output
-          dart pub publish --to-archive="$PWD/output/package.tar.gz" --skip-validation -C "${PKG_DIR:-.}"
+          dart pub publish --to-archive="$PWD/output/package.tar.gz" --skip-validation --directory="${PKG_DIR:-.}"
           echo "Package archive created at output/package.tar.gz"
 
       - name: Upload package archive
@@ -122,4 +122,4 @@ jobs:
         env:
           ATTESTATION_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
         run: |
-          dart pub publish --from-archive="output/package.tar.gz" --with-attestation="$ATTESTATION_BUNDLE" -f
+          dart pub publish --from-archive="output/package.tar.gz" --with-attestation="$ATTESTATION_BUNDLE" --force
