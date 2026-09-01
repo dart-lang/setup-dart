@@ -19,11 +19,9 @@ on:
         required: false
         type: string
       working-directory:
-        description: >-
-          The directory within the repository where the package is located (if not in the repository root).
-          If omitted, the workflow attempts to locate the package directory based on the git tag
-          (e.g. 'package_name-v1.2.3' in 'pkgs/package_name' or 'packages/package_name') or defaults to the root.
+        description: The directory within the repository where the package is located (if not in the repository root).
         required: false
+        default: '.'
         type: string
       sdk:
         description: The SDK version or channel to use.
@@ -74,59 +72,27 @@ jobs:
         if: ${{ inputs.use-flutter }}
         uses: flutter-actions/setup-flutter@c7fdb36b173fc3e88e5c5a3733c2b66bd9ac91a1 # v3
 
-      - name: Resolve package directory
-        id: resolve-pkg
-        env:
-          INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
-          TAG_REF: ${{ github.ref_name }}
-        run: |
-          if [ -n "$INPUT_WORKING_DIRECTORY" ]; then
-            PKG_DIR="$INPUT_WORKING_DIRECTORY"
-          elif [[ "$TAG_REF" =~ ^(.*)-v([0-9].*)$ ]]; then
-            TAG_PKG="${BASH_REMATCH[1]}"
-            if [ -f "pkgs/$TAG_PKG/pubspec.yaml" ]; then
-              PKG_DIR="pkgs/$TAG_PKG"
-            elif [ -f "packages/$TAG_PKG/pubspec.yaml" ]; then
-              PKG_DIR="packages/$TAG_PKG"
-            elif [ -f "./pubspec.yaml" ] && grep -q "^name: *$TAG_PKG$" "./pubspec.yaml"; then
-              PKG_DIR="."
-            else
-              PKG_DIR=$(find . -name pubspec.yaml -not -path '*/.*' -exec grep -l "^name: *$TAG_PKG$" {} + | head -n 1 | xargs -r dirname)
-              PKG_DIR="${PKG_DIR:-.}"
-            fi
-          else
-            PKG_DIR="."
-          fi
-
-          if [ ! -f "$PKG_DIR/pubspec.yaml" ]; then
-            echo "::error::pubspec.yaml not found in directory '$PKG_DIR'"
-            exit 1
-          fi
-
-          PKG_NAME=$(grep '^name:' "$PKG_DIR/pubspec.yaml" | head -n 1 | awk '{print $2}' | tr -d '\r"')
-          PKG_VERSION=$(grep '^version:' "$PKG_DIR/pubspec.yaml" | head -n 1 | awk '{print $2}' | tr -d '\r"')
-
-          echo "Target package: $PKG_NAME version $PKG_VERSION in directory $PKG_DIR"
-          echo "pkg-dir=$PKG_DIR" >> "$GITHUB_OUTPUT"
-          echo "pkg-name=$PKG_NAME" >> "$GITHUB_OUTPUT"
-          echo "pkg-version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
-
       - name: Install dependencies
         run: dart pub get
-        working-directory: ${{ steps.resolve-pkg.outputs.pkg-dir }}
+        working-directory: ${{ inputs.working-directory }}
 
       - name: Publish - dry run
         if: ${{ !inputs.skip-validation }}
         run: dart pub publish --dry-run
-        working-directory: ${{ steps.resolve-pkg.outputs.pkg-dir }}
+        working-directory: ${{ inputs.working-directory }}
 
       - name: Package archive for provenance
         env:
-          PKG_DIR: ${{ steps.resolve-pkg.outputs.pkg-dir }}
-          PKG_NAME: ${{ steps.resolve-pkg.outputs.pkg-name }}
-          PKG_VERSION: ${{ steps.resolve-pkg.outputs.pkg-version }}
+          PKG_DIR: ${{ inputs.working-directory }}
         run: |
           mkdir -p output
+          PKG_DIR="${PKG_DIR:-.}"
+          if [ ! -f "$PKG_DIR/pubspec.yaml" ]; then
+            echo "::error::pubspec.yaml not found in directory '$PKG_DIR'"
+            exit 1
+          fi
+          PKG_NAME=$(grep '^name:' "$PKG_DIR/pubspec.yaml" | head -n 1 | awk '{print $2}' | tr -d '\r"')
+          PKG_VERSION=$(grep '^version:' "$PKG_DIR/pubspec.yaml" | head -n 1 | awk '{print $2}' | tr -d '\r"')
           ARCHIVE="output/${PKG_NAME}-${PKG_VERSION}.tar.gz"
           # Run hermetically without network access when unshare is supported
           if command -v unshare >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
