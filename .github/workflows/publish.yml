@@ -156,12 +156,4 @@ jobs:
             exit 1
           fi
           echo "Publishing $ARCHIVE with attestation $ATTESTATION_BUNDLE"
-          if ! dart pub publish --from-archive="$ARCHIVE" --with-attestation="$ATTESTATION_BUNDLE" -f 2>output/err.log; then
-            if grep -q 'Could not find an option named "--with-attestation"' output/err.log; then
-              echo "::warning::'--with-attestation' is not yet supported in this Dart SDK. Publishing from archive without attestation."
-              dart pub publish --from-archive="$ARCHIVE" -f
-            else
-              cat output/err.log >&2
-              exit 1
-            fi
-          fi
+          dart pub publish --from-archive="$ARCHIVE" --with-attestation="$ATTESTATION_BUNDLE" -f
