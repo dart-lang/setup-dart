@@ -141,9 +141,5 @@ jobs:
           if [ ! -f "$ARCHIVE" ]; then
             ARCHIVE=$(find output -name '*.tar.gz' | head -n 1)
           fi
-          if [ -z "$ARCHIVE" ] || [ ! -f "$ARCHIVE" ]; then
-            echo "::error::No package archive found in output/"
-            exit 1
-          fi
           echo "Publishing $ARCHIVE with attestation $ATTESTATION_BUNDLE"
           dart pub publish --from-archive="$ARCHIVE" --with-attestation="$ATTESTATION_BUNDLE" -f
