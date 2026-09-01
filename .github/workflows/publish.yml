@@ -94,12 +94,7 @@ jobs:
           PKG_NAME=$(grep '^name:' "$PKG_DIR/pubspec.yaml" | head -n 1 | awk '{print $2}' | tr -d '\r"')
           PKG_VERSION=$(grep '^version:' "$PKG_DIR/pubspec.yaml" | head -n 1 | awk '{print $2}' | tr -d '\r"')
           ARCHIVE="output/${PKG_NAME}-${PKG_VERSION}.tar.gz"
-          # Run hermetically without network access when unshare is supported
-          if command -v unshare >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
-            sudo -E unshare -n sudo -u $(whoami) -E env "PATH=$PATH" "HOME=$HOME" dart pub publish --to-archive="$PWD/$ARCHIVE" --skip-validation -C "$PKG_DIR"
-          else
-            dart pub publish --to-archive="$PWD/$ARCHIVE" --skip-validation -C "$PKG_DIR"
-          fi
+          dart pub publish --to-archive="$PWD/$ARCHIVE" --skip-validation -C "$PKG_DIR"
           echo "Package archive created at $ARCHIVE"
 
       - name: Upload package archive
