@@ -28,24 +28,17 @@ on:
         required: false
         default: false
         type: boolean
-      use-prebuilt-archive:
+      prebuilt-package-archive:
         description: >-
-          Whether to use a pre-built package archive uploaded by the caller workflow
-          (named by package-archive-name or defaulting to 'package-archive').
-          When true, skips the package job.
+          The name of the uploaded artifact containing a pre-built package archive (package.tar.gz).
+          When specified, the packaging job is skipped and this artifact is used instead.
         required: false
-        default: false
-        type: boolean
-      package-archive-name:
-        description: The name of the uploaded artifact containing the package archive.
-        required: false
-        default: 'package-archive'
         type: string
 
 jobs:
   package:
     name: 'Package archive'
-    if: ${{ !inputs.use-prebuilt-archive }}
+    if: ${{ !inputs.prebuilt-package-archive }}
     permissions:
       contents: read
     runs-on: ubuntu-latest
@@ -79,7 +72,7 @@ jobs:
       - name: Upload package archive
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
         with:
-          name: ${{ inputs.package-archive-name }}
+          name: package-archive
           path: output/package.tar.gz
           if-no-files-found: error
 
@@ -103,7 +96,7 @@ jobs:
       - name: Download package archive
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
-          name: ${{ inputs.package-archive-name }}
+          name: ${{ inputs.prebuilt-package-archive || 'package-archive' }}
           path: output/
 
       - name: Generate Build Provenance
