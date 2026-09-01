@@ -86,22 +86,14 @@ jobs:
           PKG_DIR: ${{ inputs.working-directory }}
         run: |
           mkdir -p output
-          PKG_DIR="${PKG_DIR:-.}"
-          if [ ! -f "$PKG_DIR/pubspec.yaml" ]; then
-            echo "::error::pubspec.yaml not found in directory '$PKG_DIR'"
-            exit 1
-          fi
-          PKG_NAME=$(grep '^name:' "$PKG_DIR/pubspec.yaml" | head -n 1 | awk '{print $2}' | tr -d '\r"')
-          PKG_VERSION=$(grep '^version:' "$PKG_DIR/pubspec.yaml" | head -n 1 | awk '{print $2}' | tr -d '\r"')
-          ARCHIVE="output/${PKG_NAME}-${PKG_VERSION}.tar.gz"
-          dart pub publish --to-archive="$PWD/$ARCHIVE" --skip-validation -C "$PKG_DIR"
-          echo "Package archive created at $ARCHIVE"
+          dart pub publish --to-archive="$PWD/output/package.tar.gz" --skip-validation -C "${PKG_DIR:-.}"
+          echo "Package archive created at output/package.tar.gz"
 
       - name: Upload package archive
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
         with:
           name: ${{ inputs.package-archive-name }}
-          path: output/*.tar.gz
+          path: output/package.tar.gz
           if-no-files-found: error
 
   publish:
@@ -145,7 +137,10 @@ jobs:
         env:
           ATTESTATION_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
         run: |
-          ARCHIVE=$(find output -name '*.tar.gz' | head -n 1)
+          ARCHIVE="output/package.tar.gz"
+          if [ ! -f "$ARCHIVE" ]; then
+            ARCHIVE=$(find output -name '*.tar.gz' | head -n 1)
+          fi
           if [ -z "$ARCHIVE" ] || [ ! -f "$ARCHIVE" ]; then
             echo "::error::No package archive found in output/"
             exit 1
