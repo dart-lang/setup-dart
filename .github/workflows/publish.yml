@@ -29,17 +29,10 @@ on:
         required: false
         default: false
         type: boolean
-      prebuilt-package-archive:
-        description: >-
-          The name of the uploaded artifact containing a pre-built package archive (package.tar.gz).
-          When specified, the packaging job is skipped and this artifact is used instead.
-        required: false
-        type: string
 
 jobs:
   package:
     name: 'Package archive'
-    if: ${{ !inputs.prebuilt-package-archive }}
     permissions:
       contents: read
     runs-on: ubuntu-latest
@@ -80,7 +73,6 @@ jobs:
   publish:
     name: 'Publish to pub.dev'
     needs: [package]
-    if: always() && !cancelled() && !failure() && (needs.package.result == 'success' || needs.package.result == 'skipped')
     environment: ${{ inputs.environment }}
     permissions:
       id-token: write # Required for OIDC token minting
@@ -97,7 +89,7 @@ jobs:
       - name: Download package archive
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
-          name: ${{ inputs.prebuilt-package-archive || 'package-archive' }}
+          name: package-archive
           path: output/
 
       - name: Generate Build Provenance

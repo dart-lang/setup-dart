@@ -1,7 +1,6 @@
 ## v1.8.2-wip
 
 * Update `publish.yml` to a two-step workflow supporting package attestations via Sigstore provenance (`actions/attest@v4`) and `dart pub publish --with-attestation`.
-* Add `prebuilt-package-archive` input to support custom caller build and packaging pipelines.
 
 ## v1.8.1
 
