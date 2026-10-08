@@ -1,11 +1,15 @@
 name: Publish to pub.dev
 
 ## Caller of this workflow should use it as follows:
+##
 ## jobs:
 ##   publish:
-##     uses: dart-lang/setup-dart/.github/workflows/publish.yml@main [or a recent commit hash / version tag]
+##     permissions:
+##       id-token: write # Required for OIDC token minting
+##     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
 ##     # with:
 ##     #   working-directory: path/to/sub/directory
+##     #   use-flutter: false
 
 on:
   workflow_call:
@@ -17,36 +21,101 @@ on:
       working-directory:
         description: The directory within the repository where the package is located (if not in the repository root).
         required: false
+        default: '.'
         type: string
+      use-flutter:
+        description: Whether to install the Flutter SDK in addition to the Dart SDK.
+        required: false
+        default: true
+        type: boolean
+      test-run:
+        description: Whether to verify the package archive instead of publishing to pub.dev.
+        required: false
+        default: false
+        type: boolean
 
 jobs:
-  publish:
-    name: 'Publish to pub.dev'
-    environment: ${{ inputs.environment }}
-    permissions:
-      id-token: write # This is required for requesting the JWT
+  validate:
+    name: 'Validate package'
+    permissions: {}
     runs-on: ubuntu-latest
     steps:
-      # Checkout repository
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      # Set up the Dart SDK and provision the OIDC token used for publishing.
-      # The `dart` command from this step will be shadowed by the one from the
-      # Flutter SDK below. 
-      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d
-      # Download flutter SDK - needed for publishing Flutter packages. Can also
-      # publish pure Dart packages.
-      #
-      # The dart binary from a Flutter SDK facilitates publishing both Flutter
-      # and pure-dart packages.
-      - uses: flutter-actions/setup-flutter@6e2468fd827c4a7337cd4b835a6049b78bc0bd1f
-      # Minimal package setup and dry run checks.
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
+
+      - name: Set up Flutter
+        if: ${{ inputs.use-flutter }}
+        uses: flutter-actions/setup-flutter@6e2468fd827c4a7337cd4b835a6049b78bc0bd1f
+
       - name: Install dependencies
         run: dart pub get
         working-directory: ${{ inputs.working-directory }}
+
       - name: Publish - dry run
         run: dart pub publish --dry-run
         working-directory: ${{ inputs.working-directory }}
-      # Publishing...
+
+  package:
+    name: 'Package archive'
+    needs: [validate]
+    permissions: {}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
+
+      - name: Package archive for provenance
+        env:
+          PKG_DIR: ${{ inputs.working-directory }}
+        run: |
+          sudo -E unshare -n sudo -u "$(whoami)" -E env "PATH=$PATH" "HOME=$HOME" \
+            dart pub publish --to-archive="$RUNNER_TEMP/package.tar.gz" --skip-validation --directory="${PKG_DIR:-.}"
+          echo "Package archive created at $RUNNER_TEMP/package.tar.gz"
+
+      - name: Upload package archive
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: package-archive
+          path: ${{ runner.temp }}/package.tar.gz
+          if-no-files-found: error
+          overwrite: true
+
+  publish:
+    name: 'Publish to pub.dev'
+    needs: [package]
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write # Required for OIDC token minting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
+
+      - name: Download package archive
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: package-archive
+          path: ${{ runner.temp }}/
+
       - name: Publish to pub.dev
-        run: dart pub publish -f
-        working-directory: ${{ inputs.working-directory }}
+        if: ${{ !inputs.test-run }}
+        run: |
+          dart pub publish --from-archive="$RUNNER_TEMP/package.tar.gz" --force
+
+      - name: Verify package archive
+        if: ${{ inputs.test-run }}
+        run: |
+          if [ ! -s "$RUNNER_TEMP/package.tar.gz" ]; then
+            echo "Error: $RUNNER_TEMP/package.tar.gz does not exist or is empty."
+            exit 1
+          fi
+          echo "Archive contents:"
+          tar -ztvf "$RUNNER_TEMP/package.tar.gz"
+          tar -ztf "$RUNNER_TEMP/package.tar.gz" | grep -qx "pubspec.yaml"
+          ! tar -ztf "$RUNNER_TEMP/package.tar.gz" | grep -q "^output/"

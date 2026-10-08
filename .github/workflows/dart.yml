@@ -133,3 +133,22 @@ jobs:
           echo "main() { print('hello world'); }" > hello.dart
           dart hello.dart
       - run: dart --version
+
+  # Test the reusable publish.yml workflow (with default Flutter and pure Dart).
+  test_publish_flutter:
+    permissions:
+      id-token: write
+    uses: ./.github/workflows/publish.yml
+    with:
+      working-directory: example
+      test-run: true
+
+  test_publish_dart:
+    needs: [test_publish_flutter]
+    permissions:
+      id-token: write
+    uses: ./.github/workflows/publish.yml
+    with:
+      working-directory: example
+      use-flutter: false
+      test-run: true
