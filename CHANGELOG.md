@@ -1,6 +1,6 @@
 ## v1.8.2-wip
 
-* Update `publish.yml` to a three-job workflow (`validate`, `package`, `publish`) supporting hermetic package archiving (`--to-archive` / `--from-archive`).
+* Update `publish.yml` to a three-job workflow (`validate`, `package`, `publish`) supporting hermetic package archiving and Sigstore provenance attestations (`actions/attest@v4`) with `dart pub publish --with-attestation`.
 
 ## v1.8.1
 

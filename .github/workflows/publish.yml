@@ -6,6 +6,7 @@ name: Publish to pub.dev
 ##   publish:
 ##     permissions:
 ##       id-token: write # Required for OIDC token minting
+##       attestations: write # Required for publishing artifact attestations
 ##       contents: read # Required for actions/checkout
 ##     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v2
 ##     # with:
@@ -89,6 +90,7 @@ jobs:
     environment: ${{ inputs.environment }}
     permissions:
       id-token: write # Required for OIDC token minting
+      attestations: write # Required for publishing artifact attestations
     runs-on: ubuntu-latest
     steps:
       - name: Set up Dart
@@ -100,6 +102,20 @@ jobs:
           name: package-archive
           path: output/
 
+      - name: Generate Build Provenance
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: 'output/package.tar.gz'
+
+      - name: Upload attestation bundle
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+        with:
+          name: attestation-bundle
+          path: ${{ steps.attest.outputs.bundle-path }}
+
       - name: Publish to pub.dev
+        env:
+          ATTESTATION_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
         run: |
-          dart pub publish --from-archive="output/package.tar.gz" --force
+          dart pub publish --from-archive="output/package.tar.gz" --with-attestation="$ATTESTATION_BUNDLE" --force
