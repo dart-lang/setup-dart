@@ -28,6 +28,11 @@ on:
         required: false
         default: true
         type: boolean
+      test-run:
+        description: Whether to verify the package archive instead of publishing to pub.dev.
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   validate:
@@ -99,5 +104,18 @@ jobs:
           path: ${{ runner.temp }}/
 
       - name: Publish to pub.dev
+        if: ${{ !inputs.test-run }}
         run: |
           dart pub publish --from-archive="$RUNNER_TEMP/package.tar.gz" --force
+
+      - name: Verify package archive
+        if: ${{ inputs.test-run }}
+        run: |
+          if [ ! -s "$RUNNER_TEMP/package.tar.gz" ]; then
+            echo "Error: $RUNNER_TEMP/package.tar.gz does not exist or is empty."
+            exit 1
+          fi
+          echo "Archive contents:"
+          tar -ztvf "$RUNNER_TEMP/package.tar.gz"
+          tar -ztf "$RUNNER_TEMP/package.tar.gz" | grep -qx "pubspec.yaml"
+          ! tar -ztf "$RUNNER_TEMP/package.tar.gz" | grep -q "^output/"
