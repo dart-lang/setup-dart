@@ -1,3 +1,7 @@
+## v1.8.2-wip
+
+* Update `publish.yml` to a three-job workflow (`validate`, `package`, `publish`) supporting hermetic package archiving (`--to-archive` / `--from-archive`).
+
 ## v1.8.1
 
 * Update workflows to pin `actions/checkout` to a commit SHA.
