@@ -152,3 +152,14 @@ jobs:
       working-directory: example
       use-flutter: false
       test-run: true
+
+  test_publish_dart_dev:
+    needs: [test_publish_dart]
+    permissions:
+      id-token: write
+    uses: ./.github/workflows/publish.yml
+    with:
+      working-directory: example
+      sdk: dev
+      use-flutter: false
+      test-run: true

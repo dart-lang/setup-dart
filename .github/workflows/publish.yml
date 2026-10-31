@@ -9,6 +9,7 @@ name: Publish to pub.dev
 ##     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
 ##     # with:
 ##     #   working-directory: path/to/sub/directory
+##     #   sdk: stable
 ##     #   use-flutter: false
 
 on:
@@ -22,6 +23,13 @@ on:
         description: The directory within the repository where the package is located (if not in the repository root).
         required: false
         default: '.'
+        type: string
+      sdk:
+        description: >-
+          The Dart SDK channel ('stable', 'beta', 'dev'), release version
+          ('3.13'), or specific version ('3.14.0-286.0.dev') to install.
+        required: false
+        default: 'stable'
         type: string
       use-flutter:
         description: Whether to install the Flutter SDK in addition to the Dart SDK.
@@ -45,6 +53,8 @@ jobs:
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
+        with:
+          sdk: ${{ inputs.sdk }}
 
       - name: Set up Flutter
         if: ${{ inputs.use-flutter }}
@@ -69,6 +79,8 @@ jobs:
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
+        with:
+          sdk: ${{ inputs.sdk }}
 
       - name: Package archive for provenance
         env:
@@ -96,6 +108,8 @@ jobs:
     steps:
       - name: Set up Dart
         uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
+        with:
+          sdk: ${{ inputs.sdk }}
 
       - name: Download package archive
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
