@@ -1,6 +1,7 @@
 ## v1.8.2-wip
 
 * Update `publish.yml` to a three-job workflow (`validate`, `package`, `publish`) supporting hermetic package archiving (`--to-archive` / `--from-archive`).
+* Add `sdk` input to `publish.yml` to support publishing packages that require a non-stable Dart SDK (e.g., `beta` or `dev`).
 
 ## v1.8.1
 
