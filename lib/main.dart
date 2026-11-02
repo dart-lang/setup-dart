@@ -144,10 +144,10 @@ Future<void> _impl(List<String> args) async {
   // Register problem matcher.
   final problemMatcher = core.getInput('problem-matcher');
   if (problemMatcher != 'false') {
-    var actionPath = process.env('GITHUB_ACTION_PATH') ?? '';
-    if (actionPath.isEmpty) {
-      actionPath = actionRepoRoot ?? '.';
-    }
+    // Don't use GITHUB_ACTION_PATH here: the runner only sets it for composite
+    // actions, and when setup-dart is a step of a composite action it names
+    // the composite action's directory, not ours (#198).
+    final actionPath = actionRepoRoot ?? '.';
     print('::add-matcher::${path.join(actionPath, 'dart-analyzer.json')}');
   }
 

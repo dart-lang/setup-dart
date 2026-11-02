@@ -58,6 +58,13 @@ jobs:
           echo "main() { print('hello world'); }" > hello.dart
           dart hello.dart
 
+  # Test running setup-dart as a step of a local composite action.
+  test_composite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: ./.github/actions/test-composite
+
   # Test the architecture input parameter.
   test_arch:
     strategy:
