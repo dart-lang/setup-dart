@@ -20,5 +20,6 @@ jobs:
           sdk: dev
       - run: dart pub get
       - run: dart analyze --fatal-infos
+      - run: dart test
       - run: dart tool/sig.dart --verify
       - run: npm run build
