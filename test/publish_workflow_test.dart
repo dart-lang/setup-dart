@@ -107,190 +107,42 @@ void main() {
     });
   });
 
-  group('monorepo automatic package discovery', () {
-    test('discovers packages across multiple subdirectories', () async {
+  group('{package} placeholder expansion', () {
+    test('expands pkgs/{package} and {package} from release tags', () async {
       await d.dir('repo', [
         d.dir('pkgs', [
           d.dir('pkg_a', [
             d.file('pubspec.yaml', 'name: pkg_a\nversion: 1.0.0\n'),
           ]),
         ]),
-        d.dir('other_dir', [
-          d.dir('pkg_b', [
-            d.file('pubspec.yaml', 'name: pkg_b\nversion: 2.0.0\n'),
-          ]),
+        d.dir('webdev', [
+          d.file('pubspec.yaml', 'name: webdev\nversion: 3.0.0-dev.1\n'),
         ]),
       ]).create();
 
       final repoPath = p.join(d.sandbox, 'repo');
 
-      final resA = await runResolveDir(
+      final pkgsRes = await runResolveDir(
         repoPath: repoPath,
+        inputDir: 'pkgs/{package}',
         refName: 'pkg_a-v1.0.0',
       );
-      expect(resA.exitCode, 0, reason: resA.stderr);
-      expect(resA.directory, 'pkgs/pkg_a');
+      expect(pkgsRes.exitCode, 0, reason: pkgsRes.stderr);
+      expect(pkgsRes.directory, 'pkgs/pkg_a');
 
-      final resB = await runResolveDir(
+      final topLevelRes = await runResolveDir(
         repoPath: repoPath,
-        refName: 'pkg_b-v2.0.0-dev.1',
+        inputDir: '{package}',
+        refName: 'webdev-v3.0.0-dev.1',
       );
-      expect(resB.exitCode, 0, reason: resB.stderr);
-      expect(resB.directory, 'other_dir/pkg_b');
+      expect(topLevelRes.exitCode, 0, reason: topLevelRes.stderr);
+      expect(topLevelRes.directory, 'webdev');
     });
 
-    test(
-      'handles workspace root publish_to: none and ignores nested fixtures',
-      () async {
-        await d.dir('repo', [
-          d.file(
-            'pubspec.yaml',
-            'name: pkg_a\npublish_to: none\nworkspace:\n  - pkgs/pkg_a\n',
-          ),
-          d.dir('pkgs', [
-            d.dir('pkg_a', [
-              d.file(
-                'pubspec.yaml',
-                'name: pkg_a\nversion: 1.0.0\nresolution: workspace\n',
-              ),
-              d.dir('test', [
-                d.dir('fixtures', [
-                  d.dir('nested_pkg', [
-                    d.file(
-                      'pubspec.yaml',
-                      'name: nested_pkg\nversion: 0.0.1\n',
-                    ),
-                  ]),
-                  d.dir('dup_a', [
-                    d.file('pubspec.yaml', 'name: pkg_a\nversion: 0.0.1\n'),
-                  ]),
-                ]),
-              ]),
-            ]),
-          ]),
-        ]).create();
-
-        final repoPath = p.join(d.sandbox, 'repo');
-
-        // Resolves pkgs/pkg_a despite root workspace having publish_to: none
-        // and nested test fixture having name: pkg_a.
-        final resA = await runResolveDir(
-          repoPath: repoPath,
-          refName: 'pkg_a-v1.0.0',
-        );
-        expect(resA.exitCode, 0, reason: resA.stderr);
-        expect(resA.directory, 'pkgs/pkg_a');
-
-        // Nested fixture inside publishable package is not discoverable.
-        final resNested = await runResolveDir(
-          repoPath: repoPath,
-          refName: 'nested_pkg-v0.0.1',
-        );
-        expect(resNested.exitCode, isNonZero);
-        expect(resNested.stderr, contains("No package named 'nested_pkg'"));
-      },
-    );
-
-    test('matches by pubspec name even when directory name differs', () async {
-      await d.dir('repo', [
-        d.dir('custom', [
-          d.dir('folder_name', [
-            d.file('pubspec.yaml', 'name: actual_pkg\nversion: 1.0.0\n'),
-          ]),
-        ]),
-        d.dir('pkgs', [
-          d.dir('on', [
-            d.file('pubspec.yaml', 'name: on\nversion: 1.0.0\n'),
-          ]),
-        ]),
-      ]).create();
-
-      final repoPath = p.join(d.sandbox, 'repo');
-
-      final res = await runResolveDir(
-        repoPath: repoPath,
-        refName: 'actual_pkg-v1.0.0',
-      );
-      expect(res.exitCode, 0, reason: res.stderr);
-      expect(res.directory, 'custom/folder_name');
-
-      // Ensures YAML 1.1 boolean words like 'on' are preserved as strings.
-      final resOn = await runResolveDir(
-        repoPath: repoPath,
-        refName: 'on-v1.0.0',
-      );
-      expect(resOn.exitCode, 0, reason: resOn.stderr);
-      expect(resOn.directory, 'pkgs/on');
-    });
-
-    test('fails when tagged package has publish_to: none', () async {
-      await d.dir('repo', [
-        d.dir('pkgs', [
-          d.dir('internal_pkg', [
-            d.file(
-              'pubspec.yaml',
-              'name: internal_pkg\nversion: 1.0.0\npublish_to: none\n',
-            ),
-          ]),
-        ]),
-      ]).create();
-
-      final res = await runResolveDir(
-        repoPath: p.join(d.sandbox, 'repo'),
-        refName: 'internal_pkg-v1.0.0',
-      );
-      expect(res.exitCode, isNonZero);
-      expect(res.stderr, contains('publish_to: none'));
-    });
-
-    test('fails when multiple publishable packages share the same name',
+    test('validates tag format, pubspec existence, name, and publish_to',
         () async {
       await d.dir('repo', [
         d.dir('pkgs', [
-          d.dir('dup', [
-            d.file('pubspec.yaml', 'name: dup\nversion: 1.0.0\n'),
-          ]),
-        ]),
-        d.dir('other', [
-          d.dir('dup', [
-            d.file('pubspec.yaml', 'name: dup\nversion: 1.0.0\n'),
-          ]),
-        ]),
-      ]).create();
-
-      final res = await runResolveDir(
-        repoPath: p.join(d.sandbox, 'repo'),
-        refName: 'dup-v1.0.0',
-      );
-      expect(res.exitCode, isNonZero);
-      expect(res.stderr, contains("Multiple publishable packages named 'dup'"));
-    });
-
-    test('fails when monorepo tag does not include package name', () async {
-      await d.dir('repo', [
-        d.dir('pkgs', [
-          d.dir('pkg_a', [
-            d.file('pubspec.yaml', 'name: pkg_a\nversion: 1.0.0\n'),
-          ]),
-        ]),
-      ]).create();
-
-      final res = await runResolveDir(
-        repoPath: p.join(d.sandbox, 'repo'),
-        refName: 'v1.0.0',
-      );
-      expect(res.exitCode, isNonZero);
-      expect(res.stderr, contains('does not match'));
-    });
-  });
-
-  group('{package} placeholder expansion', () {
-    test('expands {package} and validates name and publish_to', () async {
-      await d.dir('repo', [
-        d.dir('pkgs', [
-          d.dir('pkg_a', [
-            d.file('pubspec.yaml', 'name: pkg_a\nversion: 1.0.0\n'),
-          ]),
           d.dir('internal_pkg', [
             d.file(
               'pubspec.yaml',
@@ -304,14 +156,6 @@ void main() {
       ]).create();
 
       final repoPath = p.join(d.sandbox, 'repo');
-
-      final ok = await runResolveDir(
-        repoPath: repoPath,
-        inputDir: 'pkgs/{package}',
-        refName: 'pkg_a-v1.0.0',
-      );
-      expect(ok.exitCode, 0, reason: ok.stderr);
-      expect(ok.directory, 'pkgs/pkg_a');
 
       final unpub = await runResolveDir(
         repoPath: repoPath,
@@ -327,7 +171,15 @@ void main() {
         refName: 'wrong_dir-v1.0.0',
       );
       expect(mismatch.exitCode, isNonZero);
-      expect(mismatch.stderr, contains("expected 'wrong_dir'"));
+      expect(mismatch.stderr, contains("does not match 'wrong_dir'"));
+
+      final missing = await runResolveDir(
+        repoPath: repoPath,
+        inputDir: 'pkgs/{package}',
+        refName: 'missing-v1.0.0',
+      );
+      expect(missing.exitCode, isNonZero);
+      expect(missing.stderr, contains('No pubspec.yaml found'));
 
       final badTag = await runResolveDir(
         repoPath: repoPath,
@@ -374,13 +226,17 @@ void main() {
     test('rejects path traversal outside repository', () async {
       await d.dir('repo', []).create();
 
-      final res = await runResolveDir(
-        repoPath: p.join(d.sandbox, 'repo'),
-        inputDir: '../outside',
-        refName: 'v1.0.0',
-      );
-      expect(res.exitCode, isNonZero);
-      expect(res.stderr, contains('must stay within the repository'));
+      final repoPath = p.join(d.sandbox, 'repo');
+
+      for (final badDir in ['..', '../outside', 'pkgs/../../outside', '/etc']) {
+        final res = await runResolveDir(
+          repoPath: repoPath,
+          inputDir: badDir,
+          refName: 'v1.0.0',
+        );
+        expect(res.exitCode, isNonZero, reason: 'Expected failure for $badDir');
+        expect(res.stderr, contains('must stay within the repository'));
+      }
     });
   });
 }

@@ -8,7 +8,7 @@ name: Publish to pub.dev
 ##       id-token: write # Required for OIDC token minting
 ##     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
 ##     # with:
-##     #   working-directory: path/to/sub/directory # Or pkgs/{package}, or omit to auto-discover from <package>-v<version> tags
+##     #   working-directory: path/to/sub/directory # Or pkgs/{package} for <package>-v<version> tags
 ##     #   sdk: stable
 ##     #   use-flutter: false
 
@@ -21,12 +21,10 @@ on:
         type: string
       working-directory:
         description: >-
-          The directory within the repository where the package is located.
-          Supports '{package}' placeholder expansion from '<package>-v<version>'
-          tags (for example, 'pkgs/{package}'). When omitted or '.', uses a
-          publishable root pubspec.yaml if present, or otherwise locates the
-          publishable package matching '<package>' from a '<package>-v<version>'
-          tag.
+          The directory within the repository where the package is located (if
+          not in the repository root). Supports '{package}' placeholder
+          expansion from '<package>-v<version>' tags (for example,
+          'pkgs/{package}' or '{package}').
         required: false
         default: '.'
         type: string
@@ -66,179 +64,38 @@ jobs:
           REF_NAME: ${{ github.ref_name }}
           TEST_RUN: ${{ inputs.test-run }}
         run: |
-          python3 - << 'EOF'
-          import os
-          import re
-          import sys
-
-          try:
-              import yaml
-          except ImportError:
-              yaml = None
-
-          TAG_RE = re.compile(r"^([a-z0-9_]+)-v([0-9]+\.[0-9]+\.[0-9]+.*)$")
-
-
-          def load_pubspec(path, strict=False):
-              try:
-                  with open(path, encoding="utf-8") as f:
-                      text = f.read()
-              except (OSError, UnicodeDecodeError) as e:
-                  if strict:
-                      sys.exit(f"Error: Failed to read '{path}': {e}")
-                  return None
-
-              if yaml is not None:
-                  try:
-                      data = yaml.load(text, Loader=yaml.BaseLoader)
-                      return data if isinstance(data, dict) else {}
-                  except yaml.YAMLError as e:
-                      if strict:
-                          sys.exit(f"Error: Failed to parse '{path}': {e}")
-                      return None
-
-              result = {}
-              for line in text.splitlines():
-                  m = re.match(r"^(name|publish_to)\s*:\s*(.+?)\s*$", line)
-                  if m:
-                      key, val = m.group(1), m.group(2)
-                      if " #" in val:
-                          val = val.split(" #", 1)[0].strip()
-                      if len(val) >= 2 and val[0] == val[-1] and val[0] in ("'", '"'):
-                          val = val[1:-1]
-                      result[key] = val
-              return result
-
-
-          def validate_rel_dir(d):
-              norm = os.path.normpath(d)
-              if os.path.isabs(norm) or norm == ".." or norm.startswith(".." + os.sep):
-                  sys.exit(
-                      f"Error: working-directory '{d}' must stay within the repository."
-                  )
-              return norm
-
-
-          raw_dir = os.environ.get("INPUT_DIR", ".").strip() or "."
-          ref_name = os.environ.get("REF_NAME", "").strip()
-          test_run = os.environ.get("TEST_RUN", "false").strip().lower() == "true"
-
-          if "{package}" in raw_dir:
-              m = TAG_RE.match(ref_name)
-              if not m:
-                  sys.exit(
-                      f"Error: Cannot expand '{{package}}' in working-directory "
-                      f"'{raw_dir}': ref '{ref_name}' does not match "
-                      f"'<package>-v<version>'."
-                  )
-              pkg_name = m.group(1)
-              resolved = validate_rel_dir(raw_dir.replace("{package}", pkg_name))
-              pubspec_path = os.path.join(resolved, "pubspec.yaml")
-              if not os.path.isfile(pubspec_path):
-                  sys.exit(f"Error: No pubspec.yaml found at '{pubspec_path}'.")
-              pubspec = load_pubspec(pubspec_path, strict=True)
-              actual_name = pubspec.get("name")
-              if actual_name != pkg_name:
-                  sys.exit(
-                      f"Error: Package name in '{pubspec_path}' is '{actual_name}', "
-                      f"expected '{pkg_name}' from tag '{ref_name}'."
-                  )
-              if pubspec.get("publish_to") == "none":
-                  sys.exit(
-                      f"Error: Package '{pkg_name}' at '{resolved}' has "
-                      f"'publish_to: none' and cannot be published."
-                  )
-          else:
-              norm_dir = validate_rel_dir(raw_dir)
-              if norm_dir != ".":
-                  resolved = norm_dir
-                  pubspec_path = os.path.join(resolved, "pubspec.yaml")
-                  if not os.path.isfile(pubspec_path):
-                      sys.exit(f"Error: No pubspec.yaml found at '{pubspec_path}'.")
-                  pubspec = load_pubspec(pubspec_path, strict=True)
-                  if not test_run and pubspec.get("publish_to") == "none":
-                      sys.exit(
-                          f"Error: Package at '{resolved}' has 'publish_to: none' "
-                          f"and cannot be published."
-                      )
-              else:
-                  root_has_pubspec = os.path.isfile("pubspec.yaml")
-                  root_pubspec = (
-                      load_pubspec("pubspec.yaml", strict=True)
-                      if root_has_pubspec
-                      else None
-                  )
-                  if root_pubspec is not None and root_pubspec.get("publish_to") != "none":
-                      resolved = "."
-                  else:
-                      m = TAG_RE.match(ref_name)
-                      if m:
-                          pkg_name = m.group(1)
-                          publishable_matches = []
-                          unpublished_matches = []
-                          for dirpath, dirnames, filenames in os.walk("."):
-                              dirnames[:] = [
-                                  d for d in sorted(dirnames) if not d.startswith(".")
-                              ]
-                              if "pubspec.yaml" not in filenames:
-                                  continue
-                              pubspec_path = os.path.join(dirpath, "pubspec.yaml")
-                              pubspec = load_pubspec(pubspec_path, strict=False)
-                              if pubspec is None:
-                                  continue
-                              rel_dir = os.path.normpath(dirpath)
-                              if pubspec.get("publish_to") != "none":
-                                  if pubspec.get("name") == pkg_name:
-                                      publishable_matches.append(rel_dir)
-                                  # Published packages do not contain nested published packages.
-                                  dirnames[:] = []
-                              else:
-                                  if pubspec.get("name") == pkg_name:
-                                      unpublished_matches.append(rel_dir)
-
-                          if len(publishable_matches) == 1:
-                              resolved = publishable_matches[0]
-                          elif len(publishable_matches) > 1:
-                              sys.exit(
-                                  f"Error: Multiple publishable packages named "
-                                  f"'{pkg_name}' found: "
-                                  f"{', '.join(publishable_matches)}. Specify "
-                                  f"'working-directory' explicitly."
-                              )
-                          elif unpublished_matches:
-                              sys.exit(
-                                  f"Error: Package '{pkg_name}' at "
-                                  f"'{unpublished_matches[0]}' has 'publish_to: none' "
-                                  f"and cannot be published."
-                              )
-                          else:
-                              sys.exit(
-                                  f"Error: No package named '{pkg_name}' found in "
-                                  f"repository for tag '{ref_name}'."
-                              )
-                      elif root_pubspec is not None and test_run:
-                          resolved = "."
-                      elif root_pubspec is not None:
-                          sys.exit(
-                              "Error: Root pubspec.yaml has 'publish_to: none'. "
-                              "Use a '<package>-v<version>' tag to publish a "
-                              "workspace/monorepo package, or specify "
-                              "'working-directory'."
-                          )
-                      else:
-                          sys.exit(
-                              f"Error: No root pubspec.yaml found, and ref "
-                              f"'{ref_name}' does not match '<package>-v<version>'. "
-                              f"Specify 'working-directory' or push a "
-                              f"'<package>-v<version>' tag."
-                          )
-
-          print(f"Resolved package directory: {resolved}")
-          github_output = os.environ.get("GITHUB_OUTPUT")
-          if github_output:
-              with open(github_output, "a", encoding="utf-8") as out:
-                  out.write(f"directory={resolved}\n")
-          EOF
+          dir="${INPUT_DIR:-.}"
+          pkg=""
+          placeholder='{package}'
+          if [[ "$dir" == *"$placeholder"* ]]; then
+            tag_re='^([a-z0-9_]+)-v[0-9]+\.[0-9]+\.[0-9]+'
+            if [[ ! "$REF_NAME" =~ $tag_re ]]; then
+              echo "Error: Cannot expand '{package}' in '$dir': ref '$REF_NAME' does not match '<package>-v<version>'." >&2
+              exit 1
+            fi
+            pkg="${BASH_REMATCH[1]}"
+            dir="${dir//$placeholder/$pkg}"
+          fi
+          if [[ "$dir" == /* || "/$dir/" == *"/../"* ]]; then
+            echo "Error: working-directory '$dir' must stay within the repository." >&2
+            exit 1
+          fi
+          if [[ ! -f "$dir/pubspec.yaml" ]]; then
+            echo "Error: No pubspec.yaml found at '$dir/pubspec.yaml'." >&2
+            exit 1
+          fi
+          if [[ -n "$pkg" ]] && ! grep -Eq "^name:[[:space:]]*(['\"]${pkg}['\"]|${pkg})([[:space:]]*(#.*)?)?$" "$dir/pubspec.yaml"; then
+            echo "Error: Package name in '$dir/pubspec.yaml' does not match '$pkg' from tag '$REF_NAME'." >&2
+            exit 1
+          fi
+          if [[ "$TEST_RUN" != "true" || -n "$pkg" ]] && grep -Eq "^publish_to:[[:space:]]*(['\"]none['\"]|none)([[:space:]]*(#.*)?)?$" "$dir/pubspec.yaml"; then
+            echo "Error: Package at '$dir' has 'publish_to: none' and cannot be published." >&2
+            exit 1
+          fi
+          echo "Resolved package directory: $dir"
+          if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+            echo "directory=$dir" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
