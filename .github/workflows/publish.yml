@@ -8,7 +8,7 @@ name: Publish to pub.dev
 ##       id-token: write # Required for OIDC token minting
 ##     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
 ##     # with:
-##     #   working-directory: path/to/sub/directory
+##     #   working-directory: path/to/sub/directory # Or pkgs/{package} for <package>-v<version> tags
 ##     #   sdk: stable
 ##     #   use-flutter: false
 
@@ -20,7 +20,11 @@ on:
         required: false
         type: string
       working-directory:
-        description: The directory within the repository where the package is located (if not in the repository root).
+        description: >-
+          The directory within the repository where the package is located (if
+          not in the repository root). Supports '{package}' placeholder
+          expansion from '<package>-v<version>' tags (for example,
+          'pkgs/{package}' or '{package}').
         required: false
         default: '.'
         type: string
@@ -47,9 +51,51 @@ jobs:
     name: 'Validate package'
     permissions: {}
     runs-on: ubuntu-latest
+    outputs:
+      working-directory: ${{ steps.resolve-dir.outputs.directory }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Resolve package directory
+        id: resolve-dir
+        env:
+          INPUT_DIR: ${{ inputs.working-directory }}
+          REF_NAME: ${{ github.ref_name }}
+          TEST_RUN: ${{ inputs.test-run }}
+        run: |
+          dir="${INPUT_DIR:-.}"
+          pkg=""
+          placeholder='{package}'
+          if [[ "$dir" == *"$placeholder"* ]]; then
+            tag_re='^([a-z0-9_]+)-v[0-9]+\.[0-9]+\.[0-9]+'
+            if [[ ! "$REF_NAME" =~ $tag_re ]]; then
+              echo "Error: Cannot expand '{package}' in '$dir': ref '$REF_NAME' does not match '<package>-v<version>'." >&2
+              exit 1
+            fi
+            pkg="${BASH_REMATCH[1]}"
+            dir="${dir//$placeholder/$pkg}"
+          fi
+          if [[ "$dir" == /* || "/$dir/" == *"/../"* ]]; then
+            echo "Error: working-directory '$dir' must stay within the repository." >&2
+            exit 1
+          fi
+          if [[ ! -f "$dir/pubspec.yaml" ]]; then
+            echo "Error: No pubspec.yaml found at '$dir/pubspec.yaml'." >&2
+            exit 1
+          fi
+          if [[ -n "$pkg" ]] && ! grep -Eq "^name:[[:space:]]*(['\"]${pkg}['\"]|${pkg})([[:space:]]*(#.*)?)?$" "$dir/pubspec.yaml"; then
+            echo "Error: Package name in '$dir/pubspec.yaml' does not match '$pkg' from tag '$REF_NAME'." >&2
+            exit 1
+          fi
+          if [[ "$TEST_RUN" != "true" || -n "$pkg" ]] && grep -Eq "^publish_to:[[:space:]]*(['\"]none['\"]|none)([[:space:]]*(#.*)?)?$" "$dir/pubspec.yaml"; then
+            echo "Error: Package at '$dir' has 'publish_to: none' and cannot be published." >&2
+            exit 1
+          fi
+          echo "Resolved package directory: $dir"
+          if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+            echo "directory=$dir" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
@@ -62,11 +108,11 @@ jobs:
 
       - name: Install dependencies
         run: dart pub get
-        working-directory: ${{ inputs.working-directory }}
+        working-directory: ${{ steps.resolve-dir.outputs.directory }}
 
       - name: Publish - dry run
         run: dart pub publish --dry-run
-        working-directory: ${{ inputs.working-directory }}
+        working-directory: ${{ steps.resolve-dir.outputs.directory }}
 
   package:
     name: 'Package archive'
@@ -84,7 +130,7 @@ jobs:
 
       - name: Package archive for provenance
         env:
-          PKG_DIR: ${{ inputs.working-directory }}
+          PKG_DIR: ${{ needs.validate.outputs.working-directory }}
         run: |
           sudo -E unshare -n sudo -u "$(whoami)" -E env "PATH=$PATH" "HOME=$HOME" \
             dart pub publish --to-archive="$RUNNER_TEMP/package.tar.gz" --skip-validation --directory="${PKG_DIR:-.}"
