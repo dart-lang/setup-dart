@@ -1,0 +1,15 @@
+# Runs setup-dart as a step of a composite action. Used by the test_composite
+# job in dart.yml; inside a composite action GITHUB_ACTION_PATH points here,
+# not at setup-dart (#198).
+
+name: "Test setup-dart in a composite action"
+description: "Runs setup-dart as a step of a composite action."
+runs:
+  using: composite
+  steps:
+    - uses: ./
+    - name: Run hello world
+      shell: bash
+      run: |
+        echo "main() { print('hello world'); }" > hello.dart
+        dart hello.dart
