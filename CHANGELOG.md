@@ -1,8 +1,9 @@
-## v1.8.2-wip
+## v1.8.2
 
 * Update `publish.yml` to a three-job workflow (`validate`, `package`, `publish`) supporting hermetic package archiving (`--to-archive` / `--from-archive`).
 * Add `sdk` input to `publish.yml` to support publishing packages that require a non-stable Dart SDK (e.g., `beta` or `dev`).
 * Fix registering the `dart analyze` problem matcher when setup-dart runs as a step of a composite action ([#198][]).
+* Bump `undici` to `6.29.0` and `@vercel/ncc` to `0.45.0`.
 
 [#198]: https://github.com/dart-lang/setup-dart/issues/198
 
