@@ -83,6 +83,12 @@ jobs:
     needs: [validate]
     permissions: {}
     runs-on: ubuntu-latest
+    # Job outputs are isolated per job in the Actions control plane, whereas
+    # workflow artifacts share `ACTIONS_RUNTIME_TOKEN` across all jobs in the
+    # run. Passing the archive digest here prevents a sibling job in the caller
+    # workflow from replacing `package-archive` before `attest` or `publish`.
+    outputs:
+      archive-sha256: ${{ steps.package.outputs.archive-sha256 }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -93,12 +99,15 @@ jobs:
           sdk: ${{ inputs.sdk }}
 
       - name: Package archive for provenance
+        id: package
         env:
           PKG_DIR: ${{ inputs.working-directory }}
         run: |
           sudo -E unshare -n sudo -u "$(whoami)" -E env "PATH=$PATH" "HOME=$HOME" \
             dart pub publish --to-archive="$RUNNER_TEMP/package.tar.gz" --skip-validation --directory="${PKG_DIR:-.}"
-          echo "Package archive created at $RUNNER_TEMP/package.tar.gz"
+          sha256="$(sha256sum < "$RUNNER_TEMP/package.tar.gz" | cut -d' ' -f1)"
+          echo "archive-sha256=$sha256" >> "$GITHUB_OUTPUT"
+          echo "Package archive created at $RUNNER_TEMP/package.tar.gz (sha256: $sha256)"
 
       - name: Upload package archive
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -125,6 +134,16 @@ jobs:
         with:
           name: package-archive
           path: ${{ runner.temp }}/
+
+      - name: Verify package archive digest
+        env:
+          EXPECTED_SHA256: ${{ needs.package.outputs.archive-sha256 }}
+        run: |
+          actual="$(sha256sum < "$RUNNER_TEMP/package.tar.gz" | cut -d' ' -f1)"
+          if [ -z "$EXPECTED_SHA256" ] || [ "$actual" != "$EXPECTED_SHA256" ]; then
+            echo "::error::Downloaded package.tar.gz sha256 ($actual) does not match package job output ($EXPECTED_SHA256)."
+            exit 1
+          fi
 
       - name: Generate build provenance attestation
         id: attest
@@ -167,6 +186,16 @@ jobs:
         with:
           name: package-archive
           path: ${{ runner.temp }}/
+
+      - name: Verify package archive digest
+        env:
+          EXPECTED_SHA256: ${{ needs.package.outputs.archive-sha256 }}
+        run: |
+          actual="$(sha256sum < "$RUNNER_TEMP/package.tar.gz" | cut -d' ' -f1)"
+          if [ -z "$EXPECTED_SHA256" ] || [ "$actual" != "$EXPECTED_SHA256" ]; then
+            echo "::error::Downloaded package.tar.gz sha256 ($actual) does not match package job output ($EXPECTED_SHA256)."
+            exit 1
+          fi
 
       - name: Publish to pub.dev
         if: ${{ !inputs.test-run }}
