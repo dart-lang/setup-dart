@@ -1,6 +1,7 @@
 ## v1.8.3-wip
 
 * Add an opt-in `attest` input to `publish.yml` that generates a Sigstore build provenance attestation for the package archive (`actions/attest`) and uploads it as the `attestation-bundle` workflow artifact. Callers setting `attest: true` must also grant `attestations: write`.
+* Verify the SHA-256 digest of the `package-archive` artifact in `attest` and `publish` against a `package` job output so sibling jobs in the calling workflow cannot replace it.
 
 ## v1.8.2
 
