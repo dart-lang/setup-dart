@@ -1,6 +1,7 @@
 ## v1.8.3-wip
 
 * Add an opt-in `attest` input to `publish.yml` that generates a Sigstore build provenance attestation for the package archive (`actions/attest`) and uploads it as the `attestation-bundle` workflow artifact. Callers setting `attest: true` must also grant `attestations: write`.
+* With `attest: true`, `publish.yml` also uploads the attestation to pub.dev (`dart pub publish --with-attestation`). This requires the package's `pubspec.yaml` to specify a `repository`.
 
 ## v1.8.2
 
