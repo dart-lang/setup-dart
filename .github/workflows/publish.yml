@@ -13,6 +13,8 @@ name: Publish to pub.dev
 ##     #   sdk: stable
 ##     #   use-flutter: false
 ##     #   attest: true
+##     #   bundled-files: |
+##     #     prebuilt/linux-x64/libfoo.so
 
 on:
   workflow_call:
@@ -46,6 +48,18 @@ on:
         required: false
         default: false
         type: boolean
+      bundled-files:
+        description: >-
+          Newline-separated list of package-relative file paths (not tracked in
+          git) to copy into `working-directory` from `bundled-files-*` workflow
+          artifacts uploaded by preceding jobs in the same workflow run. Fails
+          if any listed file is missing, if any unlisted or duplicate file was
+          uploaded, if a path escapes `working-directory` or overwrites a
+          git-tracked file, or if a listed file is excluded from the resulting
+          package archive.
+        required: false
+        default: ''
+        type: string
       test-run:
         description: Whether to verify the package archive instead of publishing to pub.dev.
         required: false
@@ -60,6 +74,102 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Download bundled files
+        if: ${{ inputs.bundled-files != '' }}
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: bundled-files-*
+          path: ${{ runner.temp }}/bundled-files
+          merge-multiple: false
+
+      - name: Stage bundled files
+        if: ${{ inputs.bundled-files != '' }}
+        env:
+          PKG_DIR: ${{ inputs.working-directory }}
+          BUNDLED_FILES: ${{ inputs.bundled-files }}
+          DOWNLOAD_DIR: ${{ runner.temp }}/bundled-files
+        run: |
+          python3 - << 'EOF'
+          import os, pathlib, shutil, subprocess, sys
+
+          pkg_dir = pathlib.Path(os.environ.get('PKG_DIR') or '.').resolve()
+          download_dir = pathlib.Path(os.environ['DOWNLOAD_DIR'])
+          expected = {}
+          for raw in os.environ['BUNDLED_FILES'].splitlines():
+              line = raw.strip()
+              if not line or line.startswith('#'):
+                  continue
+              rel = pathlib.PurePosixPath(line)
+              if rel.is_absolute() or '..' in rel.parts or rel.parts == ():
+                  sys.exit(f'::error::Invalid bundled-files path: {line!r}')
+              norm = rel.as_posix()
+              if norm in expected:
+                  sys.exit(f'::error::Duplicate entry in bundled-files: {norm}')
+              dest = (pkg_dir / norm).resolve()
+              if pkg_dir not in dest.parents:
+                  sys.exit(f'::error::Bundled file path escapes working-directory: {line!r}')
+              expected[norm] = dest
+
+          if not expected:
+              sys.exit('::error::bundled-files was non-empty but listed no file paths.')
+
+          tracked_out = subprocess.check_output(
+              ['git', '-C', str(pkg_dir), 'ls-files', '-z'],
+          ).decode('utf-8')
+          tracked = {p for p in tracked_out.split('\0') if p}
+          overwritten = sorted(set(expected) & tracked)
+          if overwritten:
+              sys.exit(
+                  f'::error::bundled-files may not overwrite git-tracked files: '
+                  f'{", ".join(overwritten)}'
+              )
+
+          if not download_dir.is_dir():
+              sys.exit('::error::No bundled-files-* artifacts were found.')
+
+          actual = {}
+          for artifact_dir in sorted(download_dir.iterdir()):
+              if not artifact_dir.is_dir():
+                  sys.exit(f'::error::Unexpected entry in artifact directory: {artifact_dir.name}')
+              for root, dirs, files in os.walk(artifact_dir, followlinks=False):
+                  root_path = pathlib.Path(root)
+                  for d in dirs:
+                      if (root_path / d).is_symlink():
+                          sys.exit(f'::error::Symlink directory not allowed in {artifact_dir.name}: {d}')
+                  for f in files:
+                      src = root_path / f
+                      if src.is_symlink() or not src.is_file():
+                          sys.exit(f'::error::Non-regular file not allowed in {artifact_dir.name}: {f}')
+                      rel = src.relative_to(artifact_dir).as_posix()
+                      if rel in actual:
+                          prev_artifact, _ = actual[rel]
+                          sys.exit(
+                              f'::error::Duplicate bundled file {rel!r} across artifacts '
+                              f'{prev_artifact!r} and {artifact_dir.name!r}.'
+                          )
+                      actual[rel] = (artifact_dir.name, src)
+
+          extra = sorted(set(actual) - set(expected))
+          missing = sorted(set(expected) - set(actual))
+          if extra:
+              sys.exit(f'::error::Unexpected files in bundled-files-* artifacts: {", ".join(extra)}')
+          if missing:
+              sys.exit(f'::error::Missing expected bundled files: {", ".join(missing)}')
+
+          for rel, dest in sorted(expected.items()):
+              if dest.exists() or dest.is_symlink():
+                  sys.exit(f'::error::Bundled file already exists in checkout: {rel}')
+              cur = dest.parent
+              while cur != pkg_dir:
+                  if cur.is_symlink():
+                      sys.exit(f'::error::Symlink parent directory not allowed: {cur}')
+                  cur = cur.parent
+              dest.parent.mkdir(parents=True, exist_ok=True)
+              _, src = actual[rel]
+              shutil.copy2(src, dest)
+              print(f'Staged {rel} ({src.stat().st_size} bytes)')
+          EOF
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
@@ -93,6 +203,102 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: Download bundled files
+        if: ${{ inputs.bundled-files != '' }}
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: bundled-files-*
+          path: ${{ runner.temp }}/bundled-files
+          merge-multiple: false
+
+      - name: Stage bundled files
+        if: ${{ inputs.bundled-files != '' }}
+        env:
+          PKG_DIR: ${{ inputs.working-directory }}
+          BUNDLED_FILES: ${{ inputs.bundled-files }}
+          DOWNLOAD_DIR: ${{ runner.temp }}/bundled-files
+        run: |
+          python3 - << 'EOF'
+          import os, pathlib, shutil, subprocess, sys
+
+          pkg_dir = pathlib.Path(os.environ.get('PKG_DIR') or '.').resolve()
+          download_dir = pathlib.Path(os.environ['DOWNLOAD_DIR'])
+          expected = {}
+          for raw in os.environ['BUNDLED_FILES'].splitlines():
+              line = raw.strip()
+              if not line or line.startswith('#'):
+                  continue
+              rel = pathlib.PurePosixPath(line)
+              if rel.is_absolute() or '..' in rel.parts or rel.parts == ():
+                  sys.exit(f'::error::Invalid bundled-files path: {line!r}')
+              norm = rel.as_posix()
+              if norm in expected:
+                  sys.exit(f'::error::Duplicate entry in bundled-files: {norm}')
+              dest = (pkg_dir / norm).resolve()
+              if pkg_dir not in dest.parents:
+                  sys.exit(f'::error::Bundled file path escapes working-directory: {line!r}')
+              expected[norm] = dest
+
+          if not expected:
+              sys.exit('::error::bundled-files was non-empty but listed no file paths.')
+
+          tracked_out = subprocess.check_output(
+              ['git', '-C', str(pkg_dir), 'ls-files', '-z'],
+          ).decode('utf-8')
+          tracked = {p for p in tracked_out.split('\0') if p}
+          overwritten = sorted(set(expected) & tracked)
+          if overwritten:
+              sys.exit(
+                  f'::error::bundled-files may not overwrite git-tracked files: '
+                  f'{", ".join(overwritten)}'
+              )
+
+          if not download_dir.is_dir():
+              sys.exit('::error::No bundled-files-* artifacts were found.')
+
+          actual = {}
+          for artifact_dir in sorted(download_dir.iterdir()):
+              if not artifact_dir.is_dir():
+                  sys.exit(f'::error::Unexpected entry in artifact directory: {artifact_dir.name}')
+              for root, dirs, files in os.walk(artifact_dir, followlinks=False):
+                  root_path = pathlib.Path(root)
+                  for d in dirs:
+                      if (root_path / d).is_symlink():
+                          sys.exit(f'::error::Symlink directory not allowed in {artifact_dir.name}: {d}')
+                  for f in files:
+                      src = root_path / f
+                      if src.is_symlink() or not src.is_file():
+                          sys.exit(f'::error::Non-regular file not allowed in {artifact_dir.name}: {f}')
+                      rel = src.relative_to(artifact_dir).as_posix()
+                      if rel in actual:
+                          prev_artifact, _ = actual[rel]
+                          sys.exit(
+                              f'::error::Duplicate bundled file {rel!r} across artifacts '
+                              f'{prev_artifact!r} and {artifact_dir.name!r}.'
+                          )
+                      actual[rel] = (artifact_dir.name, src)
+
+          extra = sorted(set(actual) - set(expected))
+          missing = sorted(set(expected) - set(actual))
+          if extra:
+              sys.exit(f'::error::Unexpected files in bundled-files-* artifacts: {", ".join(extra)}')
+          if missing:
+              sys.exit(f'::error::Missing expected bundled files: {", ".join(missing)}')
+
+          for rel, dest in sorted(expected.items()):
+              if dest.exists() or dest.is_symlink():
+                  sys.exit(f'::error::Bundled file already exists in checkout: {rel}')
+              cur = dest.parent
+              while cur != pkg_dir:
+                  if cur.is_symlink():
+                      sys.exit(f'::error::Symlink parent directory not allowed: {cur}')
+                  cur = cur.parent
+              dest.parent.mkdir(parents=True, exist_ok=True)
+              _, src = actual[rel]
+              shutil.copy2(src, dest)
+              print(f'Staged {rel} ({src.stat().st_size} bytes)')
+          EOF
+
       - name: Set up Dart
         uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with:
@@ -102,9 +308,31 @@ jobs:
         id: package
         env:
           PKG_DIR: ${{ inputs.working-directory }}
+          BUNDLED_FILES: ${{ inputs.bundled-files }}
         run: |
           sudo -E unshare -n sudo -u "$(whoami)" -E env "PATH=$PATH" "HOME=$HOME" \
             dart pub publish --to-archive="$RUNNER_TEMP/package.tar.gz" --skip-validation --directory="${PKG_DIR:-.}"
+          if [ -n "${BUNDLED_FILES:-}" ]; then
+            python3 - << 'EOF'
+          import os, pathlib, subprocess, sys
+          archived = set(
+              subprocess.check_output(
+                  ['tar', '-ztf', os.path.join(os.environ['RUNNER_TEMP'], 'package.tar.gz')],
+              ).decode('utf-8').splitlines()
+          )
+          missing = [
+              pathlib.PurePosixPath(line.strip()).as_posix()
+              for line in os.environ['BUNDLED_FILES'].splitlines()
+              if line.strip() and not line.strip().startswith('#')
+              and pathlib.PurePosixPath(line.strip()).as_posix() not in archived
+          ]
+          if missing:
+              sys.exit(
+                  f'::error::Bundled files were excluded from package.tar.gz '
+                  f'(check .gitignore / .pubignore): {", ".join(missing)}'
+              )
+          EOF
+          fi
           sha256="$(sha256sum < "$RUNNER_TEMP/package.tar.gz" | cut -d' ' -f1)"
           echo "archive-sha256=$sha256" >> "$GITHUB_OUTPUT"
           echo "Package archive created at $RUNNER_TEMP/package.tar.gz (sha256: $sha256)"
