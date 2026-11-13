@@ -187,3 +187,37 @@ jobs:
       use-flutter: false
       attest: true
       test-run: true
+
+  # Test bundling additional non-git files into the package archive.
+  prepare_bundled_files:
+    permissions: {}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create test artifacts
+        run: |
+          mkdir -p "$RUNNER_TEMP/a/prebuilt/linux-x64" "$RUNNER_TEMP/b/prebuilt/macos-arm64"
+          echo "linux" > "$RUNNER_TEMP/a/prebuilt/linux-x64/libexample.so"
+          echo "macos" > "$RUNNER_TEMP/b/prebuilt/macos-arm64/libexample.dylib"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: bundled-files-linux-x64
+          path: ${{ runner.temp }}/a/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: bundled-files-macos-arm64
+          path: ${{ runner.temp }}/b/
+          if-no-files-found: error
+
+  test_publish_bundled_files:
+    needs: [test_publish_dart_dev, prepare_bundled_files]
+    permissions:
+      id-token: write
+    uses: ./.github/workflows/publish.yml
+    with:
+      working-directory: example
+      use-flutter: false
+      bundled-files: |
+        prebuilt/linux-x64/libexample.so
+        prebuilt/macos-arm64/libexample.dylib
+      test-run: true
