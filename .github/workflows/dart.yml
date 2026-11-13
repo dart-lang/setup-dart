@@ -170,3 +170,20 @@ jobs:
       sdk: dev
       use-flutter: false
       test-run: true
+
+  # Test the reusable publish.yml workflow with `attest: true`. Skipped for pull
+  # requests from forks, which can't mint the OIDC token needed for signing.
+  test_publish_attest:
+    needs: [test_publish_dart_dev]
+    if: >-
+      ${{ github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository }}
+    permissions:
+      id-token: write # Required for signing the attestation
+      attestations: write # Required for persisting the attestation
+    uses: ./.github/workflows/publish.yml
+    with:
+      working-directory: example
+      use-flutter: false
+      attest: true
+      test-run: true

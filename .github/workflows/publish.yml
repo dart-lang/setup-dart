@@ -6,11 +6,13 @@ name: Publish to pub.dev
 ##   publish:
 ##     permissions:
 ##       id-token: write # Required for OIDC token minting
+##       # attestations: write # Required if `attest: true`
 ##     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
 ##     # with:
 ##     #   working-directory: path/to/sub/directory
 ##     #   sdk: stable
 ##     #   use-flutter: false
+##     #   attest: true
 
 on:
   workflow_call:
@@ -36,6 +38,14 @@ on:
         required: false
         default: true
         type: boolean
+      attest:
+        description: >-
+          Whether to generate a Sigstore build provenance attestation for the
+          package archive (using `actions/attest`). The calling job must grant
+          `attestations: write` in addition to `id-token: write`.
+        required: false
+        default: false
+        type: boolean
       test-run:
         description: Whether to verify the package archive instead of publishing to pub.dev.
         required: false
@@ -52,7 +62,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Dart
-        uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
+        uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with:
           sdk: ${{ inputs.sdk }}
 
@@ -78,7 +88,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Dart
-        uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
+        uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with:
           sdk: ${{ inputs.sdk }}
 
@@ -98,16 +108,57 @@ jobs:
           if-no-files-found: error
           overwrite: true
 
+  attest:
+    name: 'Attest package archive'
+    needs: [package]
+    if: ${{ inputs.attest }}
+    # No `permissions:` block on purpose: this job inherits the permissions of
+    # the calling job. GitHub checks the permissions requested by every job of a
+    # reusable workflow against those of the caller (even for jobs that would be
+    # skipped), so requesting `attestations: write` here would break all
+    # existing callers that only grant `id-token: write`. Callers that set
+    # `attest: true` must grant `id-token: write` and `attestations: write`.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download package archive
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: package-archive
+          path: ${{ runner.temp }}/
+
+      - name: Generate build provenance attestation
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: ${{ runner.temp }}/package.tar.gz
+
+      - name: Stage attestation bundle
+        env:
+          BUNDLE_PATH: ${{ steps.attest.outputs.bundle-path }}
+        run: cp "$BUNDLE_PATH" "$RUNNER_TEMP/package.tar.gz.sigstore.json"
+
+      - name: Upload attestation bundle
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: attestation-bundle
+          path: ${{ runner.temp }}/package.tar.gz.sigstore.json
+          if-no-files-found: error
+          overwrite: true
+
   publish:
     name: 'Publish to pub.dev'
-    needs: [package]
+    needs: [package, attest]
+    # Also publish when `attest` was skipped (i.e. `attest: false`).
+    if: >-
+      ${{ !cancelled() && needs.package.result == 'success' &&
+      (needs.attest.result == 'success' || needs.attest.result == 'skipped') }}
     environment: ${{ inputs.environment }}
     permissions:
       id-token: write # Required for OIDC token minting
     runs-on: ubuntu-latest
     steps:
       - name: Set up Dart
-        uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
+        uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with:
           sdk: ${{ inputs.sdk }}
 
