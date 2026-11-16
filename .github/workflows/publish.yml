@@ -8,7 +8,10 @@ name: Publish to pub.dev
 ##       id-token: write # Required for OIDC token minting
 ##     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
 ##     # with:
-##     #   working-directory: path/to/sub/directory
+##     #   # Fixed path (e.g. 'pkgs/my_pkg'), or a pattern using the literal
+##     #   # '{package}' placeholder and/or globs for '<package>-v<version>' tags
+##     #   # (e.g. 'pkgs/{package}', 'packages/*/{package}', or '**/{package}'):
+##     #   working-directory: pkgs/{package}
 ##     #   sdk: stable
 ##     #   use-flutter: false
 
@@ -20,7 +23,12 @@ on:
         required: false
         type: string
       working-directory:
-        description: The directory within the repository where the package is located (if not in the repository root).
+        description: >-
+          The directory (or glob pattern, such as 'packages/*/{package}' or
+          '**/{package}') within the repository where the package is located.
+          Supports the literal '{package}' placeholder, which expands '<package>'
+          from '<package>-v<version>' release tags (for example,
+          'pkgs/{package}').
         required: false
         default: '.'
         type: string
@@ -47,12 +55,90 @@ jobs:
     name: 'Validate package'
     permissions: {}
     runs-on: ubuntu-latest
+    outputs:
+      working-directory: ${{ steps.resolve-dir.outputs.directory }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: Resolve package directory
+        id: resolve-dir
+        env:
+          INPUT_DIR: ${{ inputs.working-directory }}
+          REF_NAME: ${{ github.ref_name }}
+          TEST_RUN: ${{ inputs.test-run }}
+        run: |
+          shopt -s globstar
+          dir="${INPUT_DIR:-.}"
+          pkg=""
+          placeholder='{package}'
+          if [[ "$dir" == *"$placeholder"* ]]; then
+            tag_re='^([a-z0-9_]+)-v[0-9]+\.[0-9]+\.[0-9]+'
+            if [[ ! "$REF_NAME" =~ $tag_re ]]; then
+              echo "Error: Cannot expand '{package}' in '$dir': ref '$REF_NAME' does not match '<package>-v<version>'." >&2
+              exit 1
+            fi
+            pkg="${BASH_REMATCH[1]}"
+            dir="${dir//$placeholder/$pkg}"
+          fi
+          if [[ "$dir" == /* || "/$dir/" == *"/../"* ]]; then
+            echo "Error: working-directory '$dir' must stay within the repository." >&2
+            exit 1
+          fi
+          dir="${dir%/}"
+          [[ -z "$dir" ]] && dir="."
+          is_glob=false
+          [[ "$dir" == *[\*\?\[]* ]] && is_glob=true
+          mapfile -t candidates < <(compgen -G "$dir" | sort -u || true)
+          matches=()
+          unpublished=()
+          mismatched=()
+          for cand in "${candidates[@]}"; do
+            [[ -f "$cand/pubspec.yaml" ]] || continue
+            if [[ "$is_glob" == true ]]; then
+              parent="$(dirname "$cand")"
+              nested=false
+              while [[ "$parent" != "." && "$parent" != "/" ]]; do
+                if [[ -f "$parent/pubspec.yaml" ]] && ! grep -Eq "^publish_to:[[:space:]]*(['\"]none['\"]|none)([[:space:]]*(#.*)?)?$" "$parent/pubspec.yaml"; then
+                  nested=true
+                  break
+                fi
+                parent="$(dirname "$parent")"
+              done
+              [[ "$nested" == true ]] && continue
+            fi
+            if [[ -n "$pkg" ]] && ! grep -Eq "^name:[[:space:]]*(['\"]${pkg}['\"]|${pkg})([[:space:]]*(#.*)?)?$" "$cand/pubspec.yaml"; then
+              mismatched+=("$cand")
+              continue
+            fi
+            if [[ "$TEST_RUN" != "true" || -n "$pkg" || "$is_glob" == true ]] && grep -Eq "^publish_to:[[:space:]]*(['\"]none['\"]|none)([[:space:]]*(#.*)?)?$" "$cand/pubspec.yaml"; then
+              unpublished+=("$cand")
+              continue
+            fi
+            matches+=("$cand")
+          done
+          if (( ${#matches[@]} == 0 )); then
+            if (( ${#unpublished[@]} > 0 )); then
+              echo "Error: Package at '${unpublished[0]}' has 'publish_to: none' and cannot be published." >&2
+            elif (( ${#mismatched[@]} > 0 )); then
+              echo "Error: Package name in '${mismatched[0]}/pubspec.yaml' does not match '$pkg' from tag '$REF_NAME'." >&2
+            else
+              echo "Error: No pubspec.yaml found matching '$dir'." >&2
+            fi
+            exit 1
+          fi
+          if (( ${#matches[@]} > 1 )); then
+            echo "Error: Pattern '$dir' matched multiple publishable packages: ${matches[*]}." >&2
+            exit 1
+          fi
+          resolved="${matches[0]}"
+          echo "Resolved package directory: $resolved"
+          if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+            echo "directory=$resolved" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Set up Dart
-        uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
+        uses: dart-lang/setup-dart@2286a0c042b44434fe26d292bbce8d34f7ec662b # v1
         with:
           sdk: ${{ inputs.sdk }}
 
@@ -62,11 +148,11 @@ jobs:
 
       - name: Install dependencies
         run: dart pub get
-        working-directory: ${{ inputs.working-directory }}
+        working-directory: ${{ steps.resolve-dir.outputs.directory }}
 
       - name: Publish - dry run
         run: dart pub publish --dry-run
-        working-directory: ${{ inputs.working-directory }}
+        working-directory: ${{ steps.resolve-dir.outputs.directory }}
 
   package:
     name: 'Package archive'
@@ -78,13 +164,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Dart
-        uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
+        uses: dart-lang/setup-dart@2286a0c042b44434fe26d292bbce8d34f7ec662b # v1
         with:
           sdk: ${{ inputs.sdk }}
 
       - name: Package archive for provenance
         env:
-          PKG_DIR: ${{ inputs.working-directory }}
+          PKG_DIR: ${{ needs.validate.outputs.working-directory }}
         run: |
           sudo -E unshare -n sudo -u "$(whoami)" -E env "PATH=$PATH" "HOME=$HOME" \
             dart pub publish --to-archive="$RUNNER_TEMP/package.tar.gz" --skip-validation --directory="${PKG_DIR:-.}"
@@ -107,7 +193,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Dart
-        uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
+        uses: dart-lang/setup-dart@2286a0c042b44434fe26d292bbce8d34f7ec662b # v1
         with:
           sdk: ${{ inputs.sdk }}
 
