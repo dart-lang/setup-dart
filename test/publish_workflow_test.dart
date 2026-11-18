@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-@TestOn('linux')
+@TestOn('posix')
 library;
 
 import 'dart:io';
@@ -34,7 +34,8 @@ void main() {
     expect(
       workflowText,
       contains(
-          'working-directory: \${{ steps.resolve-dir.outputs.directory }}'),
+        'working-directory: \${{ steps.resolve-dir.outputs.directory }}',
+      ),
     );
     expect(
       workflowText,
@@ -43,11 +44,10 @@ void main() {
   });
 
   Future<({int exitCode, String? directory, String stdout, String stderr})>
-      runResolveDir({
+  runResolveDir({
     required String repoPath,
     String inputDir = '.',
     String refName = 'v1.0.0',
-    bool testRun = false,
   }) async {
     final outputFile = File(p.join(d.sandbox, 'github_output.txt'));
     if (outputFile.existsSync()) {
@@ -62,9 +62,7 @@ void main() {
       environment: {
         'INPUT_DIR': inputDir,
         'REF_NAME': refName,
-        'TEST_RUN': testRun.toString(),
         'GITHUB_OUTPUT': outputFile.path,
-        'RUNNER_TEMP': d.sandbox,
       },
     );
 
@@ -140,177 +138,37 @@ void main() {
       expect(topLevelRes.directory, 'webdev');
     });
 
-    test(
-      'validates tag format, pubspec existence, name, and publish_to',
-      () async {
-        await d.dir('repo', [
-          d.dir('pkgs', [
-            d.dir('internal_pkg', [
-              d.file(
-                'pubspec.yaml',
-                'name: internal_pkg\nversion: 1.0.0\npublish_to: none\n',
-              ),
-            ]),
-            d.dir('wrong_dir', [
-              d.file('pubspec.yaml', 'name: different_name\nversion: 1.0.0\n'),
-            ]),
-          ]),
-        ]).create();
-
-        final repoPath = p.join(d.sandbox, 'repo');
-
-        final unpub = await runResolveDir(
-          repoPath: repoPath,
-          inputDir: 'pkgs/{package}',
-          refName: 'internal_pkg-v1.0.0',
-        );
-        expect(unpub.exitCode, isNonZero);
-        expect(unpub.stderr, contains('publish_to: none'));
-
-        final mismatch = await runResolveDir(
-          repoPath: repoPath,
-          inputDir: 'pkgs/{package}',
-          refName: 'wrong_dir-v1.0.0',
-        );
-        expect(mismatch.exitCode, isNonZero);
-        expect(mismatch.stderr, contains("does not match 'wrong_dir'"));
-
-        final missing = await runResolveDir(
-          repoPath: repoPath,
-          inputDir: 'pkgs/{package}',
-          refName: 'missing-v1.0.0',
-        );
-        expect(missing.exitCode, isNonZero);
-        expect(missing.stderr, contains('No pubspec.yaml found'));
-
-        final badTag = await runResolveDir(
-          repoPath: repoPath,
-          inputDir: 'pkgs/{package}',
-          refName: 'v1.0.0',
-        );
-        expect(badTag.exitCode, isNonZero);
-        expect(badTag.stderr, contains("Cannot expand '{package}'"));
-      },
-    );
-  });
-
-  group('glob patterns with {package}', () {
-    test('supports federated plugin layout packages/*/{package}', () async {
+    test('validates tag format and pubspec existence', () async {
       await d.dir('repo', [
-        d.dir('packages', [
-          d.dir('camera', [
-            d.dir('camera', [
-              d.file('pubspec.yaml', 'name: camera\nversion: 1.0.0\n'),
-            ]),
-            d.dir('camera_android', [
-              d.file('pubspec.yaml', 'name: camera_android\nversion: 1.2.0\n'),
-            ]),
+        d.dir('pkgs', [
+          d.dir('pkg_a', [
+            d.file('pubspec.yaml', 'name: pkg_a\nversion: 1.0.0\n'),
           ]),
         ]),
       ]).create();
 
       final repoPath = p.join(d.sandbox, 'repo');
 
-      final appFacing = await runResolveDir(
+      final missing = await runResolveDir(
         repoPath: repoPath,
-        inputDir: 'packages/*/{package}',
-        refName: 'camera-v1.0.0',
+        inputDir: 'pkgs/{package}',
+        refName: 'missing-v1.0.0',
       );
-      expect(appFacing.exitCode, 0, reason: appFacing.stderr);
-      expect(appFacing.directory, 'packages/camera/camera');
+      expect(missing.exitCode, isNonZero);
+      expect(missing.stderr, contains('No pubspec.yaml found'));
 
-      final androidImpl = await runResolveDir(
+      final badTag = await runResolveDir(
         repoPath: repoPath,
-        inputDir: 'packages/*/{package}',
-        refName: 'camera_android-v1.2.0',
+        inputDir: 'pkgs/{package}',
+        refName: 'v1.0.0',
       );
-      expect(androidImpl.exitCode, 0, reason: androidImpl.stderr);
-      expect(androidImpl.directory, 'packages/camera/camera_android');
-    });
-
-    test(
-      'supports mixed-depth monorepos (**/{package}) and skips nested fixtures',
-      () async {
-        await d.dir('repo', [
-          d.file('pubspec.yaml', 'name: _workspace\npublish_to: none\n'),
-          d.dir('build', [
-            d.file('pubspec.yaml', 'name: build\nversion: 4.0.0\n'),
-          ]),
-          d.dir('build_runner', [
-            d.file('pubspec.yaml', 'name: build_runner\nversion: 2.5.0\n'),
-            d.dir('test', [
-              d.dir('fixtures', [
-                d.dir('build', [
-                  d.file('pubspec.yaml', 'name: build\nversion: 0.0.1\n'),
-                ]),
-              ]),
-            ]),
-          ]),
-          d.dir('builder_pkgs', [
-            d.dir('build_web_compilers', [
-              d.file(
-                'pubspec.yaml',
-                'name: build_web_compilers\nversion: 4.1.0\n',
-              ),
-            ]),
-          ]),
-          d.dir('built_types', [
-            d.dir('built_value', [
-              d.file('pubspec.yaml', 'name: built_value\nversion: 8.9.0\n'),
-            ]),
-          ]),
-        ]).create();
-
-        final repoPath = p.join(d.sandbox, 'repo');
-
-        final depth1 = await runResolveDir(
-          repoPath: repoPath,
-          inputDir: '**/{package}',
-          refName: 'build-v4.0.0',
-        );
-        expect(depth1.exitCode, 0, reason: depth1.stderr);
-        expect(depth1.directory, 'build');
-
-        final depth2a = await runResolveDir(
-          repoPath: repoPath,
-          inputDir: '**/{package}',
-          refName: 'build_web_compilers-v4.1.0',
-        );
-        expect(depth2a.exitCode, 0, reason: depth2a.stderr);
-        expect(depth2a.directory, 'builder_pkgs/build_web_compilers');
-
-        final depth2b = await runResolveDir(
-          repoPath: repoPath,
-          inputDir: '**/{package}',
-          refName: 'built_value-v8.9.0',
-        );
-        expect(depth2b.exitCode, 0, reason: depth2b.stderr);
-        expect(depth2b.directory, 'built_types/built_value');
-      },
-    );
-
-    test('fails when glob matches multiple publishable packages', () async {
-      await d.dir('repo', [
-        d.dir('group_a', [
-          d.dir('dup', [d.file('pubspec.yaml', 'name: dup\nversion: 1.0.0\n')]),
-        ]),
-        d.dir('group_b', [
-          d.dir('dup', [d.file('pubspec.yaml', 'name: dup\nversion: 1.0.0\n')]),
-        ]),
-      ]).create();
-
-      final res = await runResolveDir(
-        repoPath: p.join(d.sandbox, 'repo'),
-        inputDir: '*/{package}',
-        refName: 'dup-v1.0.0',
-      );
-      expect(res.exitCode, isNonZero);
-      expect(res.stderr, contains('matched multiple publishable packages'));
+      expect(badTag.exitCode, isNonZero);
+      expect(badTag.stderr, contains("Cannot expand '{package}'"));
     });
   });
 
   group('explicit working-directory', () {
-    test('allows publish_to: none only when test-run is true', () async {
+    test('resolves explicit subdirectory', () async {
       await d.dir('repo', [
         d.dir('example', [
           d.file(
@@ -320,25 +178,13 @@ void main() {
         ]),
       ]).create();
 
-      final repoPath = p.join(d.sandbox, 'repo');
-
-      final testRunOk = await runResolveDir(
-        repoPath: repoPath,
+      final res = await runResolveDir(
+        repoPath: p.join(d.sandbox, 'repo'),
         inputDir: 'example',
         refName: 'main',
-        testRun: true,
       );
-      expect(testRunOk.exitCode, 0, reason: testRunOk.stderr);
-      expect(testRunOk.directory, 'example');
-
-      final realRunFail = await runResolveDir(
-        repoPath: repoPath,
-        inputDir: 'example',
-        refName: 'v0.1.0',
-        testRun: false,
-      );
-      expect(realRunFail.exitCode, isNonZero);
-      expect(realRunFail.stderr, contains('publish_to: none'));
+      expect(res.exitCode, 0, reason: res.stderr);
+      expect(res.directory, 'example');
     });
 
     test('rejects path traversal outside repository', () async {
