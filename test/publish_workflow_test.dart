@@ -64,6 +64,7 @@ void main() {
         'REF_NAME': refName,
         'TEST_RUN': testRun.toString(),
         'GITHUB_OUTPUT': outputFile.path,
+        'RUNNER_TEMP': d.sandbox,
       },
     );
 
