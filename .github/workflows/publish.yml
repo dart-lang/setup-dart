@@ -53,8 +53,6 @@ jobs:
     name: 'Validate package'
     permissions: {}
     runs-on: ubuntu-latest
-    outputs:
-      working-directory: ${{ steps.resolve-dir.outputs.directory }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -84,7 +82,7 @@ jobs:
           echo "directory=$dir" >> "$GITHUB_OUTPUT"
 
       - name: Set up Dart
-        uses: dart-lang/setup-dart@2286a0c042b44434fe26d292bbce8d34f7ec662b # v1
+        uses: dart-lang/setup-dart@2286a0c042b44434fe26d292bbce8d34f7ec662b # v1.8.2
         with:
           sdk: ${{ inputs.sdk }}
 
@@ -109,14 +107,38 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: Resolve package directory
+        id: resolve-dir
+        env:
+          INPUT_DIR: ${{ inputs.working-directory }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          dir="${INPUT_DIR:-.}"
+          if [[ "$dir" == *'{package}'* ]]; then
+            if [[ ! "$REF_NAME" =~ ^([a-z0-9_]+)-v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+              echo "Error: Cannot expand '{package}' in '$dir': ref '$REF_NAME' does not match '<package>-v<version>'." >&2
+              exit 1
+            fi
+            dir="${dir//\{package\}/${BASH_REMATCH[1]}}"
+          fi
+          if [[ "$dir" == /* || "/$dir/" == *"/../"* ]]; then
+            echo "Error: working-directory '$dir' must stay within the repository." >&2
+            exit 1
+          fi
+          if [[ ! -f "$dir/pubspec.yaml" ]]; then
+            echo "Error: No pubspec.yaml found at '$dir/pubspec.yaml'." >&2
+            exit 1
+          fi
+          echo "directory=$dir" >> "$GITHUB_OUTPUT"
+
       - name: Set up Dart
-        uses: dart-lang/setup-dart@2286a0c042b44434fe26d292bbce8d34f7ec662b # v1
+        uses: dart-lang/setup-dart@2286a0c042b44434fe26d292bbce8d34f7ec662b # v1.8.2
         with:
           sdk: ${{ inputs.sdk }}
 
       - name: Package archive for provenance
         env:
-          PKG_DIR: ${{ needs.validate.outputs.working-directory }}
+          PKG_DIR: ${{ steps.resolve-dir.outputs.directory }}
         run: |
           sudo -E unshare -n sudo -u "$(whoami)" -E env "PATH=$PATH" "HOME=$HOME" \
             dart pub publish --to-archive="$RUNNER_TEMP/package.tar.gz" --skip-validation --directory="${PKG_DIR:-.}"
@@ -139,7 +161,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Dart
-        uses: dart-lang/setup-dart@2286a0c042b44434fe26d292bbce8d34f7ec662b # v1
+        uses: dart-lang/setup-dart@2286a0c042b44434fe26d292bbce8d34f7ec662b # v1.8.2
         with:
           sdk: ${{ inputs.sdk }}
 

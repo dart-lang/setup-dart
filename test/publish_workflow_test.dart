@@ -14,23 +14,23 @@ import 'package:test_process/test_process.dart';
 
 void main() {
   late String workflowText;
+  late List<String> resolveStepScripts;
   late String resolveStepScript;
 
   setUpAll(() {
     final workflowFile = File('.github/workflows/publish.yml');
     expect(workflowFile.existsSync(), isTrue);
     workflowText = workflowFile.readAsStringSync();
-    resolveStepScript = _extractResolveDirScript(workflowText);
+    resolveStepScripts = _extractResolveDirScripts(workflowText);
+    expect(resolveStepScripts, hasLength(2));
+    resolveStepScript = resolveStepScripts.first;
   });
 
-  test('publish.yml wires resolve-dir output to validate and package jobs', () {
-    expect(
-      workflowText,
-      contains(
-        '    outputs:\n'
-        '      working-directory: \${{ steps.resolve-dir.outputs.directory }}',
-      ),
-    );
+  test('publish.yml resolves directory independently in validate and package',
+      () {
+    expect(resolveStepScripts[1], equals(resolveStepScripts[0]));
+    expect(workflowText, isNot(contains('    outputs:')));
+    expect(workflowText, isNot(contains('needs.validate.outputs')));
     expect(
       workflowText,
       contains(
@@ -39,12 +39,12 @@ void main() {
     );
     expect(
       workflowText,
-      contains('PKG_DIR: \${{ needs.validate.outputs.working-directory }}'),
+      contains('PKG_DIR: \${{ steps.resolve-dir.outputs.directory }}'),
     );
   });
 
   Future<({int exitCode, String? directory, String stdout, String stderr})>
-  runResolveDir({
+      runResolveDir({
     required String repoPath,
     String inputDir = '.',
     String refName = 'v1.0.0',
@@ -211,43 +211,46 @@ void main() {
   });
 }
 
-String _extractResolveDirScript(String workflowContent) {
+List<String> _extractResolveDirScripts(String workflowContent) {
   final lines = workflowContent.split('\n');
-  final idIndex = lines.indexWhere((l) => l.trim() == 'id: resolve-dir');
-  if (idIndex == -1) {
-    throw StateError('Could not find step with id: resolve-dir in publish.yml');
+  final scripts = <String>[];
+
+  for (var idIndex = 0; idIndex < lines.length; idIndex++) {
+    if (lines[idIndex].trim() != 'id: resolve-dir') continue;
+
+    var runIndex = -1;
+    for (var i = idIndex + 1; i < lines.length; i++) {
+      final trimmed = lines[i].trimLeft();
+      if (trimmed.startsWith('- ')) break;
+      if (trimmed == 'run: |') {
+        runIndex = i;
+        break;
+      }
+    }
+    if (runIndex == -1) {
+      throw StateError('Could not find run: | block for resolve-dir');
+    }
+
+    final blockLines = <String>[];
+    String? indent;
+    for (var i = runIndex + 1; i < lines.length; i++) {
+      final line = lines[i];
+      if (line.trim().isEmpty) {
+        blockLines.add('');
+        continue;
+      }
+      if (indent == null) {
+        final leadingSpaces = line.length - line.trimLeft().length;
+        indent = ' ' * leadingSpaces;
+      }
+      if (!line.startsWith(indent)) {
+        break;
+      }
+      blockLines.add(line.substring(indent.length));
+    }
+
+    scripts.add(blockLines.join('\n'));
   }
 
-  var runIndex = -1;
-  for (var i = idIndex + 1; i < lines.length; i++) {
-    final trimmed = lines[i].trimLeft();
-    if (trimmed.startsWith('- ')) break;
-    if (trimmed == 'run: |') {
-      runIndex = i;
-      break;
-    }
-  }
-  if (runIndex == -1) {
-    throw StateError('Could not find run: | block for resolve-dir');
-  }
-
-  final blockLines = <String>[];
-  String? indent;
-  for (var i = runIndex + 1; i < lines.length; i++) {
-    final line = lines[i];
-    if (line.trim().isEmpty) {
-      blockLines.add('');
-      continue;
-    }
-    if (indent == null) {
-      final leadingSpaces = line.length - line.trimLeft().length;
-      indent = ' ' * leadingSpaces;
-    }
-    if (!line.startsWith(indent)) {
-      break;
-    }
-    blockLines.add(line.substring(indent.length));
-  }
-
-  return blockLines.join('\n');
+  return scripts;
 }
