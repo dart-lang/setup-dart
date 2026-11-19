@@ -1,3 +1,7 @@
+## v1.8.3-wip
+
+* Support the `{package}` placeholder in `publish.yml`'s `working-directory` input, expanding `<package>` from `<package>-v<version>` release tags.
+
 ## v1.8.2
 
 * Update `publish.yml` to a three-job workflow (`validate`, `package`, `publish`) supporting hermetic package archiving (`--to-archive` / `--from-archive`).
